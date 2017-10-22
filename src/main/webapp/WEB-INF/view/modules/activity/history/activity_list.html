@@ -1,0 +1,21 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.pid}"></td>
+		    <td>${list_index+1}</td>
+		    <td>${list.title!''}</td>
+		    <td>${list.releaseTime?string("yyyy-MM-dd HH:mm:ss")}</td>
+		    <td>${list.activityTime!''}</td>
+			<td>${list.wantNumber!''}</td>
+		    <td>${list.browse!''}</td>
+		    <td>${list.sumOrder!''}</td>
+		    <td>
+		    	<input type="hidden" class="index-id" value="${list.pid!''}">
+				<input type="hidden" class="index-title" value="${list.title!''}">
+				<input type="hidden" class="index-address" value="${list.address!''}">
+				<input type="hidden" class="index-activityTime" value="${list.activityTime!''}">
+				<a href="javascript:void(0)" class="layui-btn operate layui-btn-mini" data-fn="select">选择</a>
+		 	</td>
+		</tr>
+	</#list>
+</#if>

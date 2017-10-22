@@ -1,0 +1,38 @@
+<div style="margin: 15px; display:none" id="add-form">
+	<form class="layui-form layui-form-pane">
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>卡名称</label>
+			<div class="layui-input-inline">
+				<input type="text" name="name" placeholder="请输卡名称" autocomplete="off" class="layui-input" lay-verify="required">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>代金券</label>
+			<div class="layui-input-inline" style="width:auto" id="coupon"></div>
+			<div class="layui-input-inline">
+				<select lay-filter="coupon" lay-verify="required" lay-search>
+					<option value="">请选择</option>
+					<@module name="option" class="com.logistics.label.impl.GetCouponNode" type="1"/>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>卡有效期</label>
+			<div class="layui-input-inline" style="width: 260px; ">
+				<input type="text" name="expireTime" id="valid-period" placeholder="选择卡有效期" autocomplete="off" class="layui-input" lay-verify="required">
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label"><span>*</span>卡描述</label>
+			<div class="layui-input-block">
+				<textarea name="info" placeholder="请输入备注信息(250个字符之内)" class="layui-textarea" lay-verify="required"></textarea>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block">
+				<textarea name="remark" placeholder="请输入备注信息" class="layui-textarea"></textarea>
+			</div>
+		</div>
+	</form>
+</div>

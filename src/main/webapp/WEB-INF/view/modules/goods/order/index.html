@@ -1,0 +1,207 @@
+<#include "../../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+	<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="export-order"><i class="layui-icon">&#xe642;</i> 导出订单</a>
+	<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="ship"><i class="layui-icon">&#xe609;</i> 发货</a>
+	</blockquote>
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+			<div class="layui-inline">
+				<label class="layui-form-label">下单时间：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="startTime" id="start-time" placeholder="开始时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this, istime: true, format:'YYYY-MM-DD hh:mm:ss'})">
+				</div>
+				--
+				<div class="layui-input-inline">
+					<input type="text" name="endTime" id="end-time" placeholder="结束时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this, istime: true, format:'YYYY-MM-DD hh:mm:ss'})">
+				</div>
+			</div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">下单用户：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="mobile" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">订单状态</label>
+		      <div class="layui-input-inline">
+		        <select name="orderStatus" multiple="multiple">
+				  <option value=" ">全部</option>
+					<@module name="option" class="com.logistics.label.impl.GetOrderGoodsStatusNode"/>
+				</select>
+			  </div>
+		    </div>
+			<div class="layui-inline">
+				<label class="layui-form-label">供应商：</label>
+				<div class="layui-input-inline">
+					<select name="supplierId">
+						<option value="">全部</option>
+						<@module name="option" class="com.logistics.label.impl.GetSupplierNode" type="2"/>
+					</select>
+				</div>
+			</div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding">
+	    <thead>
+	      <tr>
+	        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+	        <th>订单编号</th>
+		    <th>商品编号</th>
+	        <th>商品名称</th>
+	        <th>供货商名称</th>
+	        <th>下单日期</th>
+	        <th>下单账户</th>
+	        <th>收货人</th>
+		    <th>收货地址</th>
+	        <th>电话</th>
+		    <th>商品原价(进货价)</th>
+		    <th>运费</th>
+		    <th>进货总价</th>
+	        <th>商品售价</th>
+		    <th>购买数量</th>
+		    <th>订单总额</th>
+		    <th>现金支付金额</th>
+		    <th>优惠券金额</th>
+		    <th>物流公司</th>
+		    <th>物流单号</th>
+	        <th fixed="right">订单状态</th>
+	        <th fixed="right">操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody ></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<#include "_add.html"><#t>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script type="text/javascript" src="${assets}js/layui-mz-min.js" charset="utf-8"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate','common'], function(){
+  var $ = layui.jquery;
+  var form = layui.form()
+	  ,common = layui.common
+  ,datagrid = layui.datagrid();
+  layui.selMeltiple($);
+  //表格数据加载插件，可选参数：
+  datagrid.init({
+	  url: 'list',
+	  pageSize: 15,
+	  pageEm: $('#page'),
+	  tempEm: $('#twrap'),
+	  filterForm: $('#filterForm')
+  });
+  
+  //搜索， 依赖datagrid
+  $('#search').bind('click', function(){
+	  datagrid.search();	  
+  })
+  //搜索， 依赖datagrid
+  $('#reset').bind('click', function(){
+//	$('#filterForm')[0].reset();
+      $("#filterForm input[name = 'startTime']").val("");
+      $("#filterForm input[name = 'endTime']").val("");
+      $("#filterForm input[name = 'mobile']").val("");
+      $("#filterForm input[name = 'mobile']").val("");
+      $("#filterForm select[selected='supplierId']").val("");
+//      $("#filterForm input[name = 'orderStatus']").val("");
+      layui.clearData($);
+	  datagrid.search();
+  })
+  //发货功能
+  $('#ship').bind('click', function(){
+      var id = datagrid.getCheckedVal();
+      if(id.length < 1){
+          layer.msg('请至少选择一项进行发货!');
+          return;
+      }
+      var checkedList = new Array();
+      var totalChoice = 0;
+      $("#twrap input[name='order-id']:checked").each(function () {
+		  var status = $(this).parents("tr").find(".order-goods-status").data("status");
+          if(status == 5){// 状态为已发货，并且发货失败的订单才可以重新发货
+              checkedList.push($(this).attr('data'));
+              totalChoice++;
+          }
+      });
+      if(totalChoice == 0){
+          layer.msg("请至少选择一项进行发货");
+          return;
+      }
+      var url = "ship?ids="+checkedList.toString();
+      common.layer_shows(url,"商品发货")
+  })
+    //操作
+  $('#twrap').on('click', '.operate', function(){
+	var cmd = $(this).attr('data-fn');
+	var id = $(this).siblings('.index-orderId').val();
+	var orderStatus = $(this).siblings('.index-orderStatus').val();
+	if (cmd == 'show-info') {
+		showInfoFn(id,orderStatus);
+	}
+  })
+  $('#show-info').bind('click', function(){
+	  var id = datagrid.getCheckedVal();
+	  if(id.length != 1){
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+      showInfoFn(id)
+  });
+  var showInfoFn = function(id,status) {
+	if (!id) {
+      layer.msg('请选择一条数据编辑!');
+      return;
+  	}
+	layer_show("editView",id);
+  }
+  //添加物流信息
+  var addCourier = function (id) {
+      $("#order-id").val(id);//设置订单编号
+      datagrid.open({
+          url: 'addCourier',
+          content: $('#add-form'),
+          title: '添加物流信息'
+      });
+  }
+  //公用的弹窗
+  var layer_show  = function (url,id,title) {
+	$.get(url, {id: id},function(html){
+		//打开编辑页
+		var index = layer.open({
+			type:1,
+			title: title,
+			shadeClose: true,
+			shade: false,
+			area: ['893px', '600px'],
+			content: html
+		});
+		layer.full(index)
+	}, "html");
+  }
+  //导出订单
+  $("#export-order").on('click',function () {
+      var formEm = $("#filterForm").serialize();
+      var url = "export?"+formEm;
+      window.open(url);
+  });
+  var _tools = {
+	//获取选中的优惠券
+    search: function(){
+	  datagrid.search();
+	}
+  }
+  window.tools = _tools
+});
+</script>
+</@footer>        

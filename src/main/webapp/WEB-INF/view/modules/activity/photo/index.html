@@ -1,0 +1,152 @@
+<#include "../../../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add"><i class="layui-icon">&#xe654;</i> 发布活动</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="edit"><i class="layui-icon">&#xe642;</i> 编辑</a>
+		<!--<a href="#" class="layui-btn layui-btn-small layui-btn-danger" id="delete"><i class="layui-icon">&#xe640;</i> 删除</a>-->
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+		     <div class="layui-inline">
+		      <label class="layui-form-label">发布时间：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="startTime" id="start-time" placeholder="开始时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this,istime: true,format:'YYYY-MM-DD hh:mm:ss'})">
+		      </div>
+		      --
+		      <div class="layui-input-inline">
+		        <input type="text" name="endTime" id="end-time" placeholder="结束时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this,istime: true,format:'YYYY-MM-DD hh:mm:ss'})">
+		      </div>
+		    </div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding">
+	    <thead>
+	      <tr>
+	        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+	        <th>活动标题</th>
+	        <th>活动时间</th>
+		    <th>活动地点</th>
+			<th>发布时间</th>
+		    <th>发布人</th>
+		    <th>照片张数</th>
+	        <th>链接地址</th>
+	        <th>链接有效期</th>
+		    <th fixed="right">状态</th>
+	        <th fixed="right">操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate','layedit','upload','common'], function(){
+  var $ = layui.jquery;
+  var datagrid = layui.datagrid()
+  common = layui.common;
+  //表格数据加载插件，可选参数：
+  datagrid.init({
+	  url: 'list',
+	  pageSize: 15,
+	  pageEm: $('#page'),
+	  tempEm: $('#twrap'),
+	  filterForm: $('#filterForm')
+  });
+  
+  //搜索， 依赖datagrid
+  $('#search').bind('click', function(){
+	  datagrid.search();	  
+  })
+
+//搜索， 依赖datagrid
+  $('#reset').bind('click', function(){
+      $('#filterForm')[0].reset();
+      datagrid.search();
+  })
+ //编辑活动图片信息
+  $('#edit').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if (ids.length != 1) {
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+	  editFn(ids[0]);
+  })
+  //添加活动图片信息
+  $('#add').bind('click', function(){
+      common.layer_shows("getView","添加活动图片",true)
+  })
+
+  //删除
+  $('#delete').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if (ids.length < 1) {
+		  layer.msg('请选择至少一条数据删除!');
+		  return;
+	  }
+	  delFn(ids);
+  });
+//操作
+  $('#twrap').on('click', '.operate', function(){
+	  var cmd = $(this).attr('data-fn');
+	  var id = $(this).siblings('.index-id').val();
+	  var status = $(this).siblings('.index-status').val();
+	  if (cmd == 'edit') {
+		  editFn(id);
+	  }
+      if (cmd == 'stop') {
+          changeStatus(id,status,"您确定要禁用这些活动图片吗？");
+      }
+      if (cmd == 'start') {
+          changeStatus(id,status,"您确定要开启这些活动图片吗？");
+      }
+  })
+  
+  //打开编辑框
+    var editFn = function(id){
+        if(!id){
+            layer.msg('请选择一条数据编辑!');
+            return;
+        }
+	common.layer_shows("getView?id="+id,"修改活动信息",true)
+  }
+  
+//删除数据
+  var changeStatus = function(id,status,titile){
+	  layer.confirm(titile, {icon: 3, title:'提示'}, function(){
+		  $.ajax({ 
+			type: "POST", 
+			url: "upOrDown",
+			data: {ids:id,status:status},
+			success: function(json) { 
+				if (json.code == -1){
+					layer.msg(json.msg);
+				} else{
+					layer.msg("开启或启用链接成功！",{time:500});
+					datagrid.search();
+				}	
+			} 
+		 });
+	  });  
+  }
+  var _tools = {
+	searchData: function () {
+		datagrid.search();
+	}
+  }
+  window.tools = _tools
+});
+</script>
+</@footer>        

@@ -1,0 +1,80 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 开启注解支持 -->
+	<mvc:annotation-driven />
+	
+ 	<!-- 事务支持 --> 
+	<tx:annotation-driven transaction-manager="txManager" />
+	
+	<!-- 扫描bean资源 -->
+	<context:component-scan base-package="com.logistics,com.logistics.base.cache">
+   		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+   </context:component-scan>
+
+	<!-- 加载配置文件 -->
+	<context:property-placeholder location="classpath:resources.properties" />
+
+	<!-- 阿里 druid 数据库连接池 -->
+	<bean id = "dataSource" class = "com.alibaba.druid.pool.DruidDataSource" destroy-method = "close" >
+		<!-- 数据库基本信息配置 -->
+		<property name = "url" value = "${druid.connection.url}" />
+		<property name = "username" value = "${druid.connection.username}" />
+		<property name = "password" value = "${druid.connection.password}" />
+		<property name = "driverClassName" value = "${druid.connection.driverclass}" />
+		<property name = "filters" value = "${druid.connection.filters}" />
+		<property name = "maxActive" value = "${druid.connection.maxActive}" /><!-- 最大并发连接数 -->
+		<property name = "initialSize" value = "${druid.connection.initialSize}" /><!-- 初始化连接数量 -->
+		<property name = "maxWait" value = "${druid.connection.maxWait}" /><!-- 配置获取连接等待超时的时间 -->
+		<property name = "minIdle" value = "${druid.connection.minIdle}" /><!-- 最小空闲连接数 -->
+		<property name = "timeBetweenEvictionRunsMillis" value ="${druid.connection.timeBetweenEvictionRunsMillis}" /><!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name = "minEvictableIdleTimeMillis" value ="${druid.connection.minEvictableIdleTimeMillis}" /><!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name = "maxOpenPreparedStatements" value ="${druid.connection.maxOpenPreparedStatements}" />
+	</bean >
+
+	<!-- 注入数据源 到 DataSourceHolder -->
+	<bean id="dataSourceHolder" class="cn.assist.easydao.dao.datasource.DataSourceHolder">
+		<property name="dataSource" ref="dataSource" />
+		<property name="dev" value="${is.dev}" />
+	</bean>
+	
+	<!--&lt;!&ndash; cache 配置 &ndash;&gt;-->
+	<bean name="memcachedClient" class="net.rubyeye.xmemcached.utils.XMemcachedClientFactoryBean" destroy-method="shutdown">
+		<property name="servers">
+			<value>${memcache.ip}:${memcache.port}</value>
+		</property>
+		<property name="commandFactory">
+			<bean class="net.rubyeye.xmemcached.command.BinaryCommandFactory"></bean>
+        </property>
+	</bean>
+
+	<bean name="cache" class="com.logistics.base.cache.MCacheKit">
+		<constructor-arg type="net.rubyeye.xmemcached.MemcachedClient" ref="memcachedClient"/>
+	</bean>
+	<!---->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="springFactory" class="com.logistics.base.helper.SpringFactory"/>
+	
+ 	<!-- 开启切面支持 -->
+ 	<aop:aspectj-autoproxy/>
+</beans>

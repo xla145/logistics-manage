@@ -1,0 +1,30 @@
+<div style="margin: 15px; display:none" id="add-payOrder-form">
+	<form class="layui-form layui-form-pane">
+		<div class="layui-form-item">
+			<label class="layui-inline" style="color: red">目前有<span class="person-number"></span>位出行人员信息，产品参考价格为<span class="product-price"></span>元/人起</label>
+		</div>
+		<div class="layui-form-item" >
+			<input name="orderId" value="${orderId!''}" type="hidden">
+			<label class="layui-form-label">收款金额</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="payAmount" lay-verify="required">
+			</div>
+			<label class="layui-form-label">支付方式</label>
+			<div class="layui-input-inline">
+				<select name="payWay">
+					<option value="">请选择</option>
+					<option value="1" selected>微信支付</option>
+					<option value="2">支付宝支付</option>
+					<option value="4">网银转账</option>
+					<option value="5">其他</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text" style="margin-bottom: 5px;" >
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block">
+				<textarea placeholder="请输入内容" class="layui-textarea" name="remark"></textarea>
+			</div>
+		</div>
+	</form>
+</div>

@@ -1,0 +1,55 @@
+<#include "../../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div style="margin: 15px;" >
+	<form class="layui-form layui-form-pane" id="add-addRefund-form">
+		<input name="orderId" value="${data.orderId!''}" type="hidden">
+		<#if data.mcid??>
+			<div class="layui-form-item" style="margin-bottom: 5px;">
+				<label class="layui-form-label">优惠券名字</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input" value="${data.couponName!''}" readonly>
+				</div>
+				<label class="layui-form-label">优惠券金额</label>
+				<div class="layui-input-inline">
+					<input type="number" class="layui-input" value="${data.couponAmount!''}" readonly>
+				</div>
+			</div>
+		</#if>
+		<div class="layui-form-item" style="margin-bottom: 5px;">
+			<label class="layui-form-label">退款金额</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="amount">
+			</div>
+			<#if data.mcid??>
+				<label class="layui-form-label" style="width: 130px;">是否退回优惠券</label>
+				<div class="layui-inline">
+					<input type="checkbox" name="isRefund" lay-skin="switch" lay-text="是|否">
+				</div>
+			</#if>
+		</div>
+		<div class="layui-form-item layui-form-text" style="margin-bottom: 5px;" >
+			<label class="layui-form-label">退款原因</label>
+			<div class="layui-input-block">
+				<textarea placeholder="请输入内容" class="layui-textarea" name="applyReason"></textarea>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text" style="margin-bottom: 5px;" >
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block">
+				<textarea placeholder="请输入内容" class="layui-textarea" name="remark"></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+<@footer>
+<script>
+	layui.use(['form'], function(){
+	    var form = layui.form;
+	});
+</script>
+</@footer>
+<style type="text/css">
+	.layui-unselect.layui-form-switch {
+		width: 50px;
+	}
+</style>

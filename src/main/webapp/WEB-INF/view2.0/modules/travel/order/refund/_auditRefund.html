@@ -1,0 +1,76 @@
+<#include "../../../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div style="margin: 15px;">
+	<form class="layui-form layui-form-pane" id="add-audit-form">
+		<div class="layui-form-item" style="margin-bottom: 5px;">
+			<input type="hidden" class="layui-input" name="proid" value="${data.proid!''}" >
+			<label class="layui-form-label">订单号：</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="orderId" value="${data.orderId!''}" readonly>
+			</div>
+			<label class="layui-form-label">退款人姓名</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="name" lay-verify="required">
+			</div>
+		</div>
+		<div class="layui-form-item" style="margin-bottom: 5px;">
+			<label class="layui-form-label">退款金额</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="amount" value="${data.amount?string('#.##')}" readonly>
+			</div>
+			<label class="layui-form-label">退款账户</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="account" lay-verify="required">
+			</div>
+		</div>
+		<div class="layui-form-item" style="margin-bottom: 5px;">
+			<label class="layui-form-label">预留手机号：</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="mobile" lay-verify="mobile">
+			</div>
+		</div>
+		<div class="layui-form-item" style="margin-bottom: 5px;">
+			<label class="layui-form-label" style="width: 130px;">退款人开户行</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="bankAccount" >
+			</div>
+			<label class="layui-form-label">退款方式</label>
+			<div class="layui-input-inline">
+				<select name="refundType" lay-verify="required">
+					<option value="">请选择</option>
+					<option value="1" selected>微信支付</option>
+					<option value="2">支付宝支付</option>
+					<option value="4">网银转账</option>
+					<option value="5">其他</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text" style="margin-bottom: 5px;">
+			<label class="layui-form-label">审核原因</label>
+			<div class="layui-input-block">
+				<textarea placeholder="请输入内容" class="layui-textarea" name="auditReason" lay-verify="required"></textarea>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text" style="margin-bottom: 5px;" >
+			<label class="layui-form-label">退款失败原因</label>
+			<div class="layui-input-block">
+				<textarea placeholder="请输入内容" class="layui-textarea" name="failReason"></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+<@footer>
+<script>
+	layui.use(['form'], function(){
+		var form = layui.form;
+        //自定义验证规则
+        form.verify({
+            mobile: function (value) {
+                if(value != "" && !/^(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/.test(value)){
+                    return '手机号不合法！';
+                }
+            }
+        });
+	})
+</script>
+</@footer>

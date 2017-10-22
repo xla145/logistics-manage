@@ -1,0 +1,120 @@
+<div id="edit-form" style="margin: 10px;border: 1px solid #e6e6e6;">
+	<div class="layui-block">订单信息</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">订单编号:</label>
+			<div class="layui-msg">${data.orderId!''}</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">活动标题:</label>
+			<div class="layui-msg">${data.orderName!''}</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">票价:</label>
+			<div class="layui-msg">${data.productPrice!''}</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">下单用户:</label>
+			<div class="layui-msg">${data.buyMobile!''}</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">下单时间:</label>
+			<div class="layui-msg">${data.createTime?string("yyyy-MM-dd HH:mm:ss")}</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">活动地点:</label>
+			<div class="layui-msg">${data.activityAddr}</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+	<div class="layui-inline">
+		<label class="layui-form-label">活动时间:</label>
+		<div class="layui-msg">${data.activityTime!''}</div>
+	</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">商家:</label>
+			<div class="layui-msg">${data.supplierName!''}</div>
+		</div>
+	</div>
+	<#if data.detailList??>
+		<#list data.detailList as list>
+			<#if list.payType == 3><!--使用了优惠券 -->
+				<div class="layui-block">使用优惠券信息</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">优惠券码:</label>
+						<div class="layui-msg">${list.mcid!''}</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">优惠券面额:</label>
+						<div class="layui-msg">${list.payAmount!''}</div>
+					</div>
+				</div>
+				<#else>
+					<div class="layui-block">订单支付信息</div>
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<label class="layui-form-label">订单状态:</label>
+							<div class="layui-msg">${data.orderStatus!''}</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label">支付账号:</label>
+							<div class="layui-msg">${list.payAccount!''}</div>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<label class="layui-form-label">支付日期:</label>
+							<div class="layui-msg">${list.createTime?string("yyyy-MM-dd HH:mm:ss")}</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label">支付金额:</label>
+							<div class="layui-msg">${list.payAmount!''}</div>
+						</div>
+					</div>
+				</#if>
+		</#list>
+	</#if>
+	<#if data.memberList??>
+		<div class="layui-block">邀请人员信息</div>
+		<table class="layui-table">
+			<thead>
+			<tr>
+				<th>序号</th>
+				<th>用户名</th>
+				<th>手机号</th>
+			</tr>
+			</thead>
+			<tbody>
+				<#list data.memberList as list>
+					<tr>
+						<td>${list_index+1}</td>
+						<td>${list.name!''}</td>
+						<td>${list.mobile!''}</td>
+					</tr>
+				</#list>
+			</tbody>
+		</table>
+	</#if>
+</div>
+<style type="text/css">
+	.layui-form-item .layui-inline {
+		margin-bottom: 5px;
+		margin-right: 100px;
+	}
+	.layui-msg {
+		width: 250px;
+		float: left;
+		line-height: 36px;
+	}
+	.layui-block {
+		background-color: #e6e6e6;
+		padding: 10px;
+	}
+</style>

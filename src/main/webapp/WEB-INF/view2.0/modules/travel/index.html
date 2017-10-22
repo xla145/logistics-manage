@@ -1,0 +1,269 @@
+<#include "../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 发布旅游产品</a>
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small layui-btn-normal operator-btn" data-type="edit"><i class="layui-icon">&#xe642;</i> 编辑</a>
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="info"><i class="layui-icon">&#xe60a;</i> 详情</a>
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small layui-btn-normal operator-btn" data-type="copy"><i class="layui-icon">&#xe630;</i> 复制</a>
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" id="filterForm">
+		    <div class="layui-inline">
+		      <label class="layui-filtrate-title">发布时间：</label>
+		      <div class="layui-input-inline">
+				  <input type="text" class="layui-input" id="release-time" name="releaseTime" style="width: 250px;">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-filtrate-title">产品编号：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="pid" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-filtrate-title">旅游状态：</label>
+		      <div class="layui-input-inline">
+		        <select name="status">
+				  <option value=" ">全部</option>
+				  <option value="0">初始状态</option>
+				  <option value="10">上架</option>
+				  <option value="15">管理员下架</option>
+				</select>
+		      </div>
+		    </div>
+			<div class="layui-inline">
+				<label class="layui-filtrate-title">合作商家：</label>
+				<div class="layui-input-inline">
+					<select name="supplierId">
+						<option value=" ">全部</option>
+						<@module name="option" class="com.logistics.label.impl.GetSupplierNode" type="3"/>
+					</select>
+				</div>
+			</div>
+			<div class="layui-inline">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+			</div>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<!--<table id="test2"></table>-->
+	<table class="layui-table" id="table-travel" lay-filter="table-travel"></table>
+	<script type="text/html" id="barDemo">
+		{{# if(d.status === 10){}}
+			{{"<a class='layui-btn layui-btn-danger layui-btn-mini' lay-event='upOrDownProduct'>下架</a>"}}
+		{{# } else { }}
+		{{
+			"<a class='layui-btn layui-btn-mini layui-btn-mini' lay-event='upOrDownProduct'>上架</a>"
+			+"<a class='layui-btn layui-btn-mini layui-btn-normal' lay-event='edit'>编辑</a>"
+			+"<a class='layui-btn layui-btn-danger layui-btn-mini' lay-event='del'>删除</a>"
+	     }}
+		{{# } }}
+		<a class='layui-btn layui-btn-mini' lay-event='info'>详情</a>
+		<a class='layui-btn layui-btn-mini layui-btn-normal' lay-event='copy'>复制</a>
+	</script>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}js/common.js"></script>
+<script>
+//入口
+layui.use(['form','table','common','laydate','layer'], function(){
+  var $ = layui.jquery;
+  var table = layui.table,
+      common = layui.common,
+      layer = layui.layer,
+      laydate = layui.laydate;
+  //常规用法
+  laydate.render({
+      elem: '#release-time'
+      ,type: 'datetime'
+      ,range: true
+  });
+  var tableIns = table.render({ //其它参数在此省略
+    id: 'table-travel',
+    elem: '#table-travel',
+    url: '${ctx}travel/list',
+  	request: {
+          pageName: 'pageNo' //页码的参数名称，默认：page
+          ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+    },
+  	size: 'sm',
+    method: 'post',
+    cols: [[
+        {checkbox: true, fixed: true}
+        ,{field:'pid', title: '旅游产品编码', width:150, sort: true, fixed: true}
+        ,{field:'title', title: '旅游产品标题', width:300}
+        ,{field:'catName', title: '主题类型', width:120}
+        ,{field:'supplierName', title: '合作商家', width:120}
+        ,{field:'departTime', title: '出发时间', width:200,templet: '#departTimeTpl'}
+        ,{field:'label', title: '标签', width:177}
+        ,{field:'weight', title: '权重', sort: true, width:80}
+        ,{field:'price', title: '会员价', sort: true, width:80}
+        ,{field:'wantNumber', title: '想去', width:80}
+        ,{field:'releaseTime', title: '发布时间', width:150,sort: true, templet: '#timeTpl'}
+        ,{field:'status', title: '旅游产品状态', sort: true, width:135,templet: '#statusTpl'}
+        ,{fixed: 'right',title: '操作', width:250, align:'left', toolbar: '#barDemo'}
+    ]],
+    height: 'full-140',
+    even: true,
+    page: true,
+    limits: [30,60,90,150,300]
+    ,limit: 30 //默认采用30
+  });
+  var windowIndex ;
+  // 编辑 删除
+  var $ = layui.$, active = {
+      search: function () {
+          dataReload();
+      },
+      reset: function () {
+          $('#filterForm')[0].reset();
+          dataReload();
+      },
+	  add: function () {
+		  windowIndex = layer.open({
+              type: 2,
+              title: '添加旅游产品',
+              shadeClose: true,
+              shade: false,
+              offset: ['0px'],
+              area: ['1000px', '600px'],
+              maxmin: true, //开启最大化最小化按钮
+              content: 'getView'
+          });
+          layer.full(windowIndex);
+      },
+      edit: function (data) {
+          data = data || table.checkStatus('table-travel').data;
+          if(data.length != 1){
+              layer.msg("请选择一条数据进行编辑！");
+              return;
+          }
+          if (data[0].status == 10) {
+              layer.msg("上架的商品不能进行编辑！");
+              return;
+		  }
+          edit(data[0].pid);
+      },
+	  del: function (data) {
+          layer.confirm('真的删除行么', function(index){
+              layer.close(index);
+              del(data[0].pid);
+          });
+      },
+      upOrDownProduct: function (data) {
+          var msg = "你确定要下架商品？"
+          if (data.status == 0 || data.status == 15) {
+              msg = "你确定要上架商品？"
+          }
+          layer.confirm(msg, function(index){
+              layer.close(index)
+              upOrDownProduct(data[0].pid,data[0].status);
+          });
+      },
+	  info: function (data) {
+          console.log(data)
+          data = data || table.checkStatus('table-travel').data;
+          if(data.length != 1){
+              layer.msg("请选择一条数据进行查看！");
+              return;
+          }
+          common.layerShowIframe("info?pid="+data[0].pid,"旅游产品信息",true)
+      },
+      copy: function (data) {
+          data = data || table.checkStatus('table-travel').data;
+          if(data.length != 1){
+              layer.msg("请选择一条数据进行复制！");
+              return;
+          }
+          common.post("copyProduct",{pid: data[0].pid},function (result) {
+              if (result.code != 0) {
+                  layer.msg(result.msg);
+                  return;
+              }
+              dataReload();
+          })
+      }
+  }
+  //加载数据
+  var dataReload = function () {
+      tableIns.reload({
+          where: common.formatForm($('#filterForm'))
+      });
+  }
+  //编辑
+  var edit = function (pid) {
+	  if (!pid){
+	      layer.msg("请选择一条数据进行编辑！")
+	  }
+	  common.layerShowIframe("getView?pid="+pid,"修改旅游产品信息",true)
+  }
+  //删除
+  var del = function (pid) {
+      common.post("del",{ids: pid},function (result) {
+		  if (result.code != 0) {
+		      layer.msg(result.msg)
+			  return;
+		  }
+          dataReload();
+      })
+  }
+  //上下架
+  var upOrDownProduct = function (pid,status) {
+	common.post("upOrDownProduct",{ids: pid, status: status},function (result) {
+		if (result.code != 0) {
+			layer.msg(result.msg);
+			return;
+		}
+        dataReload();
+	})
+  }
+  //绑定操作按钮
+  $('.operator-btn').on('click', function(){
+	var type = $(this).data('type');
+	active[type] ? active[type].call(this) : '';
+  });
+  //监听工具条
+  table.on('tool(table-travel)', function(obj){
+	var type = obj.event;
+	active[type] ? active[type].call(this, [obj.data]) : '';
+  });
+  $(window).resize(function() {
+
+  });
+});
+</script>
+<script type="text/html" id="departTimeTpl">
+	{{# var fn = function(time){
+		return stampToDate(time);
+	}
+	}}
+	{{fn(d.departTime)}}
+</script>
+<script type="text/html" id="timeTpl">
+	{{# var fn = function(time){
+	var newDate = new Date();
+	newDate.setTime(time);
+	return newDate.Format("yyyy-MM-dd hh:mm:ss");
+	}
+	}}
+	{{fn(d.releaseTime)}}
+</script>
+<script type="text/html" id="statusTpl">
+	{{# if(d.status === 0){ }}
+		{{ "初始状态" }}
+	{{# } }}
+	{{# if(d.status === 10){ }}
+		{{ "上架" }}
+	{{# } }}
+	{{# if(d.status === 14){ }}
+		{{ "售完下架" }}
+	{{# } }}
+	{{# if(d.status === 15){ }}
+		{{ "管理员下架" }}
+	{{# } }}
+</script>
+</@footer>

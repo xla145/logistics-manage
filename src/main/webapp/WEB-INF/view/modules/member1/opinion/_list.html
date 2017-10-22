@@ -1,0 +1,16 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.id}"></td>
+		    <td>${list_index+1}</td>
+		    <td>${list.uid!''}</td>
+		    <td>${list.mobile!''}</td>
+			<td class="layui-elip">${list.feedback!''}</td>
+			<td>${list.createTime?string("yyyy-MM-dd HH:mm:ss")}</td>
+		    <td>
+				<input type="hidden" class="index-id" value="${list.id}">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-normal layui-btn-mini operate" data-fn="info">详情</a>
+		 	</td>
+		</tr>
+	</#list>
+</#if>

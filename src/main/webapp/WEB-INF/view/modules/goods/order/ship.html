@@ -1,0 +1,101 @@
+<#include "../../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+	<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="ship"><i class="layui-icon">&#xe642;</i> 发货</a>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding">
+	    <thead>
+	      <tr>
+	        <!--<th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>-->
+	        <!--<th>订单编号</th>-->
+	        <th>商品名称</th>
+	        <th>供货商名称</th>
+		    <th>收货人</th>
+		    <th>收货地址</th>
+	        <th>物流公司</th>
+	        <th>快递单号</th>
+	      </tr> 
+	    </thead>
+	    <tbody>
+			<#if data??>
+				<#list data as list>
+					<tr>
+						<input type="hidden" value="${list.orderId!''}" name="order_id">
+						<td>${list.productName!''}</td>
+						<td>${list.supplierName!''}</td>
+						<td>${list.adresName!''}</td>
+						<td>${list.adresAddr!''}</td>
+						<td>
+							<div class="layui-input-inline">
+								<select name="courierCompany" id="company">
+									<option value="快递发货">快递发货</option>
+									<option value="顺丰快递">顺丰快递</option>
+									<option value="中通快递">中通快递</option>
+									<option value="圆通快递">圆通快递</option>
+									<option value="申通快递">申通快递</option>
+									<option value="百世汇通快递">百世汇通快递</option>
+									<option value="宅急送">宅急送</option>
+									<option value="韵达快递">韵达快递</option>
+									<option value="天天快递">天天快递</option>
+									<option value="EMS">EMS</option>
+									<option value="邮政/平邮">邮政/平邮</option>
+								</select>
+							</div>
+						</td>
+						<td>
+							<div class="layui-input-inline">
+								<input name="courierNumber" id="courierNumber"/>
+							</div>
+						</td>
+					</tr>
+				</#list>
+			</#if>
+		</tbody>
+	  </table>
+	</div>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate','common'], function(){
+  var $ = layui.jquery;
+  var form = layui.form()
+	  ,common = layui.common
+  ,datagrid = layui.datagrid();
+  //操作
+  $('#ship').on('click', function(){
+      var checkedList = new Array();
+      $("#twrap input[name='order_id']").each(function() {
+          var courier = new Array();
+          var order_id = $(this).val();
+          var courierCompany = $(this).parents("tr").find("#company option:selected").val();
+          var courierNumber = $(this).parents("tr").find("#courierNumber").val()
+		  courier.push(order_id);
+          courier.push(courierCompany);
+          courier.push(courierNumber);
+          checkedList.push(courier);
+      });
+	  $.ajax({
+          type: "POST",
+          url: "deliverGoods",
+          data: common.arrayTokeyval({'courier':checkedList}),
+          success: function(result) {
+              if(result.code == 0){
+                  //window.parent.location.reload();
+                  parent.tools.search();
+                  var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                  parent.layer.close(index);  // 关闭layer
+              }else{
+                  layer.msg(result.msg);
+              }
+          }
+      });
+  })
+});
+</script>
+</@footer>        

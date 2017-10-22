@@ -1,0 +1,182 @@
+<#include "../../../_layout/_layout.html"><#t>
+<@header/>
+<div id="form-save" style="margin: 15px;">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label layui-title">历史活动标题：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="historyTitle" autocomplete="off" class="layui-input" lay-verify="required" value="${data.historyTitle!''}">
+				<input type="hidden" id="hid" value="${data.id!''}" name="id">
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">列表页图片:</label>
+			<div class="site-demo-upbar">
+				<#if data.imageUrl??>
+					<img id="img-show" src="${data.imageUrl!''}">
+					<#else>
+					<img id="img-show" src="" style="display: none">
+				</#if>
+				<input type="hidden" name="historyImgUrl" id = "img-url" value="${data.imageUrl!''}"/>
+				<input type="file" name="file" id="layui-upload-img">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">活动标题：</label>
+			<div class="layui-input-inline">
+				<!--<input type="text" autocomplete="off" class="layui-input layui-inline" lay-verify="required" id="title" readonly value="${data.title!''}"/>-->
+				<span class="layui-title">${data.title!''}</span>
+				<#if data.title??>
+					<#else>
+						<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add-activity-title"></i>请选择</a>
+						<input type="hidden" name="pid" id="pid">
+				</#if>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">活动时间：</label>
+			<div class="layui-input-inline">
+				<span class="layui-activityTime">${data.activityTime!''}</span>
+				<!--<input type="text" autocomplete="off" class="layui-input" readonly id="activityTime" value="${data.activityTime!''}"/>-->
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">活动地点：</label>
+			<div class="layui-input-inline">
+				<span class="layui-address">${data.address!''}</span>
+				<!--<input type="text" autocomplete="off" class="layui-input" readonly id="address" value="${data.address!''}"/>-->
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品详情：</label>
+			<div class="layui-input-block product-info">
+				<textarea  name ="info" style="display: none" id="info"></textarea>
+				<div id="good-info">${data.info!''}</div>
+				<!--<textarea id="gimplinfo" naimplinfo" cols="" rows="" style="width:100%;height:400px;border: 0px;">${dimplinfo!''}</textarea>-->
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" type="button" id="submit">立即提交</button>
+				<button class="layui-btn layui-btn-primary" id="cancel">取消</button>
+			</div>
+		</div>
+	</form>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}plugins/wangEditor/wangEditor.min.js"></script>
+<script type="text/javascript" src="${assets}js/wangEdit.js"></script>
+<script>
+//    var ue = editor("good-impl");
+    var ue = editor('#good-info',"${contextPath!''}upload")
+	//入口
+	layui.use(['laydate','upload','form'], function() {
+		var $ = layui.jquery;
+		var form = layui.form();
+        $(".w-e-text-container").css("height",450)
+        $(".w-e-text-container").css("font-size",16)
+		//上传功能
+		layui.upload({
+			url: '${contextPath!''}upload' //上传接口
+			,elem: '#layui-upload-img'
+			,success: function(res){ //上传成功后的回调
+				if (res.code == 0) {
+					$("#img-url").val(res.data[0])
+					$("#img-show").css("display","").attr("src",res.data[0]);
+				}
+			}
+		});
+		//自定义验证
+		form.verify({
+			price: function(value){
+				if(value == "") {
+					return '请填写优惠券面额！';
+				}
+				if(/^[0-9]+(.[0-9]{2})?$/.test(value)){
+					return '面额请保留两位小数！';
+				}
+			}
+		});
+		$("#submit").on('click', function(){
+            var content = ue.txt.html();
+            if (content == "") {
+                layer.msg("商品内容不能为空！")
+                return;
+            }
+            $("#info").val(content);
+			var formEm = $("#form-save").find('form');
+			if(!form.onVerify(formEm)){
+				return false;
+			}
+            var id = $("#hid").val();
+            var url = "add";
+            if(id != "") {
+                url = "edit"
+            }
+			$.post(url,formEm.serialize(),function(result){
+				if(result.code == 0){
+					formEm[0].reset();	//清空弹框表单内容
+					var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+					parent.layer.close(index);
+					parent.tools.searchData();
+				}
+				layer.msg(result.msg);
+			});
+		});
+		$("#add-activity-title").on('click',function () {
+			layer_show("activityIndex","选择活动标题");
+        });
+		$("#cancel").on('click',function () {
+            $("#form-save").find('form')[0].reset();
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            parent.layer.close(index);
+        });
+		/*
+		* 公共弹窗
+		* */
+        var layer_show = function (url,title) {
+            var index = layer.open({
+                type: 2,
+                title: title,
+                shadeClose: true,
+                shade: false,
+                area: ['900px', '600px'],
+                offset: ['0px'],
+                content: url
+            });
+//            layer.full(index);
+        }
+	var _tools = {
+		setActivity: function (pid,title,address,activityTime) {
+//            console.log(address+"---"+title+"------"+pid+"======="+activityTime);
+			$("#pid").val(pid);
+			$(".layui-title").text(title);
+            $(".layui-activityTime").text(activityTime);
+            $(".layui-address").text(address);
+        }
+	}
+	window.tools = _tools
+	});
+</script>
+</@footer>
+<style>
+	.layui-input-inline span{
+		line-height:38px;
+	}
+	.layui-form-label {
+		width: 90px;
+	}
+	.layui-title{
+		width: 95px;
+	}
+	.product-info {
+		margin-left: 120px;
+	}
+	img#img-show{
+		max-width:200px;
+	}
+	.layui-word-aux{
+		color: red;
+	}
+</style>

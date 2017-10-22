@@ -1,0 +1,178 @@
+<#include "../../../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="export-order"><i class="layui-icon">&#xe654;</i> 导出订单</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="show-info"><i class="layui-icon">&#xe642;</i> 查看</a>
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+			<div class="layui-inline">
+				<label class="layui-form-label">下单时间：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="startTime" id="start-time" placeholder="开始时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+				</div>
+				--
+				<div class="layui-input-inline">
+					<input type="text" name="endTime" id="end-time" placeholder="结束时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+				</div>
+			</div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">下单用户：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="mobile" class="layui-input">
+		      </div>
+		    </div>
+			<div class="layui-inline">
+				<label class="layui-form-label">活动标题：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="title" class="layui-input">
+				</div>
+			</div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">订单状态</label>
+		      <div class="layui-input-inline">
+		        <select name="status">
+				  <option value="">全部</option>
+				  <@module name="option" class="com.logistics.label.impl.GetOrderActivityStatusNode"/>
+				</select>
+		      </div>
+		    </div>
+			<div class="layui-inline">
+				<label class="layui-form-label">合作商家：</label>
+				<div class="layui-input-inline">
+					<select name="supplierId">
+						<option value=" ">全部</option>
+						<@module name="option" class="com.logistics.label.impl.GetSupplierNode" type="1"/>
+					</select>
+				</div>
+			</div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding" lay-skin="line">
+	    <thead>
+	      <tr>
+	        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+		  	<th>序号</th>
+	        <th>订单编号</th>
+	        <th>活动标题</th>
+	        <th>合作商家</th>
+	        <th>下单日期</th>
+	        <th>下单账户</th>
+	        <th>商品金额</th>
+		    <th>现金支付金额</th>
+		    <th>优惠券金额</th>
+	        <th fixed="right">订单状态</th>
+		    <th fixed="right">是否可邀请好友</th>
+	        <th fixed="right">操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody ></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate'], function(){
+  var $ = layui.jquery;
+  var form = layui.form()
+  ,datagrid = layui.datagrid();
+  
+  //表格数据加载插件，可选参数：
+  datagrid.init({
+	  url: 'list',
+	  pageSize: 15,
+	  pageEm: $('#page'),
+	  tempEm: $('#twrap'),
+	  filterForm: $('#filterForm')
+  });
+  
+  //搜索， 依赖datagrid
+  $('#search').bind('click', function(){
+	  datagrid.search();	  
+  })
+  
+ //添加、编辑插件可选配置：
+  $('#add').bind('click', function(){
+	  datagrid.open({
+		  url: 'add',
+		  content: $('#add-form'),
+		  title: '添加用户'
+	  });
+  })
+    //操作
+  $('#twrap').on('click', '.operate', function(){
+	var cmd = $(this).attr('data-fn');
+	var id = $(this).siblings('.index-orderId').val();
+	console.log(id+"=======================")
+//	var orderStatus = $(this).siblings('.index-orderStatus').val();
+	if (cmd == 'show-info') {
+		showInfoFn(id);
+	}
+  })
+  $('#show-info').bind('click', function(){
+	  var id = datagrid.getCheckedVal();
+	  if(id.length != 1){
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+      showInfoFn(id[0])
+  });
+	var showInfoFn = function(id) {
+        if (!id) {
+            layer.msg('请选择一条数据编辑!');
+            return;
+        }
+        //打开编辑框
+        $.get("editView", {orderId: id},function(html){
+            //打开编辑页
+            datagrid.open({
+                url: 'edit',
+                content: html,
+                title: '订单详情'
+            });
+        }, "html");
+    }
+  //删除
+  $('#delete').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if(ids.length != 1){
+		  layer.msg('请选择一条数据删除!');
+		  return;
+	  }
+	  layer.open({
+		  	content: '您确认要删除该流量池?',
+			btn: ['确认', '取消'],
+			shadeClose: false,
+			yes: function(){
+				$.post("/pool/delete", { id : ids[0] },
+				   function(result){
+						layer.msg(result.msg);
+						location.reload();
+				   });
+			}, 
+			no: function(){
+				layer.open({content: '您选择了取消', time: 0});
+			}
+	  	 
+		});
+  });
+  //导出订单
+  $("#export-order").on('click',function () {
+	var formEm = $("#filterForm").serialize();
+	console.log(formEm);
+	var url = "export?"+formEm;
+	window.open(url);
+  });
+});
+</script>
+</@footer>        

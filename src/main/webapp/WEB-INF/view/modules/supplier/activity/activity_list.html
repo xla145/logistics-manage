@@ -1,0 +1,16 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.pid}"></td>
+		    <td>${list_index+1}</td>
+		    <td>${list.title!''}</td>
+		    <td>${list.releaseTime?string("yyyy-MM-dd HH:mm:ss")}</td>
+		    <td>${list.activityTime!''}</td>
+		    <td>${list.price!''}</td>
+		    <td>
+		    	<#if list.status == 14 && list.status == 15>下架</#if>
+		    	<#if list.status == 10>上架</#if>
+		    </td> 
+		</tr>
+	</#list>
+</#if>

@@ -1,0 +1,123 @@
+<#include "../_layout/_layout.html"><#t>
+<@header/>
+<div id="edit-form" style="margin:10px;margin-bottom: 0px;">
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">uid:</label>
+			<div class="layui-msg">${data.uid!''}</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">昵称:</label>
+			<div class="layui-msg">${data.nickname!''}</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">会员等级:</label>
+			<div class="layui-msg">会员等级</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">性别:</label>
+			<div class="layui-msg">男</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">注册时间：</label>
+			<div class="layui-msg">${data.createTime?string("yyyy-MM-dd HH:mm:ss")}</div>
+		</div>
+	</div>
+<div class="layui-block layui-title">用户优惠券列表</div>
+<!-- 表格区域 -->
+<div class="layui-form" id="twrap">
+	<table class="layui-table">
+		<thead>
+		<tr>
+			<th>序号</th>
+			<th>优惠券名称</th>
+			<th>类型</th>
+			<th>有效期</th>
+			<th>发放时间</th>
+			<th>优惠券状态</th>
+			<th>来源</th>
+		</tr>
+		</thead>
+		<tbody ></tbody>
+	</table>
+	<!-- 分页容器 -->
+	<div class="layui-show"><div id="page"></div></div>
+</div>
+<div class="layui-block layui-title">用户收货地址信息：</div>
+	<table class="layui-table">
+		<thead>
+		<tr>
+			<th>序号</th>
+			<th>收货人姓名</th>
+			<th>手机号</th>
+			<th>所在地区</th>
+			<th>详细地址</th>
+		</tr>
+		</thead>
+		<tbody>
+		<#if data.addressList??>
+			<#list data.addressList as list>
+				<tr>
+					<td>${list_index+1}</td>
+					<td>${list.name!''}</td>
+					<td>${list.mobile!''}</td>
+					<td>${list.town!''}</td>
+					<td>${list.addr!''}</td>
+				</tr>
+			</#list>
+		</#if>
+		</tbody>
+	</table>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate'], function(){
+	var $ = layui.jquery;
+	var form = layui.form()
+		,datagrid = layui.datagrid();
+	var uid = ${data.uid!''};
+	//表格数据加载插件，可选参数：
+	datagrid.init({
+		url: 'couponList',
+		pageSize: 15,
+		pageEm: $('#page'),
+		tempEm: $('#twrap'),
+        params: {'uid': uid}
+//		filterForm: $('#filterForm')
+	});
+    $('#twrap-foot').on('click', '.operate', function(){
+        var cmd = $(this).attr('data-fn');
+        var id = $(this).siblings('.index-id').val();
+    })
+});
+</script>
+</@footer>
+<style type="text/css">
+	.layui-form-item .layui-inline {
+		margin-bottom: 5px;
+		margin-right: 100px;
+	}
+	.layui-msg {
+		width: 250px;
+		float: left;
+		line-height: 36px;
+	}
+	.layui-title {
+		background-color: rgba(171, 171, 171, 0.38);
+		padding: 8px;
+	}
+	.layui-table-flex table td, th{
+		padding: 6px 15px;
+		min-height: 20px;
+		line-height: initial;
+	}
+	.layui-table td, .layui-table th{
+		padding: 6px 15px;
+	}
+</style>

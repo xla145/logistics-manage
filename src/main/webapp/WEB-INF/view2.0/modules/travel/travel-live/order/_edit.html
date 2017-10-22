@@ -1,0 +1,662 @@
+<#include "../../../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div>
+	<form class="layui-form layui-form-pane" id="edit-form">
+		<input type="hidden" name="orderId" id="orderId" value="${orderId!''}">
+		<input type="hidden" name="orderTravelStatus" id="orderTravelStatus" value="${orderTravelSummary.orderTravelStatus!''}">
+		<input type="hidden" value="${orderTravelSummary.payStatus!''}" id="pay-status">
+		<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+			<ul class="layui-tab-title">
+				<li class="layui-this">订单基本信息</li>
+				<#if orderTravelSummary.orderTravelStatus?? && orderTravelSummary.orderTravelStatus != -99 && orderTravelSummary.orderTravelStatus != 0>
+				<li>收款管理</li>
+					<#if orderTravelSummary.payStatus?? && orderTravelSummary.payStatus == 6>
+						<li>退款管理</li>
+					</#if>
+				</#if>
+			</ul>
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show">
+					<blockquote class="site-text site-title layui-elem-quote">旅游订单-产品信息：</blockquote>
+					<div class="layui-form-item">
+						<label class="layui-form-label">旅游产品</label>
+						<div class="layui-input-inline" style="width: 520px">
+							<select name="pid" lay-filter="pid" id="pid"  style="width: 600px" lay-verify="required" lay-search <#if orderTravelSummary.orderTravelStatus == 20>disabled</#if>>
+							<option value="" data-info='{}'>请选择旅游产品</option>
+							<#if travelSummary??>
+								<#list travelSummary as tsItem>
+									<option value="${tsItem.pid!''}" <#if (orderTravelSummary.pid == tsItem.pid)>selected</#if> data-info='{departTime: "${tsItem.departTime!""}",price: ${tsItem.price?string("#.##")},departure: "${tsItem.departure!""}",destination: "${tsItem.destination!""}",originalPrice: ${tsItem.originalPrice!""},travelDay:${tsItem.travelDay!""},suggestTime: "${tsItem.suggestTime!""}"}' >${tsItem.name!''}</option>
+								</#list>
+							</#if>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">出发时间</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="departTime" disabled>
+						</div>
+						<label class="layui-form-label">产品价格</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="price" disabled>
+						</div>
+						<div class="layui-form-mid layui-word-aux">元/人起</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">出发地</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="departure" disabled>
+						</div>
+						<label class="layui-form-label">目的地</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="destination" disabled>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">旅游天数</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="travelDay" disabled>
+						</div>
+					</div>
+					<blockquote class="site-text site-title layui-elem-quote">旅游订单-预定人信息：</blockquote>
+					<div class="layui-form-item">
+						<label class="layui-form-label">预定人姓名</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" name="buyName" value="${orderTravelSummary.buyName!''}" lay-verify="required">
+						</div>
+						<label class="layui-form-label" style="width: 130px;">预定人手机号</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" name="buyMobile" value="${orderTravelSummary.buyMobile!''}" lay-verify="phone" lay-filter="buyMobile" id="buyMobile">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">出发地点</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" name="travelPlace" value="${orderTravelSummary.travelPlace!''}" lay-verify="required">
+						</div>
+						<label class="layui-form-label">出发时间</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" name="travelTime" value="${orderTravelSummary.travelTime?string('yyyy-MM-dd')}" id="begin-time" lay-verify="required" >
+						</div>
+					</div>
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">特殊要求</label>
+						<div class="layui-input-block">
+							<textarea placeholder="请输入内容" class="layui-textarea" name="demands">${orderTravelSummary.demands!''}</textarea>
+						</div>
+					</div>
+					<blockquote class="site-text site-title layui-elem-quote">旅游订单-出行人员信息：
+						<a href="javascript:void(0)"  class="layui-btn layui-btn-mini operator-btn" data-type="addTravelPersonnel"><i class="layui-icon">&#xe608;</i>添加</a>
+					</blockquote>
+					<input type="hidden" id="number">
+					<table class="layui-hide" id="personnelEdit" lay-filter="personnelEdit"></table>
+					<blockquote class="site-text site-title layui-elem-quote">旅游订单-优惠券信息：</blockquote>
+					<table class="layui-hide" id="coupon-table" lay-filter="coupon-table"></table>
+					<blockquote class="site-text site-title layui-elem-quote">说明信息：
+					</blockquote>
+					<div class="layui-form-item layui-form-text">
+						<div class="layui-input-block">
+							<textarea placeholder="请输入内容" class="layui-textarea" name="explain">${orderTravelSummary.explain!''}</textarea>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block layui-form-save">
+							<button class="layui-btn operator-btn" type="button" data-type="save">确认订单</button>
+							<#if orderTravelSummary.orderTravelStatus == -99>
+							<button class="layui-btn operator-btn layui-btn-primary" type="button" data-type="saveToDraft">保存为草稿</button>
+							</#if>
+							<#if orderTravelSummary.orderTravelStatus != 20>
+								<#if orderTravelSummary.orderTravelStatus == 5>
+									<button class="layui-btn operator-btn layui-btn-normal" type="button" data-type="finishOrder"> 订单完成</button>
+								</#if>
+								<button class="layui-btn operator-btn layui-btn-danger" type="button" data-type="reduceOrder"> 取消订单</button>
+							</#if>
+						</div>
+					</div>
+				</div>
+				<div class="layui-tab-item">
+					<blockquote class="site-text site-title layui-elem-quote">旅游订单-收款信息：<a href="javascript:void(0)"  class="layui-btn layui-btn-normal layui-btn-mini operator-btn layui-pay" data-type="pay"><i class="layui-icon">&#xe608;</i><#if orderTravelSummary.payStatus !=6>收款<#else>差价单</#if></a></blockquote>
+					<table class="layui-hide" id="payAdd" lay-filter="payAdd"></table>
+				</div>
+				<div class="layui-tab-item">
+					<blockquote class="site-text site-title layui-elem-quote">旅游订单-退款信息：<a href="javascript:void(0)" class="layui-btn layui-btn-normal layui-btn-mini operator-btn layui-refund" data-type="refund"><i class="layui-icon">&#xe608;</i>申请退款</a></blockquote>
+					<table class="layui-hide" id="refundAdd" lay-filter="refundAdd"></table>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<#include "_addPersonnel.html"><#t>
+<#include "_addPay.html"><#t>
+<#include "_addCancelOrder.html"><#t>
+<@footer>
+<script type="text/html" id="person-bar">
+	<a class="layui-btn layui-btn-mini operator-btn" lay-event="editPerson">修改</a>
+	<a class='layui-btn layui-btn-mini layui-btn-danger operator-btn' lay-event='delPerson'>删除</a>
+</script>
+<script>
+var personnelEditTable;
+layui.use(['element','form','table','laydate','common','element'], function(){
+	var table = layui.table, form = layui.form, $ = layui.jquery, laydate = layui.laydate,element = layui.element,common = layui.common;
+
+	laydate.render({elem: '#validTime'});
+	laydate.render({elem: '#issueTime'});
+    laydate.render({elem: '#begin-time'});
+
+    //自定义验证规则
+    form.verify({
+        mobile: function (value) {
+            if(value != "" && !/^(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/.test(value)){
+                return '手机号不合法！';
+            }
+        },
+        referPrice: function(value){
+            if(value != "" && !/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(value)){
+                return '参考价只能是整数或小数！';
+            }
+        },
+        credentials: function (value) {
+            var number = $('#credentials').find("option:selected").attr('data-info') || 0;
+            var text = $('#credentials').find("option:selected").text() || "";
+            if (text != "" && value.length != number ) {
+                return text+'必须是'+number+'位数';
+			}
+        },
+        validTime: function (value) {
+            var time = $('#begin-time').val();
+            var day = Number($('#travelDay').val()) + 183;// 转数值类型
+            var date = new Date(time).addTime(3,day).Format("yyyy-MM-dd");
+            if (value != "" && value < date) {
+                return '证件有效期的截止时间要在行程结束的时间半年之前';
+			}
+        }
+    });
+	//下拉框联动更新
+	var initInfo = function(elem){
+		var info = $(elem).find("option:selected").attr('data-info') || {};
+		console.log(info)
+	 	info = eval('(' + info + ')');
+		if (info.departTime == "") {
+            $('#departTime').val(info.suggestTime);
+		} else {
+            $('#departTime').val(common.stampToDate(info.departTime));
+		}
+	 	$('#price').val(info.price);
+	 	$('#travelDay').val(info.travelDay);
+	 	$('#destination').val(info.destination);
+	 	$('#departure').val(info.departure);
+	}
+	form.on('select(pid)', function(data){
+		initInfo($(data.elem))
+	});
+	initInfo($('#pid'));
+	var personNumber = 0;
+	//渲染出行人员表格
+	$.get("${ctx}travel/order/getPersonnels", {orderId: $('#orderId').val()},function(data){
+	    console.log(data.data.length)
+	    personNumber = data.data.length;
+		personnelEditTable = table.render({
+		    elem: '#personnelEdit'
+		    ,data: data.data
+		    ,cols: [[
+		         { fixed: true,field:'cnName', width:100,title: '中文姓名'}
+		   		,{field:'enName', width:140, title: '英文姓名'}
+		   		,{field:'typeName', width:60, title: '类型'}
+		   		,{field:'sexName', width:60, title: '性别'}
+		   		,{field:'mobile', width:160, title: '手机号'}
+		   		,{field:'credentialsName', width:100, title: '证件类型'}
+		   		,{field:'credentialsId', width:200, title: '证件号码'}
+		   		,{field:'issueAt', width:200, title: '签发地'}
+		   		,{field:'issueTime', width:120, title: '签发日期'}
+		   		,{field:'validTime', width:120, title: '有效期'}
+		   		,{field:'referPrice', width:120, title: '参考价'}
+                ,{fixed: 'right', width:200, title: '操作', align:'left', toolbar: '#person-bar'}
+		        ]]
+		    ,skin: 'row'
+		    ,even: true
+		    ,page: false
+		})
+	})
+
+    //优惠券信息
+    $.get("${ctx}travel/order/getCoupon", {orderId: $('#orderId').val()},function(data){
+        var couponIndex = table.render({
+            elem: '#coupon-table'
+            ,data: data.data
+            ,cols: [[
+                { fixed: true,field:'mcid', width:150,title: '用户优惠券编码'}
+                ,{ fixed: true,field:'couponName', width:100,title: '优惠券名称'}
+                ,{ fixed: true,field:'couponCid', width:150,title: '优惠券编码'}
+                ,{ fixed: true,field:'couponType', width:100,title: '优惠券类型',templet: '#typeTpl'}
+                ,{field:'couponAmount', width:140, title: '优惠券金额'}
+                ,{field:'validPeriod', width:280, title: '优惠券有效期',templet: '#validPeriodTpl'}
+                ,{field:'payStatus', width:280, title: '是否退还优惠券',templet: '#payStatusTpl'}
+            ]]
+            ,skin: 'row'
+            ,even: true
+            ,page: false
+        })
+    })
+
+    //支付信息
+	var payEditTable = table.render({
+		elem: '#payAdd'
+		,url: "${ctx}travel/order/payList",
+		where: {orderId: $('#orderId').val()},
+		method: "post"
+		,cols: [[
+			{field:'orderId', width:160,title: '订单编号'}
+			,{field:'status', width:100, title: '订单状态',templet: '#orderStatusTemple'}
+			,{field:'buyUid', width:100, title: '支付人'}
+			,{field:'createTime', width:200, title: '支付日期',templet: '#createTimeTemple'}
+			,{field:'payAmount', width:200, title: '支付金额'}
+			,{field:'remark', width:200, title: '备注'}
+			,{field:'payWay', width:100, title: '支付方式',templet: '#payWayTemple'}
+			,{field:'payType', width:100, title: '支付类型',templet: '#payTypeTemple'}
+		]]
+		,skin: 'row'
+		,even: true
+		,page: false
+	})
+    //退款信息
+	var refundEditTable = table.render({
+		elem: '#refundAdd',
+		url: '${ctx}travel/order/getPayRefundOrderList',
+		where: {orderId: $('#orderId').val()},
+		method: "post"
+		,cols: [[
+			{field:'orderId', width:160,title: '订单信息'}
+			,{field:'uid', width:100, title: '发起人'}
+			,{field:'amount', width:100, title: '退款金额'}
+			,{field:'status', width:120, title: '状态',templet: '#refundStatusTemple'}
+			,{field:'applyReason', width:160, title: '发起退款原因'}
+			,{field:'remark', width:120, title: '备注'}
+		]]
+		,skin: 'row'
+		,even: true
+		,page: false
+	})
+ 	 var $ = layui.$, active = {
+	     save: function () {
+             var $formEm = $("#edit-form");
+             if (!form.onVerify($formEm)){
+                 return false;
+             }
+             save("你确定要保存订单吗？","edit",$formEm)
+         },
+		 saveToDraft:function () {
+	         var $formEm = $("#edit-form");
+             if (!form.onVerify($formEm)){
+                 return false;
+             }
+             save("你确定要保存为草稿吗？","editTemp",$formEm)
+         },
+	     reduceOrder :function () {
+             var orderId = $("#orderId").val();
+             var payStatus = $("#pay-status").val();
+             if (payStatus == 6) {
+                 layer.confirm('该订单已支付，需要先执行退款操作再取消订单，你是否确认操作！', function(index){
+                     layer.close(index);
+                     layer.open({
+                         content: '${ctx}travel/live/order/orderCouponInfo?orderId='+$('#orderId').val(),
+                         type: 2,
+                         title: '退款操作',
+                         btn: ['保存', '取消'],
+                         maxmin: false,
+                         area: ['680px', '480px'],
+                         yes: function(index, layero) {
+                             var formEm = $(layero).find('iframe').contents().find("#add-addRefund-form");
+                             if (!form.onVerify(formEm)){
+                                 return false;
+                             }
+                             $.post('${ctx}travel/order/live/reduceAndRefundOrder', formEm.serialize(), function(result){
+                                 if(result.code == 0){
+                                     formEm[0].reset();	//清空弹框表单内容
+                                     layer.close(index);	//关闭弹框
+                                     layer.msg("取消订单成功!");
+                                     closeParentWindow();
+                                     return;
+                                 }
+                                 layer.msg(result.msg);
+                             });
+                         }
+                     })
+                 });
+			 } else {
+                 layer.open({
+                     content: $('#add-reduceOrder-form'),
+                     type: 1,
+                     title: '取消订单操作',
+                     btn: ['提交', '取消'],
+                     maxmin: false,
+                     area: ['680px', '300px'],
+                     yes: function(index, layero) {
+                         var formEm = $(layero).find('form');
+                         if (!form.onVerify(formEm)){
+                             return false;
+                         }
+                         $.post('${ctx}travel/live/order/reduce', formEm.serialize(), function(result){
+                             if(result.code == 0){
+                                 formEm[0].reset();	//清空弹框表单内容
+                                 layer.closeAll();	//关闭弹框
+                                 closeParentWindow();
+                                 layer.msg("取消订单成功!");
+                                 return;
+                             }
+                             layer.msg(result.msg);
+                         });
+                     }
+                 })
+			 }
+         },
+         finishOrder :function () {
+             layer.confirm('你确认完成订单吗？', function(index){
+                 var orderId = $("#orderId").val();
+                 $.post('${ctx}travel/live/order/finish', {orderId: orderId}, function(result){
+                     if(result.code == 0){
+                         layer.close(index);	//关闭弹框
+                         closeParentWindow();
+                         return;
+                     }
+                     layer.msg(result.msg);
+                 });
+             });
+         },
+         delPerson: function(obj) {
+             layer.confirm('你确认要删除该人员信息吗？', function(index){
+                 obj.del();
+                 personNumber --;
+                 layer.close(index)
+             });
+         },
+         editPerson: function (obj) {
+             var json= JSON.stringify(obj.data);
+             layer.open({
+                 type: 2,
+                 shadeClose: true,
+                 shade: false,
+                 maxmin: true,
+                 content: '${ctx}travel/live/order/getPersonView?'+common.arrayTokeyval(obj.data),
+                 title: '修改出行人员信息',
+                 btn: ['保存', '取消'],
+                 area: ['800px', '450px'],
+                 yes: function(index, layero) {
+                     var formEm = $(layero).find('iframe').contents().find("#edit-person");
+                     if(!form.onVerify(formEm)){
+                         return false;
+                     }
+                     var id = formEm.find("input[name=id]").val();
+                     if (id == "") {
+                         changeType(formEm);// 类型转化
+                         var formData = form.serializeJson(formEm);
+                         obj.update(formData)
+                         formEm[0].reset();
+                         layer.close(index);
+                         return;
+					 } else {
+                         $.post('${ctx}travel/live/order/editPerson', formEm.serialize(), function (result) {
+                             if (result.code == 0) {
+                                 changeType(formEm);// 类型转化
+                                 var formData = form.serializeJson(formEm);
+                                 obj.update(formData)
+                                 formEm[0].reset();
+                                 layer.close(index);
+                                 return;
+                             }
+                             layer.msg(result.msg);
+                         });
+					 }
+                 }
+             })
+         },
+		 //添加出行人员
+		 addTravelPersonnel: function(){
+			layer.open({
+				content: $('#add-personnel-form'),
+		        type: 1,
+		        title: '新增出行人员信息',
+		        btn: ['保存', '取消'],
+		        maxmin: false,
+		        area: ['700px', '450px'],
+		        yes: function(index, layero) {
+		            var formEm = $(layero).find('form');
+                    if(!form.onVerify(formEm)){
+                        return false;
+                    }
+                    personNumber ++;
+                    changeType(formEm);// 类型转化
+		            var formData = form.serializeJson(formEm);
+		            personnelEditTable.addRow(formData);
+		            formEm[0].reset();
+		          	layer.close(index);
+		        }
+			})
+		 },
+         //支付操作
+         pay: function(){
+		     $(".product-price").text($("#price").val());
+             $(".person-number").text(personNumber);
+             layer.open({
+                 content: $('#add-payOrder-form'),
+                 type: 1,
+                 title: '收款操作',
+                 btn: ['保存', '取消'],
+                 maxmin: false,
+                 area: ['680px', '400px'],
+                 yes: function(index, layero) {
+                     var i = index;
+                     var formEm = $(layero).find('form');
+                     if (!form.onVerify(formEm)){
+                         return false;
+                     }
+                     layer.confirm('你确认收款吗？', function(index) {
+                         $.post('${ctx}travel/live/order/payOrder', formEm.serialize(), function (result) {
+                             if (result.code == 0) {
+                                 payEditTable.reload(); //刷新表格数据
+                                 formEm[0].reset();	//清空弹框表单内容
+                                 layer.close(index);	//关闭弹框
+								 layer.close(i);
+                                 layer.msg("支付成功！");
+								 return;
+                             }
+                             layer.msg(result.msg);
+                         });
+                     });
+                 }
+             })
+         },
+         //退款操作
+         refund: function(){
+             layer.open({
+                 content: '${ctx}travel/live/order/orderCouponInfo?orderId='+$('#orderId').val(),
+                 type: 2,
+                 title: '退款操作',
+                 btn: ['保存', '取消'],
+                 maxmin: false,
+                 area: ['680px', '480px'],
+                 yes: function(index, layero) {
+                     var formEm = $(layero).find('iframe').contents().find("#add-addRefund-form");
+                     if (!form.onVerify(formEm)){
+                         return false;
+                     }
+                     $.post('${ctx}travel/live/order/refundOrder', formEm.serialize(), function(result){
+                         if(result.code == 0){
+                             refundEditTable.reload(); //刷新表格数据
+                             formEm[0].reset();	//清空弹框表单内容
+                             layer.close(index);	//关闭弹框
+							 return;
+                         }
+                         layer.msg(result.msg);
+                     });
+                 }
+             })
+         }
+  	}
+  	//保存订单信息
+  	var save = function (confirm,url,formEm) {
+        layer.confirm(confirm, function(index){
+            $.post(url, formEm.serialize()+'&personnels=' + JSON.stringify(personnelEditTable.getTableData()), function(result){
+                if(result.code == 0){
+                    parent._tools.search();
+                    formEm[0].reset();	//清空弹框表单内容
+                    layer.closeAll();	//关闭弹框
+                    closeParentWindow();
+                }
+                layer.msg(result.msg);
+            });
+        });
+    }
+    // 关闭父窗口
+	var closeParentWindow = function () {
+        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+        parent.layer.close(index);
+        parent._tools.search();
+    }
+    // 类型 转化
+    var changeType = function (formEm) {
+        formEm.find("input[name='sexName']").val(formEm.find('input:radio[name="sex"]:checked').attr("title"));
+        formEm.find("input[name='typeName']").val(formEm.find('select[name="type"]').find("option:selected").attr("data-fn"));
+        formEm.find("input[name='credentialsName']").val(formEm.find('select[name="credentials"]').find("option:selected").attr("data-fn"));
+    }
+	//绑定操作按钮
+	$('.operator-btn').on('click', function(){
+		var type = $(this).data('type');
+		active[type] ? active[type].call(this) : '';
+	});
+    table.on('tool(personnelEdit)', function(obj){
+        var layEvent = obj.event, data = obj.data;
+        active[layEvent] ? active[layEvent].call(this, obj) : '';
+    })
+})
+</script>
+<script type="text/html" id="orderStatusTemple">
+	{{# if(d.status === 10){ }}
+	{{ "支付成功" }}
+	{{# } }}
+	{{# if(d.status === 0){ }}
+	{{ "支付未完成" }}
+	{{# } }}
+</script>
+<script type="text/html" id="refundStatusTemple">
+	{{# if(d.status === 0){ }}
+	{{ "待审核" }}
+	{{# } }}
+	{{# if(d.status === 5){ }}
+	{{ "退款成功" }}
+	{{# } }}
+	{{# if(d.status === 10){ }}
+	{{ "审核失败" }}
+	{{# } }}
+</script>
+<script type="text/html" id="payWayTemple">
+	{{# if(d.payWay === 1){ }}
+	{{ "微信支付" }}
+	{{# } }}
+	{{# if(d.payWay === 2){ }}
+	{{ "支付宝支付" }}
+	{{# } }}
+	{{# if(d.payWay === 3){ }}
+	{{ "代金券抵扣" }}
+	{{# } }}
+	{{# if(d.payWay === 4){ }}
+	{{ "网银转账" }}
+	{{# } }}
+	{{# if(d.payWay === 5){ }}
+	{{ "其他" }}
+	{{# } }}
+</script>
+<script type="text/html" id="payTypeTemple">
+	{{# if(d.payType === 1){ }}
+	{{ "支付单" }}
+	{{# } }}
+	{{# if(d.payType === 2){ }}
+	{{ "差价单" }}
+	{{# } }}
+</script>
+<script type="text/html" id="issueTimeTpl">
+	{{# var fn = function(time){
+	var newDate = new Date();
+	newDate.setTime(time);
+	return newDate.Format("yyyy-MM-dd");
+	}
+	}}
+	{{fn(d.issueTime)}}
+</script>
+<script type="text/html" id="validTimeTpl">
+	{{# var fn = function(time){
+		var newDate = new Date();
+		newDate.setTime(time);
+		return newDate.Format("yyyy-MM-dd");
+	}
+	}}
+	{{fn(d.validTime)}}
+</script>
+<script type="text/html" id="createTimeTemple">
+	{{# var fn = function(time){
+	var newDate = new Date();
+	newDate.setTime(time);
+	return newDate.Format("yyyy-MM-dd hh:mm:ss");
+	}
+	}}
+	{{fn(d.createTime)}}
+</script>
+<script type="text/html" id="auditTimeTemple">
+	{{# var fn = function(time){
+	var newDate = new Date();
+	newDate.setTime(time);
+	return newDate.Format("yyyy-MM-dd hh:mm:ss");
+	}
+	}}
+	{{fn(d.auditTime)}}
+</script>
+<script type="text/html" id="typeTpl">
+	{{# if(d.couponType === 1){ }}
+	{{ '活动劵' }}
+	{{# } }}
+	{{# if(d.couponType === 2){ }}
+	{{ '商品劵' }}
+	{{# } }}
+	{{# if(d.couponType === 3){ }}
+	{{ '旅游劵' }}
+	{{# } }}
+	{{# if(d.couponType === 99){ }}
+	{{ '通用劵' }}
+	{{# } }}
+</script>
+<script type="text/html" id="payStatusTpl">
+	{{# if(d.payStatus === 20){ }}
+	{{ '是' }}
+	{{# } else { }}
+	{{ '否' }}
+	{{# } }}
+</script>
+<script type="text/html" id="validPeriodTpl">
+	{{# var fn = function(time){
+	var newDate = new Date();
+	newDate.setTime(time);
+	return newDate.Format("yyyy-MM-dd hh:mm:ss");
+	}
+	}}
+	{{fn(d.startTime) +"~"+ fn(d.endTime)}}
+</script>
+</@footer>
+<style type="text/css">
+	.layui-tab {
+		margin: 0px 0;
+		text-align: left !important;
+	}
+	.layui-elem-quote{
+		position: relative;
+	}
+	.layui-refund,.layui-pay {
+		position: absolute;
+		top: 7px;
+		right: 25px;
+	}
+	.layui-form-save{
+		text-align: right;
+		position: fixed;
+		bottom: 5px;
+		right: 15px;
+	}
+</style>

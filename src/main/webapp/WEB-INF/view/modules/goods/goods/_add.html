@@ -1,0 +1,262 @@
+<#include "../../_layout/_layout.html"><#t>
+<@header/>
+<link rel="stylesheet" href="${assets}css/common.css" media="all">
+<div id="form-save" style="margin: 15px;">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品标题：</label>
+			<div class="layui-title">
+				<input type="text" name="title" placeholder="请输入商品标题" autocomplete="off" class="layui-input" lay-verify="required" value="${data.title!''}">
+				<input type="hidden" value="${data.pid!''}" name="pid" id="pid">
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品名称：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="name" placeholder="请输入商品名称" autocomplete="off" class="layui-input" lay-verify="required" value="${data.name!''}">
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+			<label class="layui-form-label">价格：</label>
+			<div class="layui-input-inline">
+				<#if data.price??>
+					<input type="text" name="price" placeholder="请输入商品价格" autocomplete="off" class="layui-input" lay-verify="required" value="${data.price?string('#.##')}">
+				<#else>
+					<input type="text" name="price" placeholder="请输入商品价格" autocomplete="off" class="layui-input" lay-verify="required">
+				</#if>
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">进货价：</label>
+			<div class="layui-input-inline">
+				<#if data.originalPrice??>
+					<input type="text" name="originalPrice" placeholder="请输入进货价" autocomplete="off" class="layui-input" lay-verify="required" value="${data.originalPrice?string('#.##')}">
+					<#else>
+					<input type="text" name="originalPrice" placeholder="请输入进货价" autocomplete="off" class="layui-input" lay-verify="required">
+				</#if>
+			</div>
+			<label class="layui-form-label">包装单位：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="unit" placeholder="请输入包装单位" autocomplete="off" class="layui-input" value="${data.unit!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">配送方式：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="delivery" placeholder="请输入配送方式" autocomplete="off" class="layui-input" value="快递配送">
+			</div>
+			<label class="layui-form-label">销量：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="sales" placeholder="请输入销量" autocomplete="off" class="layui-input" value="${data.sales!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">运费：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="freight" placeholder="请输入运费" autocomplete="off" class="layui-input" value="${data.freight!''}">
+			</div>
+			<label class="layui-form-label">库存数：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="stock" placeholder="请输入库存数" autocomplete="off" class="layui-input" lay-verify="required" value="${data.stock!''}">
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">产品权重：</label>
+			<div class="layui-input-inline">
+				<input type="number" name="weight" placeholder="请输入产品权重越大越靠前" autocomplete="off" class="layui-input" value="${data.weight!''}">
+			</div>
+			<div class="layui-form-mid layui-word-aux">*商品权重越大页面显示越靠前</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">列表页图片:</label>
+			<div class="layui-img">
+				<#if data.imageUrl??>
+					<img id="img-show" src="${data.imageUrl!''}" >
+					<#else>
+					<img id="img-show" src="${data.imageUrl!''}" style="display: none" >
+				</#if>
+				<input type="hidden" name="imageUrl" id = "img-url" value="${data.imageUrl!''}"/>
+				<input type="file" name="file" id="layui-upload-img">
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">页面轮播图:</label>
+			<fieldset class="layui-elem-field layui-field-title layui-banner-show">
+				<div class="layui-input-block" id="layui-banner">
+					<ul class="layui-upload-list">
+						<#if data.imageList??>
+							<#list data.imageList as list>
+								<li class="layui-upload-list_item is-success">
+									<img src="${list.url!''}" class="banner-img">
+									<input type="hidden" name="" class = "banner-imgurl" value="${list.url!''}"/>
+									<span class='el-upload-list__item-actions'>
+										<span class='el-upload-list__item-delete'><i class='layui-icon el-icon-delete2'>&#xe640;</i></span>
+									</span>
+								</li>
+							</#list>
+						</#if>
+					</ul>
+					<input type="file" name="file" class="layui-upload-file">
+				</div>
+			</fieldset>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">供应商：</label>
+			<div class="layui-input-inline">
+				<input type="hidden" name="supplierId" autocomplete="off" class="layui-input" id="supplier-id" value="${data.supplierId!''}">
+				<input type="text" name="supplierName" lay-verify="required" autocomplete="off" class="layui-input layui-inline" id="supplier-name" readonly value="${data.supplierName!''}">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add-supplier"></i>请选择</a>
+			</div>
+			<div class="layui-form-mid layui-word-aux">*</div>
+		</div>
+		<!--<div class="layui-form-item layui-form-text">-->
+			<!--<label class="layui-form-label">备注</label>-->
+			<!--<div class="layui-input-block">-->
+				<!--<textarea name="remark" placeholder="请输入备注信息" class="layui-textarea" lay-verify="required">${data.remark!''}</textarea>-->
+			<!--</div>-->
+		<!--</div>-->
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品详情：</label>
+			<div class="layui-input-block product-info">
+				<textarea  name ="info" style="display: none" id="info"></textarea>
+				<div id="good-info">${data.info!''}</div>
+			</div>
+			<!--<div class="layui-form-mid layui-word-aux">*</div>-->
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" type="button" id="submit">立即提交</button>
+				<button class="layui-btn layui-btn-primary" id="cancel">取消</button>
+			</div>
+		</div>
+	</form>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}plugins/wangEditor/wangEditor.min.js"></script>
+<script type="text/javascript" src="${assets}js/wangEdit.js"></script>
+<script>
+	//创建富文本编辑器
+    var ue = editor('#good-info',"${contextPath!''}upload")
+    //入口
+    layui.use(['laydate','upload','form'], function() {
+        var $ = layui.jquery;
+            form = layui.form();
+		$(".w-e-text-container").css("height",450)
+        //上传功能
+        layui.upload({
+            url: "${contextPath!''}upload" //上传接口
+            ,elem: '#layui-upload-img'
+            ,success: function(res){ //上传成功后的回调
+                if (res.code == 0) {
+                    $("#img-url").val(res.data[0])
+                    $("#img-show").css("display","").attr("src",res.data[0]);
+                    return;
+                }
+                layer.msg(res.msg);
+            }
+        });
+        layui.upload({
+            url: "${contextPath!''}upload" //上传接口
+            ,success: function(res){ //上传成功后的回调
+                if (res.code == 0) {
+                    var index = $(".layui-upload-list").find("li").length;//因为下标从零开始
+					var imgIndex = 'imageList['+ (index) +'].url'
+					if (index == 0) {
+                        $(".layui-upload-list").append("<li class='layui-upload-list_item'><img class='banner-img' src='' style='display: none'>" +
+                            "<input type='hidden' class='banner-imgurl' name=''><span class='el-upload-list__item-actions'><span class='el-upload-list__item-delete'><i class='layui-icon el-icon-delete2'>&#xe640;</i></span></span></li>")
+					} else {
+                        $(".layui-upload-list li").eq(index-1).after("<li class='layui-upload-list_item'><img class='banner-img' src='' style='display: none'>" +
+                        "<input type='hidden' class='banner-imgurl' name=''><span class='el-upload-list__item-actions'><span class='el-upload-list__item-delete'><i class='layui-icon el-icon-delete2'>&#xe640;</i></span></span></li>");
+					}
+                    $(".banner-img").eq(index).css("display","").attr("src",res.data[0]);
+                    $(".banner-imgurl").eq(index).val(res.data[0]);
+                    //在按钮添加后在创建点击事件
+                    $(".layui-upload-list_item .el-upload-list__item-actions").click(function () {
+                        var html = $(this).parent().remove();
+                    });
+                    $(".layui-upload-list_item").hover(function () {
+                        $(this).find('img').css("opacity","0.4");
+                    },function () {
+                        $(this).find('img').css("opacity","1");
+                    });
+                    return;
+                }
+                layer.msg(res.msg);
+            }
+        });
+        $("#submit").on('click', function(){
+            //给轮播图片的隐藏表单设置name
+            $(".layui-upload-list li").each(function (index,element) {
+                $(this).find("input").attr("name",'imageList['+ (index) +'].url')
+            });
+            var content = ue.txt.html();
+            if (content == "") {
+                layer.msg("商品内容不能为空！")
+                return;
+            }
+            $("#info").val(content);
+            var formEm = $("#form-save").find('form');
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+            var pid = $("#pid").val();
+            var url = "add";
+            if(pid != "") { //根据pid是否W为空判断是添加还是更新
+                url = "edit"
+            }
+            $.post(url,formEm.serialize(),function(result){
+                if(result.code == 0){
+                    formEm[0].reset();	//清空弹框表单内容
+                    var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                    parent.layer.close(index);
+                    parent.tools.searchData();
+                }
+                layer.msg(result.msg);
+            });
+		});
+        //添加供应商
+        $('#add-supplier').on('click', function(){
+            layer.open({
+                type: 2,
+                title: '选择供应商信息',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                resize: false,
+                area: ['893px', '600px'],
+                offset: '0px',
+                content: 'supplierIndex'
+            });
+        });
+        $("#cancel").on('click',function () {
+            var formEm = $("#form-save").find('form')[0].reset();
+            closeWindow();
+        });
+        //在按钮添加后在创建点击事件
+        $(".layui-upload-list_item .el-upload-list__item-actions").click(function () {
+            var html = $(this).parent().remove();
+        });
+        $(".layui-upload-list_item").hover(function () {
+            $(this).find('img').css("opacity","0.4");
+        },function () {
+            $(this).find('img').css("opacity","1");
+        });
+        var _tools = {
+            //获取选中的优惠券
+            setSupplier: function(supplierId,suppilerName){
+                $("#supplier-id").val(supplierId);
+                $("#supplier-name").val(suppilerName);
+            }
+        }
+        var closeWindow = function () {
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            parent.layer.close(index);
+            parent.tools.searchData();
+        }
+        window.tools = _tools
+    });
+</script>
+</@footer>

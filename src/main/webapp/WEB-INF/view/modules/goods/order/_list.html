@@ -1,0 +1,39 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.orderId}" name="order-id"></td>
+		    <td>${list.orderId!''}</td>
+			<td>${list.pid!''}</td>
+		    <td>${list.productName!''}</td>
+		    <td>${list.supplierName!''}</td>
+		    <td>${list.createTime?string("yyyy-MM-dd HH:mm:ss")}</td>
+		    <td>${list.buyMobile!''}</td>
+		    <td>${list.adresName!''}</td>
+			<td>${list.adresAddr!''}</td>
+		    <td>${list.adresMobile!''}</td>
+			<td>${list.productOriginalPrice!0}</td>
+			<td>${list.freight!0}</td>
+		    <td>${list.totalOriginalPrice!0}</td>
+			<td>${list.productPrice!0}</td>
+			<td>${list.buyCount!0}</td>
+			<td>${list.totalAmount!0}</td>
+			<td>${list.payCash!0}</td>
+			<td>${list.payNoncash!0}</td>
+			<td>${list.courierCompany!''}</td>
+			<td>${list.courierNumber!''}</td>
+			<td class="order-goods-status" data-status="${list.orderGoodsStatus!''}">
+				<#if list.orderGoodsStatus == 0>待付款</#if>
+				<#if list.orderGoodsStatus == 5>待发货</#if>
+				<#if list.orderGoodsStatus == 10>待收货</#if>
+				<#if list.orderGoodsStatus == 15>已完成</#if>
+				<#if list.orderGoodsStatus == 20>已退款</#if>
+				<#if list.orderGoodsStatus == 25>已取消</#if>
+			</td>
+		    <td>
+				<input type="hidden" class="index-orderId" value="${list.orderId}">
+				<input type="hidden" class="index-orderStatus" value="${list.orderGoodsStatus}">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-mini operate" data-fn="show-info">查看详情</a>
+		 	</td>
+		</tr>
+	</#list>
+</#if>

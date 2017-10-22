@@ -1,0 +1,36 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.orderId}"></td>
+			<td>${list_index+1}</td>
+		    <td>${list.orderId!''}</td>
+		    <td>${list.orderName!''}</td>
+		    <td>${list.supplierName!''}</td>
+		    <td>${list.createTime?string("yyyy-MM-dd HH:mm:ss")}</td>
+		    <td>${list.buyMobile!''}</td>
+		    <td>${list.productPrice!''}</td>
+			<td>${list.payCash!0}</td>
+			<td>${list.payNoncash!0}</td>
+			<td>
+				<#if list.orderActivityStatus == 0>待付款</#if>
+				<!--<#if list.orderActivityStatus == 5>待开始</#if>-->
+				<#if list.orderActivityStatus == 10>待开始</#if>
+				<#if list.orderActivityStatus == 12>已开始</#if>
+				<#if list.orderActivityStatus == 15>已结束</#if>
+				<#if list.orderActivityStatus == 20>已取消</#if>
+			</td>
+			<td>
+				<#if list.inviteCount == 0>
+					否
+					<#else>
+						是
+				</#if>
+			</td>
+		    <td>
+				<input type="hidden" class="index-orderId" value="${list.orderId}">
+				<input type="hidden" class="index-orderStatus" value="${list.orderActivityStatus}">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-mini operate" data-fn="show-info">编辑</a>
+		 	</td>
+		</tr>
+	</#list>
+</#if>

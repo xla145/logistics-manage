@@ -1,0 +1,24 @@
+<div style="margin: 15px; display:none" id="add-form">
+	<form class="layui-form layui-form-pane">
+		<input type="hidden" value="${card.id!''}" name="cardId" />
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>数量</label>
+			<div class="layui-input-inline">
+				<input type="text" name="count" placeholder="请输入数量" autocomplete="off" class="layui-input" >
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>批次号</label>
+			<div class="layui-input-inline">
+				<input type="text" name="batchNo" placeholder="请输入批次号" autocomplete="off" class="layui-input">
+			</div>
+			<div class="layui-form-mid layui-word-aux"><a href="javascript:void(0);" class="operator-btn layui-btn layui-btn-mini layui-btn-normal" data-type="authBatchNo">自动生成</a>&nbsp;&nbsp;<span style="color: red;">注意：(你可以手动输入或自动生成)</span></div>
+		</div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block">
+				<textarea name="remark" placeholder="请输入备注信息" class="layui-textarea"></textarea>
+			</div>
+		</div>
+	</form>
+</div>

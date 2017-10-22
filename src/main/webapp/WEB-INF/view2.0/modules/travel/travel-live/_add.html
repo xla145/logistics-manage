@@ -1,0 +1,526 @@
+<#include "../../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div id="form-save">
+	<form name="travel-form" class="layui-form layui-form-pane" id="travel-form">
+	<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+		<ul class="layui-tab-title">
+			<li class="layui-this">产品基本信息</li>
+			<li>产品描述</li>
+			<li>图片</li>
+			<li>行程安排</li>
+			<li>报价信息</li>
+			<li>预定须知</li>
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show">
+					<div class="layui-form-item ">
+						<label class="layui-form-label"><span>*</span>产品标题：</label>
+						<div class="layui-input-block">
+							<input type="text" name="title" autocomplete="off" class="layui-input" lay-verify="title">
+							<input type="hidden" name="pid" value="${pid!''}" id="pid">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span>*</span>产品副标题：</label>
+						<div class="layui-input-block">
+							<input type="text" name="subTitle" autocomplete="off" class="layui-input" lay-verify="subTitle">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">出发地：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="text" name="departure" autocomplete="off" class="layui-input">
+						</div>
+						<div class="layui-form-mid layui-word-aux">不填则为空</div>
+						<label class="layui-form-label">目的地：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="text" name="destination" autocomplete="off" class="layui-input">
+						</div>
+						<div class="layui-form-mid layui-word-aux">不填则为空</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width: 130px;">建议出发时间：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="text" name="suggestTime" autocomplete="off" class="layui-input">
+						</div>
+						<div class="layui-form-mid layui-word-aux"></div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">出发时间：</label>
+						<div class="layui-inline time-item">
+							<input type="text" class="layui-input depart-time-item" name="departTime">
+						</div>
+						<a href="javascript:void(0)" id="add-depart-time"><i class="layui-icon">&#xe654;</i></a>
+						<a href="javascript:void(0)" id="del-depart-time"><i class="layui-icon">&#xe640;</i></a>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span>*</span>会员价：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="text" name="price" class="layui-input" lay-verify="price">
+						</div>
+						<div class="layui-form-mid layui-word-aux">(/人起)</div>
+						<label class="layui-form-label">非会员价：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="text" name="originalPrice" class="layui-input" lay-verify="originalPrice">
+						</div>
+						<div class="layui-form-mid layui-word-aux">(/人起)</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">交通情况：</label>
+						<div class="layui-input-block">
+							<input type="checkbox" name="trafficMode" lay-skin="primary" title="飞机" checked="" value="1">
+							<input type="checkbox" name="trafficMode" lay-skin="primary" title="轮船" value="2">
+							<input type="checkbox" name="trafficMode" lay-skin="primary" title="汽车" value="3">
+							<input type="checkbox" name="trafficMode" lay-skin="primary" title="火车" value="4">
+							<input type="checkbox" name="trafficMode" lay-skin="primary" title="自理" value="5">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">合作商家：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input name="supplierName" type="hidden">
+							<select name="supplierId" lay-filter="supplier">
+								<option value="">请选择</option>
+								<@module name="option" class="com.logistics.label.impl.GetSupplierNode" type="3"/>
+							</select>
+						</div>
+						<label class="layui-form-label">想去的人：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="number" name="wantNumber" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">产品标签：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="text" name="label" class="layui-input" lay-verify="label">
+						</div>
+						<div class="layui-form-mid layui-word-aux">注意：多标签请以( , )隔外</div>
+						<label class="layui-form-label"><span>*</span>权重：</label>
+						<div class="layui-input-inline layui-input-travel">
+							<input type="number" name="weight" class="layui-input" lay-verify="required">
+						</div>
+						<div class="layui-form-mid layui-word-aux">注意：数字越大越靠前</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-block layui-form-save">
+							<button class="layui-btn" id="travel" type="button">立即保存</button>
+						</div>
+					</div>
+			</div>
+			<div class="layui-tab-item">
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">产品介绍：</label>
+					<div class="layui-input-block">
+						<textarea class="layui-textarea layui-hide" lay-verify="content" name="info" id="travel-info"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">行程亮点：</label>
+					<div class="layui-input-block">
+						<textarea class="layui-textarea layui-hide"  lay-verify="content" name="stroke" id="travel-stroke"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block layui-form-save">
+						<button class="layui-btn" id="travel-content" type="button">立即保存</button>
+					</div>
+				</div>
+			</div>
+			<div class="layui-tab-item">
+				<fieldset class="layui-elem-field layui-field-title">
+					<legend>上传封面图片：</legend>
+				</fieldset>
+				<div class="layui-input-inline">
+					<div class="layui-upload-drag" id="img-url">
+						<i class="layui-icon"></i>
+						<p>点击上传</p>
+					</div>
+				</div>
+				<fieldset class="layui-elem-field layui-field-title">
+					<legend>上传轮播图片：</legend>
+				</fieldset>
+				<div class="layui-upload">
+					<button type="button" class="layui-btn" id="imglist-url">多图片上传</button>
+					<blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+						预览图：
+						<div class="layui-upload-list" id="img-list"></div>
+					</blockquote>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-block layui-form-save">
+						<button class="layui-btn" id="travel-img" type="button">立即保存</button>
+					</div>
+				</div>
+			</div>
+			<div class="layui-tab-item">
+				<div class="layui-block layui-add-day">
+					<a href="javascript:void(0)" class="layui-btn layui-btn-small layui-btn-normal travel-arrange">保&nbsp;&nbsp;&nbsp;存</a>
+					<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add-day"><i class="layui-icon">&#xe654;</i> 添加天数</a>
+					<a href="javascript:void(0)" class="layui-btn layui-btn-small layui-btn-danger" id="del-day"><i class="layui-icon">&#xe640;</i> 删除天数</a>
+				</div>
+				<div class="layui-collapse layui-day-list">
+					<div class="layui-colla-item layui-day-item">
+						<h2 class="layui-colla-title">第 1 天</h2>
+						<div class="layui-colla-content layui-show">
+							<div class="layui-form-item">
+								<label class="layui-form-label">标题：</label>
+								<div class="layui-input-block">
+									<input type="text" name="productTravelArranges[0].title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+								</div>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label">行程内容：</label>
+								<div class="layui-input-block">
+									<textarea class="layui-textarea layui-hide" name="productTravelArranges[0].content" id="travel-content-0"></textarea>
+								</div>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label">用餐情况：</label>
+								<div class="layui-input-block">
+								<textarea class="layui-textarea" name="productTravelArranges[0].diningName">早餐：午餐：晚餐：</textarea>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">交通情况：</label>
+								<div class="layui-input-block">
+									<input type="checkbox" name="productTravelArranges[0].trafficMode" lay-skin="primary" title="飞机" value="1">
+									<input type="checkbox" name="productTravelArranges[0].trafficMode" lay-skin="primary" title="轮船" value="2">
+									<input type="checkbox" name="productTravelArranges[0].trafficMode" lay-skin="primary" title="汽车" value="3">
+									<input type="checkbox" name="productTravelArranges[0].trafficMode" lay-skin="primary" title="火车" value="4">
+									<input type="checkbox" name="productTravelArranges[0].trafficMode" lay-skin="primary" title="自理" value="5">
+								</div>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label">住宿情况：</label>
+								<div class="layui-input-block">
+									<textarea class="layui-textarea layui-hide" name="productTravelArranges[0].accommodation" id="travel-accommodation-0"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block layui-form-save">
+						<button class="layui-btn travel-arrange" type="button">立即保存</button>
+					</div>
+				</div>
+			</div>
+			<div class="layui-tab-item">
+				<blockquote class="layui-elem-quote">费用信息：</blockquote>
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">报价包含：</label>
+					<div class="layui-input-block">
+						<textarea class="layui-textarea layui-hide"  lay-verify="content" id="travel-with-cost" name="withCost"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">报价不包含：</label>
+					<div class="layui-input-block">
+						<textarea class="layui-textarea layui-hide" name="withoutCost" lay-verify="content" id="travel-not-cost"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-block layui-form-save">
+						<button class="layui-btn" id="travel-cost" type="button">立即保存</button>
+					</div>
+				</div>
+			</div>
+			<div class="layui-tab-item">
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">预定须知：</label>
+					<div class="layui-input-block">
+						<textarea class="layui-textarea layui-hide" name="bookings" id="travel-bookings"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">备注：</label>
+					<div class="layui-input-block">
+						<textarea placeholder="请输入小于250个字符" class="layui-textarea" name="remark"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-block layui-form-save">
+						<button class="layui-btn" id="travel-booking" type="button">立即保存</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+<@footer>
+<script>
+	//入口
+	layui.use(['element','form','upload','laydate'], function() {
+        var element = layui.element,
+			form = layui.form,
+			$ = layui.jquery
+            ,upload = layui.upload,
+			laydate = layui.laydate;
+        lay('.depart-time-item').each(function(){
+            laydate.render({
+                elem: this
+                ,trigger: 'click'
+            });
+        });
+        //自定义验证规则
+        form.verify({
+			title: function (value) {
+                if(!/^.{3,150}$/.test(value)){
+                    return '标题必须3到150位！';
+                }
+            },
+            subTitle: function (value) {
+                if(!/^.{3,512}$/.test(value)){
+                    return '副标题必须大于3位！';
+                }
+            },
+            price: function(value){
+                if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(value)){
+                    return '价格只能是整数或小数！';
+                }
+            },
+            originalPrice: function(value){
+                if(value != "" && !/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(value)){
+                    return '价格只能是整数或小数！';
+                }
+            },
+            label: function (value) {
+                if(value != "" && !/^[\S]{0,50}$/.test(value)){
+                    return '标签必须小于50位！';
+                }
+            }
+        });
+        $("#add-depart-time").on('click',function () {
+			var index = $(".time-item").length;
+			var html = "<div class='layui-inline time-item'> <input type='text' class='layui-input depart-time-item' name='departTime'> </div>";
+            if (index == 0) {
+                $(this).before(html);
+            } else {
+                $(".time-item:eq("+(index-1)+")").after(html);
+            }
+            timeListRender();
+        });
+        $("#del-depart-time").on('click',function () {
+            var index = $(".time-item").length;
+            $(".time-item:eq("+(index-1)+")").remove();
+            timeListRender();
+        });
+        //同时绑定多个
+		var timeListRender = function () {
+            lay('.depart-time-item').each(function(){
+                laydate.render({
+                    elem: this
+                    ,trigger: 'click'
+                });
+            });
+        }
+		//选择供应商
+        form.on('select(supplier)',function (data) {
+            $("#travel-form").find('input[name=supplierName]').val($(data.elem).find("option:selected").text());
+        })
+        var map = {};
+        //创建一个编辑器
+        //初始化一个编辑器
+        var travelInfoIndex = new Editor().init({
+            editorEm: $('#travel-info')	//产品介绍
+             
+        })
+        var travelStrokeIndex =  new Editor().init({
+            editorEm: $('#travel-stroke') //行程亮点
+        })
+        var travelBookingsIndex =  new Editor().init({
+            editorEm: $('#travel-bookings')	//预定须知
+
+        })
+        var travelNoCostIndex =  new Editor().init({
+            editorEm: $('#travel-not-cost')	//费用包含
+        })
+        var travelWithCostIndex =  new Editor().init({
+            editorEm: $('#travel-with-cost')//费用不包含
+        })
+		//创建行程安排的富文本框
+        map["travel-accommodation-0"] = new Editor().init({editorEm: $('#travel-accommodation-0')})
+        map["travel-content-0"] = new Editor().init({editorEm: $('#travel-content-0')});
+        //多图片上传
+        upload.render({
+            elem: '#imglist-url'
+            ,url: '${ctx}upload'
+            ,multiple: true
+			,before: function(obj){
+				var index = layer.msg('图片上传中...', {
+					icon: 16,
+					shade: 0.01,
+					time: 0
+				})
+			},done: function(res,index){
+                layer.close(layer.msg());//关闭上传提示窗口
+                //上传完毕
+                var html = "";
+				if (res.code == 0) {
+                    html =
+						"<div class='layui-img-item'>"
+                        	+"<img src="+ res.data[0] +" class='layui-upload-img'>"
+                        	+"<input type='hidden'class='img-url' value="+ res.data[0] +">"
+							+"<div class='img-weight'>"
+                        		+"<input type='text' placeholder='输入图片权重，越小越靠前！'>"
+							+"</div>"
+                        	+"<div class='layui-fun-list'>"
+                        		+"<span class='del-img'><i class='layui-icon'>&#xe640;</i></span>"
+                        	+"</div>"
+                        +"</div>";
+				}
+                $('#img-list').append(html);
+                //轮播图片删除
+                $(".del-img").on('click',function () {
+                    var $img = $(this).parent().parent();
+                    $img.remove();
+                });
+            }
+        });
+        //拖拽上传
+        upload.render({
+            elem: '#img-url'
+            ,url: '${ctx}upload'
+            ,done: function(res){
+                var html = "<input type='hidden' name='imageUrl' value="+res.data[0]+"> <img width='200' src="+res.data[0]+">";
+                $("#img-url").html(html)
+            }
+        });
+        var day = 1;
+        //添加天数
+		$("#add-day").on('click',function () {
+            var index = $(".layui-day-item").length;
+			var html = getDayContent();
+			console.log(element)
+            $(".layui-day-item:eq("+(index-1)+")").after(html);
+            map["travel-accommodation-"+index] = new Editor().init({editorEm: $('#travel-accommodation-'+index)});
+            map["travel-content-"+index] = new Editor().init({editorEm: $('#travel-content-'+index)});
+            form.render(); //更新全部
+            element.init('collapse');// 重新初始化 collapse
+        });
+        //删除天数
+        $("#del-day").on('click',function () {
+            var index = $(".layui-day-item").length - 1;
+            if (index == 0) {
+                layer.msg("必须要有第一天内容！");
+				return;
+			}
+            $(".layui-day-item:eq("+index+")").remove();
+        });
+		var getDayContent = function () {
+			day++;
+			var index = $(".layui-day-list .layui-day-item").length;
+			var html = "";
+			html+='<div class="layui-colla-item layui-day-item">'
+            +'<h2 class="layui-colla-title">'+
+				'第 '+(day)+' 天'
+            +'</h2>'
+			+'<div class="layui-colla-content">'
+            +'<div class="layui-form-item">'
+                +'<label class="layui-form-label">标题：</label>'
+            +'<div class="layui-input-block">'
+               + '<input type="text" name="productTravelArranges['+index+'].title" autocomplete="off" placeholder="请输入标题" class="layui-input">'
+                +'</div>'
+                +'</div>'
+                +'<div class="layui-form-item layui-form-text">'
+                +'<label class="layui-form-label">行程内容：</label>'
+                +'<div class="layui-input-block">'
+                +'<textarea class="layui-textarea layui-hide" name="productTravelArranges['+index+'].content" lay-verify="content" id="travel-content-'+index+'"></textarea>'
+                +'</div>'
+                +'</div>'
+                +'<div class="layui-form-item layui-form-text">'
+                +'<label class="layui-form-label">用餐情况：</label>'
+            +'<div class="layui-input-block">'
+                +'<textarea class="layui-textarea" name="productTravelArranges['+index+'].diningName">早餐：午餐：晚餐：</textarea>'
+                +'</div>'
+                +'</div>'
+                +'<div class="layui-form-item">'
+                +'<label class="layui-form-label">交通情况：</label>'
+            +'<div class="layui-input-block">'
+                +'<input type="checkbox" name="productTravelArranges['+index+'].trafficMode" lay-skin="primary" title="飞机" value="1">'
+                +'<input type="checkbox" name="productTravelArranges['+index+'].trafficMode" lay-skin="primary" title="轮船" value="2">'
+                +'<input type="checkbox" name="productTravelArranges['+index+'].trafficMode" lay-skin="primary" title="汽车" value="3">'
+                +'<input type="checkbox" name="productTravelArranges['+index+'].trafficMode" lay-skin="primary" title="火车" value="4">'
+                +'<input type="checkbox" name="productTravelArranges['+index+'].trafficMode" lay-skin="primary" title="自理" value="5">'
+                +'</div>'
+                +'</div>'
+                +'<div class="layui-form-item layui-form-text">'
+                +'<label class="layui-form-label">住宿情况：</label>'
+            +'<div class="layui-input-block">'
+                +'<textarea class="layui-textarea layui-hide" name="productTravelArranges['+index+'].accommodation" lay-verify="content" id="travel-accommodation-'+index+'"></textarea>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+			+'</div>';
+			return html;
+        }
+        //产品基本信息保存
+        var formEm = $("#travel-form");
+		$("#travel").on('click',function () {
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+            addTravel();
+        })
+		//产品内容保存
+        $("#travel-content").on('click',function () {
+            $("#travel-info").val(travelInfoIndex.getCode());
+            $("#travel-stroke").val(travelStrokeIndex.getCode());
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+            addTravel();
+        })
+        //保存图片信息
+        $("#travel-img").on('click',function () {
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+          addTravel();
+        })
+        //保存行程安排信息
+        $(".travel-arrange").on('click',function () {
+            for(var prop in map){
+                if(map.hasOwnProperty(prop)){
+                    $("#"+prop).val(map[prop].getCode());
+                }
+            }
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+            addTravel();
+        })
+        //保存报价信息
+        $("#travel-cost").on('click',function () {
+            $("#travel-with-cost").val(travelWithCostIndex.getCode());
+            $("#travel-not-cost").val(travelNoCostIndex.getCode())
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+            addTravel();
+        })
+        //保存预定须知信息
+        $("#travel-booking").on('click',function () {
+            $("#travel-booking").val(travelBookingsIndex.getCode());
+            if(!form.onVerify(formEm)){
+                return false;
+            }
+            addTravel();
+        })
+        function addTravel() {
+            $(".layui-upload-list .img-url").each(function (i,j) {
+                $(this).attr("name","productImages["+i+"].url");
+                $(this).next().find("input").attr("name","productImages["+i+"].weight");
+            })
+            $.post("${ctx}travel/live/add",formEm.serialize(),function(result){
+                if(result.code == 0){
+                    layer.msg("保存成功！");
+                    return;
+                }
+                layer.msg(result.msg);
+            });
+        }
+    });
+</script>
+</@footer>

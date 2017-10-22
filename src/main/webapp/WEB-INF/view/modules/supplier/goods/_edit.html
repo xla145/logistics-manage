@@ -1,0 +1,67 @@
+<div style="margin: 15px;" id="edit-form">
+	<form class="layui-form">
+		<input type="hidden" name="id" value="${data.id!''}" id="supplier_id">
+		<div class="layui-form-item">
+			<label class="layui-form-label">合作商名称:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="name" placeholder="请输入合作商名称" lay-verify="required" autocomplete="off" class="layui-input" value="${data.name!''}">
+			</div>
+			<label class="layui-form-label">联系人:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="people" placeholder="请输入联系人" lay-verify="required" autocomplete="off" class="layui-input" value="${data.people!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">电话:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="mobile" autocomplete="off" class="layui-input" value="${data.mobile!''}">
+			</div>
+			<label class="layui-form-label">传真:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="fax" autocomplete="off" class="layui-input" value="${data.fax!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">地址:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="address" autocomplete="off" class="layui-input" lay-verify="required" value="${data.address!''}">
+			</div>
+			<label class="layui-form-label">网址:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="url" autocomplete="off" class="layui-input" value="${data.url!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">邮箱:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="email" autocomplete="off" class="layui-input" value="${data.email!''}">
+			</div>
+			<label class="layui-form-label">QQ:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="qq" autocomplete="off" class="layui-input" value="${data.qq!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">结算方式:</label>
+			<div class="layui-input-inline">
+				<select name="settType" id="settlement_type" lay-filter="expenses">
+				   	<option value="1" <#if data.settType == 1>selected</#if>>日结算</option>
+					<option value="2" <#if data.settType == 2>selected</#if>>月结算</option>
+					<option value="3" <#if data.settType == 3>selected</#if>>半年结算</option>
+					<option value="4" <#if data.settType == 4>selected</#if>>单笔结算</option>
+				</select> 
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">添加时间:</label>
+			<div class="layui-input-inline layui-time">${data.createTime?string("yyyy-MM-dd HH:mm:ss")}</div>
+			<label class="layui-form-label">停止时间:</label>
+			<div class="layui-input-inline layui-time"><#if data.stopTime??>${data.stopTime?string("yyyy-MM-dd HH:mm:ss")}</#if></div>
+		</div>
+	</form>
+</div>
+<style type="text/css">
+.layui-input-inline.layui-time {
+    line-height: 40px;
+}
+</style>

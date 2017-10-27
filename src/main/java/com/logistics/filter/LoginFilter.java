@@ -23,8 +23,6 @@ public class LoginFilter implements Filter{
 	static{
 		excludeList.add("/login");
 		excludeList.add("/getCode");
-		excludeList.add("/datas/");
-		excludeList.add("/resources/");
 		excludeList.add("/resources2.0/");
 	}
 	public void init(FilterConfig filterConfig) throws ServletException {

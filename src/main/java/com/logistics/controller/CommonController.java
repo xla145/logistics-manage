@@ -188,4 +188,9 @@ public class CommonController {
 		}
 		return JsonBean.error("图片上传失败");
 	}
+
+	@RequestMapping("/demo")
+	public String getIndex() {
+		return "modules/index";
+	}
 }

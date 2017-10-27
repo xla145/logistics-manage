@@ -7,10 +7,26 @@ import cn.assist.easydao.annotation.Temporary;
 
 import cn.assist.easydao.pojo.BasePojo;
 import java.util.Date;
+import java.math.*;
 
-/**
- * 供应商信息
- */
+
+/** supplier
+	ID	INT(11)
+	NAME	VARCHAR(50)
+	PEOPLE	VARCHAR(20)
+	MOBILE	VARCHAR(11)
+	FAX	VARCHAR(20)
+	URL	VARCHAR(50)
+	QQ	VARCHAR(12)
+	ADDRESS	VARCHAR(30)
+	STATUS	INT(5)
+	STOP_TIME	DATETIME(19)
+	EMAIL	VARCHAR(20)
+	SETT_TYPE	INT(5)
+	REMARK	VARCHAR(255)
+	UPDATE_TIME	DATETIME(19)
+	CREATE_TIME	DATETIME(19)
+*/
 public class Supplier extends BasePojo {
 	@Temporary
 	private static final long serialVersionUID = 1L;
@@ -27,7 +43,6 @@ public class Supplier extends BasePojo {
 	private Date stopTime;
 	private String email;
 	private Integer settType;
-	private Integer productGroupType;
 	private String remark;
 	private Date updateTime;
 	private Date createTime;
@@ -98,23 +113,12 @@ public class Supplier extends BasePojo {
 	public String getEmail(){
 		return email;
 	}
-
-	public Integer getSettType() {
+	public void setSettType(Integer settType){
+		this.settType=settType;
+	}
+	public Integer getSettType(){
 		return settType;
 	}
-
-	public void setSettType(Integer settType) {
-		this.settType = settType;
-	}
-
-	public Integer getProductGroupType() {
-		return productGroupType;
-	}
-
-	public void setProductGroupType(Integer productGroupType) {
-		this.productGroupType = productGroupType;
-	}
-
 	public void setRemark(String remark){
 		this.remark=remark;
 	}

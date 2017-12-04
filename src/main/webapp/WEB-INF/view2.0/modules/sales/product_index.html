@@ -81,7 +81,7 @@
         var tableIns = table.render({
 			id: 'activity-table',
             elem: '#activity-table'
-            ,url: '${ctx}purchase/productList'
+            ,url: '${ctx}sales/productStockList'
             ,height: 'full-90'
             ,page: true
             ,method: 'post'
@@ -96,6 +96,7 @@
                 {checkbox: true, fixed: true}
                 ,{fixed: true,field:'pid', title: '商品编号', width:150}
                 ,{field:'productName', title: '商品名称', width:250}
+                ,{field:'remaining', title: '剩余库存', width:250}
                 ,{field:'productPrice', title: '售价', width:80}
             ]],
         });

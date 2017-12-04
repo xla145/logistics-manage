@@ -3,12 +3,12 @@ package com.logistics.label.impl;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
-import com.logistics.base.constant.SupplierConstant;
+import com.logistics.base.constant.WarehouseConstant;
 import com.logistics.base.helper.SpringFactory;
 import com.logistics.label.ModuleData;
-import com.logistics.service.supplier.ISupplierService;
 import com.logistics.service.vo.Option;
-import com.logistics.service.vo.Supplier;
+import com.logistics.service.vo.Warehouse;
+import com.logistics.service.warehouse.IWarehouseService;
 import freemarker.template.TemplateModel;
 
 import java.util.ArrayList;
@@ -22,19 +22,19 @@ import java.util.Map;
  * @author caibin
  *
  */
-public class GetSupplierNode extends ModuleData {
+public class GetWarehouseNode extends ModuleData {
 
 	@Override
 	public Map<String, Object> getModelData(Map<String, Object> params) throws Exception {
 		TemplateModel checked = (TemplateModel) params.get("checked");
-		ISupplierService supplierService = SpringFactory.getBean("ISupplierService");
-		List<Supplier> list = supplierService.supplierList(new Conditions("status", SqlExpr.EQUAL, SupplierConstant.STATUS_START));
+		IWarehouseService iWarehouseService = SpringFactory.getBean("IWarehouseService");
+		List<Warehouse> list = iWarehouseService.getWarehouseList(new Conditions("status",SqlExpr.EQUAL, WarehouseConstant.PWAREHOUSE_ENABLE));
 		List<Option> options = new ArrayList<Option>();
 		if(list != null){
-			for (Supplier supplier : list) {
+			for (Warehouse warehouse : list) {
 				Option option = new Option();
-				option.setId(supplier.getId()+"");
-				option.setName(supplier.getName());
+				option.setId(warehouse.getWid()+"");
+				option.setName(warehouse.getName());
 				options.add(option);
 			}
 		}

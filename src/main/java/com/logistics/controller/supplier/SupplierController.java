@@ -1,21 +1,19 @@
-package com.yuelinghui.controller.supplier;
+package com.logistics.controller.supplier;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
 import cn.assist.easydao.common.SqlJoin;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
-import com.yuelinghui.base.constant.ProductGroupTypeConstant;
-import com.yuelinghui.base.constant.SettlementTypeConstant;
-import com.yuelinghui.base.utils.DataObj;
-import com.yuelinghui.base.utils.JsonBean;
-import com.yuelinghui.base.utils.PageUtils;
-import com.yuelinghui.base.utils.ReqUtils;
-import com.yuelinghui.controller.BaseController;
-import com.yuelinghui.service.model.ProductGoodsModel;
-import com.yuelinghui.service.product.ProductService;
-import com.yuelinghui.service.supplier.SupplierService;
-import com.yuelinghui.service.vo.Supplier;
+import com.logistics.base.constant.SettlementTypeConstant;
+import com.logistics.base.utils.DataObj;
+import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.ReqUtils;
+import com.logistics.controller.BaseController;
+import com.logistics.service.product.IProductService;
+import com.logistics.service.supplier.ISupplierService;
+import com.logistics.service.vo.Product;
+import com.logistics.service.vo.Supplier;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 
@@ -34,20 +32,20 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 @Controller
-@RequestMapping(value = "/supplier/goods")
-public class SupplierGoodsController extends BaseController{
+@RequestMapping(value = "/supplier")
+public class SupplierController extends BaseController {
 
 	@Autowired
-	private SupplierService supplierService;
+	private ISupplierService supplierService;
 	
 	@Autowired
-	private ProductService productService;
+	private IProductService iproductService;
 	
 	
 	@RequestMapping(value = "/index")
 	public String index(HttpServletRequest request, Model model){
 		model.addAttribute("settlementTypeList", SettlementTypeConstant.values());
-		return "modules/supplier/goods/index";
+		return "modules/supplier/index";
 	}
 	
 	/**
@@ -67,7 +65,6 @@ public class SupplierGoodsController extends BaseController{
 		//查询条件
 		Conditions conn = new Conditions("name", SqlExpr.EQUAL, name);
 		conn.add(new Conditions("status", SqlExpr.EQUAL, status), SqlJoin.AND);
-		conn.add(new Conditions("product_group_type", SqlExpr.EQUAL, ProductGroupTypeConstant.GOODS.getId()), SqlJoin.AND);
 
 		PagePojo<Supplier> page = supplierService.getSupplierPage(conn, pageNo, pageSize);
 		//render结果
@@ -96,7 +93,6 @@ public class SupplierGoodsController extends BaseController{
 		if(supplier.getSettType() == null){
 			return JsonBean.error("结算方式必填");
 		}
-		supplier.setProductGroupType(ProductGroupTypeConstant.GOODS.getId());
 		DataObj<Supplier> result = supplierService.addSupplier(supplier);
 		if (result.isSuccessCode()) {
 			return JsonBean.success("保存成功！");
@@ -119,7 +115,7 @@ public class SupplierGoodsController extends BaseController{
 			supplier = supplierService.getSupplier(id);
 		}
 		model.addAttribute("data",supplier);
-		return "modules/supplier/goods/_edit";
+		return "modules/supplier/_edit";
 	}
 	
 	/**
@@ -165,7 +161,7 @@ public class SupplierGoodsController extends BaseController{
 		int pageNo = ReqUtils.getParamToInt(request, "pageNo", 1);
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
 		Integer supplierId = ReqUtils.getParamToInteger(request, "supplierId", null);
-		PagePojo<ProductGoodsModel> page = productService.getProductGoodsBySupplierId(supplierId, pageNo, pageSize);
+		PagePojo<Product> page = iproductService.getProductGoodsBySupplierId(supplierId,pageNo,pageSize);
 		//render结果
 		return JsonBean.success(page);
 	}
@@ -186,7 +182,7 @@ public class SupplierGoodsController extends BaseController{
 			supplier = supplierService.getSupplier(id);
 		}
 		model.addAttribute("data",supplier);
-		return "modules/supplier/goods/_info";
+		return "modules/supplier/_info";
 	}
 
 	@RequestMapping(value = "/del")

@@ -198,7 +198,7 @@ layui.define(['element', 'common'], function(exports) {
 					if(data[i].icon.indexOf('fa-') !== -1) {
 						ulHtml += '<i class="fa ' + data[i].icon + '" aria-hidden="true" data-icon="' + data[i].icon + '"></i>';
 					} else {
-						ulHtml += '<i class="layui-icon" data-icon="' + data[i].icon + '">' + data[i].icon + '</i>';
+						ulHtml += '<i class="layui-icon  ' + data[i].icon + ' " data-icon="' + data[i].icon + '"></i>';
 					}
 				}
 				ulHtml += '<cite>' + data[i].title + '</cite>'

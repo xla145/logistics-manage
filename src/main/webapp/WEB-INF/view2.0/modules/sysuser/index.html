@@ -3,9 +3,7 @@
 <div class="admin-main">
 	<!-- 按钮组 -->
 	<blockquote class="layui-elem-quote">
-		<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 添加</a>
-		<a href="#" class="layui-btn layui-btn-small layui-btn-normal operator-btn" data-type="edit"><i class="layui-icon">&#xe642;</i> 编辑</a>
-		<!--<a href="#" class="layui-btn layui-btn-small layui-btn-danger" id="delete"><i class="layui-icon">&#xe640;</i> 删除信息</a>-->
+		<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 添加</a>
 	</blockquote>
 	<!-- 筛选组 -->
 	<blockquote class="layui-elem-quote filter-bar">
@@ -51,16 +49,16 @@
 		      </div>
 		    </div>
 			<div class="layui-inline">
-				<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
-				<a href="javascript:void(0)" class="layui-btn layui-btn-small layui-btn-normal operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm layui-btn-normal operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
 			</div>
 		</form>
 	</blockquote>
 	<!-- 表格区域 -->
 	<table class="layui-table" id="sysuser-table" lay-filter="sysuser-table"></table>
 	<script type="text/html" id="barDemo">
-		<a class='layui-btn layui-btn-mini layui-btn-normal' lay-event='edit'>编辑</a>
-		<a class='layui-btn layui-btn-danger layui-btn-mini' lay-event='auth'>赋权</a>
+		<a class='layui-btn layui-btn-xs layui-btn-normal' lay-event='edit'>编辑</a>
+		<a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='auth'>赋权</a>
 	</script>
 	</div>
 </div>
@@ -96,8 +94,8 @@
                 ,{field:'mobile', title: '手机号', width:120}
                 ,{field:'qq', title: '联系QQ', width:150}
                 ,{field:'email', title: '邮箱', width:200}
-                ,{field:'createTime', title: '创建时间', width:150,sort:true,templet: '#createTimeTpl'}
-                ,{field:'lastLoginTime', title: '最后登录时间', width:150,sort:true,templet: '#lastLoginTimeTpl'}
+                ,{field:'createTime', title: '创建时间', width:150,sort:true,templet: '<div>{{dateFormat(d.createTime)}}</div>'}
+                ,{field:'lastLoginTime', title: '最后登录时间', width:150,sort:true,templet:  '<div>{{dateFormat(d.lastLoginTime)}}</div>'}
                 ,{field:'isValid', title: '是否有效', width:80,templet: '#isValidTpl'}
                 ,{fixed:'right', title: '操作',width:120, align:'left', toolbar: '#barDemo'}
             ]],
@@ -217,24 +215,6 @@
             active[type] ? active[type].call(this, [obj.data]) : '';
         });
     });
-</script>
-<script type="text/html" id="createTimeTpl">
-	{{# var fn = function(time){
-	var newDate = new Date();
-	newDate.setTime(time);
-	return newDate.Format("yyyy-MM-dd hh:mm:ss");
-	}
-	}}
-	{{fn(d.createTime)}}
-</script>
-<script type="text/html" id="lastLoginTimeTpl">
-	{{# var fn = function(time){
-	var newDate = new Date();
-	newDate.setTime(time);
-	return newDate.Format("yyyy-MM-dd hh:mm:ss");
-	}
-	}}
-	{{fn(d.lastLoginTime)}}
 </script>
 <script type="text/html" id="isValidTpl">
 	{{# if(d.isValid === 0){ }}

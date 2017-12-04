@@ -10,126 +10,41 @@ import java.util.Date;
 import java.math.*;
 
 
-/** `order`
-	ORDER_ID	VARCHAR(128)
-	ORDER_TYPE	VARCHAR(255)
-	ORDER_NAME	VARCHAR(256)
-	BUY_UID	INT(11)
-	BUY_NAME	VARCHAR(64)
-	BUY_MOBILE	VARCHAR(11)
+/** purchase
+	PE_ID	VARCHAR(20)
+	NAME	VARCHAR(256)
 	WID	VARCHAR(30)
-	CAT_ID	INT(11)
-	PRODUCT_ID	VARCHAR(128)
-	PRODUCT_IMG	VARCHAR(512)
-	PRODUCT_NAME	VARCHAR(256)
-	PRODUCT_PRICE	DECIMAL(10,2)
-	PRODUCT_ORIGINAL_PRICE	DECIMAL(10,2)
 	BUY_COUNT	INT(11)
 	TOTAL_AMOUNT	DECIMAL(10,2)
 	CREATE_TIME	DATETIME(19)
 	UPDATE_TIME	DATETIME(19)
 	REMARK	VARCHAR(256)
+	OPEAR_ID	INT(11)
+	OPEAR_NAME	VARCHAR(20)
+	TYPE	INT(11)
 */
 public class Purchase extends BasePojo {
 	@Temporary
 	private static final long serialVersionUID = 1L;
 	@Id
-	private String orderId;
-	private String orderType;
-	private String orderName;
-	private Integer buyUid;
-	private String buyName;
-	private String buyMobile;
-	private String wid;
-	private Integer catId;
-	private String productId;
-	private String productImg;
-	private String productName;
-	private BigDecimal productPrice;
-	private BigDecimal productOriginalPrice;
-	private Integer buyCount;
-	private BigDecimal totalAmount;
+	private String peId;
+	private Integer buyCount; // 采购单总数
+	private BigDecimal totalAmount;// 采购单总价
 	private Date createTime;
 	private Date updateTime;
 	private String remark;
+	private Integer opearId; // 系统操作人信息
+	private String opearName;// 操作人
+	private Integer type;// 采购单类型
+	private Integer status;// 采购单状态
+	private Date peDate;// 单据时间
+	private String purchaseName;// 采购人员
 
-	public void setOrderId(String orderId){
-		this.orderId=orderId;
+	public void setPeId(String peId){
+		this.peId=peId;
 	}
-	public String getOrderId(){
-		return orderId;
-	}
-	public void setOrderType(String orderType){
-		this.orderType=orderType;
-	}
-	public String getOrderType(){
-		return orderType;
-	}
-	public void setOrderName(String orderName){
-		this.orderName=orderName;
-	}
-	public String getOrderName(){
-		return orderName;
-	}
-	public void setBuyUid(Integer buyUid){
-		this.buyUid=buyUid;
-	}
-	public Integer getBuyUid(){
-		return buyUid;
-	}
-	public void setBuyName(String buyName){
-		this.buyName=buyName;
-	}
-	public String getBuyName(){
-		return buyName;
-	}
-	public void setBuyMobile(String buyMobile){
-		this.buyMobile=buyMobile;
-	}
-	public String getBuyMobile(){
-		return buyMobile;
-	}
-	public void setWid(String wid){
-		this.wid=wid;
-	}
-	public String getWid(){
-		return wid;
-	}
-	public void setCatId(Integer catId){
-		this.catId=catId;
-	}
-	public Integer getCatId(){
-		return catId;
-	}
-	public void setProductId(String productId){
-		this.productId=productId;
-	}
-	public String getProductId(){
-		return productId;
-	}
-	public void setProductImg(String productImg){
-		this.productImg=productImg;
-	}
-	public String getProductImg(){
-		return productImg;
-	}
-	public void setProductName(String productName){
-		this.productName=productName;
-	}
-	public String getProductName(){
-		return productName;
-	}
-	public void setProductPrice(BigDecimal productPrice){
-		this.productPrice=productPrice;
-	}
-	public BigDecimal getProductPrice(){
-		return productPrice;
-	}
-	public void setProductOriginalPrice(BigDecimal productOriginalPrice){
-		this.productOriginalPrice=productOriginalPrice;
-	}
-	public BigDecimal getProductOriginalPrice(){
-		return productOriginalPrice;
+	public String getPeId(){
+		return peId;
 	}
 	public void setBuyCount(Integer buyCount){
 		this.buyCount=buyCount;
@@ -160,6 +75,48 @@ public class Purchase extends BasePojo {
 	}
 	public String getRemark(){
 		return remark;
+	}
+	public void setOpearId(Integer opearId){
+		this.opearId=opearId;
+	}
+	public Integer getOpearId(){
+		return opearId;
+	}
+	public void setOpearName(String opearName){
+		this.opearName=opearName;
+	}
+	public String getOpearName(){
+		return opearName;
+	}
+	public void setType(Integer type){
+		this.type=type;
+	}
+	public Integer getType(){
+		return type;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Date getPeDate() {
+		return peDate;
+	}
+
+	public void setPeDate(Date peDate) {
+		this.peDate = peDate;
+	}
+
+	public String getPurchaseName() {
+		return purchaseName;
+	}
+
+	public void setPurchaseName(String purchaseName) {
+		this.purchaseName = purchaseName;
 	}
 }
 

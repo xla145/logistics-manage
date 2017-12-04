@@ -17,7 +17,7 @@ import java.math.*;
 	PARENT_ID_PATH	VARCHAR(128)
 	IS_SHOW	TINYINT UNSIGNED(4)
 	IMG_URL	VARCHAR(512)
-	STATUS	TINYINT(4)
+	STATUS	INT(4)
 	CREATE_TIME	DATETIME(19)
 	UPDATE_TIME	DATETIME(19)
 	WEIGHT	INT UNSIGNED(11)
@@ -33,7 +33,7 @@ public class ProductCategory extends BasePojo {
 	private String parentIdPath;
 	private Integer isShow;
 	private String imgUrl;
-	private boolean status;
+	private Integer status;
 	private Date createTime;
 	private Date updateTime;
 	private Integer weight;
@@ -75,10 +75,10 @@ public class ProductCategory extends BasePojo {
 	public String getImgUrl(){
 		return imgUrl;
 	}
-	public void setStatus(boolean status){
+	public void setStatus(Integer status){
 		this.status=status;
 	}
-	public boolean getStatus(){
+	public Integer getStatus(){
 		return status;
 	}
 	public void setCreateTime(Date createTime){

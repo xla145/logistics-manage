@@ -1,7 +1,8 @@
-package com.logistics.controller.purchase;
+package com.logistics.controller.sales;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
+import cn.assist.easydao.common.SqlJoin;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -11,14 +12,17 @@ import com.logistics.base.utils.RecordBean;
 import com.logistics.base.utils.ReqUtils;
 import com.logistics.controller.BaseController;
 import com.logistics.service.model.ProductModel;
+import com.logistics.service.model.ProductStockModel;
 import com.logistics.service.model.PurchaseModel;
+import com.logistics.service.model.SalesModel;
+import com.logistics.service.product.IProductCategoryService;
 import com.logistics.service.product.IProductService;
+import com.logistics.service.product.IProductStockService;
 import com.logistics.service.purchase.IPurchaseService;
+import com.logistics.service.sales.ISalesService;
 import com.logistics.service.supplier.ISupplierService;
-import com.logistics.service.vo.Product;
-import com.logistics.service.vo.ProductCategory;
-import com.logistics.service.vo.Purchase;
-import com.logistics.service.vo.PurchaseProduct;
+import com.logistics.service.vo.*;
+import com.sun.org.apache.xalan.internal.xslt.Process;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,42 +39,48 @@ import java.util.Map;
 
 /**
  * 
- * 会员活动
+ * 销售管理
  * @author caibin
  *
  */
 @Controller
-@RequestMapping(value = "/purchase")
-public class PurchaseController extends BaseController {
+@RequestMapping(value = "/sales")
+public class SalesController extends BaseController {
 
 	@Autowired
-	private ISupplierService isupplierService;
+	private IProductCategoryService iProductCategoryService;
 	@Autowired
-	private IProductService iproductService;
+	private IProductStockService iProductStockService;
 	@Autowired
-	private IPurchaseService iPurchaseyService;
+	private ISalesService iSalesService;
 	
 	@RequestMapping(value = "/index")
 	public String index(HttpServletRequest request, Model model){
-		return "modules/purchase/index";
+		return "modules/sales/index";
 	}
 
+	/**
+	 * 获取销售单商品页面
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/productIndex")
 	public String productIndex(HttpServletRequest request, Model model){
-		String peId = ReqUtils.getParam(request,"peId",null);
-		model.addAttribute("peId",peId);
-		return "modules/purchase/product_index";
+		String sid = ReqUtils.getParam(request,"sid",null);
+		model.addAttribute("sid",sid);
+		return "modules/sales/product_index";
 	}
 	
 	/**
 	 *
-	 * 获取采购单列表
+	 * 获取销售单列表
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "/list")
 	@ResponseBody
-	public JSONObject data(HttpServletRequest request){
+	public JSONObject list(HttpServletRequest request){
 		/**
 		 * 获取参数
 		 * */
@@ -81,7 +91,7 @@ public class PurchaseController extends BaseController {
 		//查询条件
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("createTime", createTime);
-		PagePojo<Purchase> page = iPurchaseyService.getPurchasePage(map, pageNo, pageSize);
+		PagePojo<Sales> page = iSalesService.getSalesPage(map, pageNo, pageSize);
 		
 		//render结果
 		return JsonBean.success(page);
@@ -89,28 +99,39 @@ public class PurchaseController extends BaseController {
 
 	/**
 	 *
-	 * 获取采购单的商品列表
+	 * 获取销售单的商品列表
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/purchaseProductList")
+	@RequestMapping(value = "/salesProductList")
 	@ResponseBody
-	public JSONObject purchaseProductList(HttpServletRequest request){
+	public JSONObject salesProductList(HttpServletRequest request){
 		/**
 		 * 获取参数
 		 * */
 		int pageNo = ReqUtils.getParamToInt(request, "pageNo", 1);
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
-		String peId = ReqUtils.getParam(request, "peId", null);
+		String sId = ReqUtils.getParam(request, "sId", null);
 
-		PagePojo<PurchaseProduct> page = new PagePojo<PurchaseProduct>();
+		PagePojo<SalesProduct> page = new PagePojo<SalesProduct>();
 		//查询条件
-		if (StringUtils.isNotBlank(peId)) {
-			Conditions conn = new Conditions("peId", SqlExpr.EQUAL,peId);
-			page = iPurchaseyService.getPurchaseProductPage(conn, pageNo, pageSize);
+		if (StringUtils.isNotBlank(sId)) {
+			Conditions conn = new Conditions("s_id", SqlExpr.EQUAL,sId);
+			page = iSalesService.getSalesProductPage(conn, pageNo, pageSize);
 		}
 		//render结果
 		return JsonBean.success(page);
+	}
+
+	@RequestMapping(value = "/getView")
+	public String getView(HttpServletRequest request, Model model){
+		String sId = ReqUtils.getParam(request, "sId", null);
+		SalesModel salesProduct = new SalesModel();
+		if(StringUtils.isNotBlank(sId)){
+			salesProduct = iSalesService.getSalesModel(sId);
+		}
+		model.addAttribute("data",salesProduct);
+		return "modules/sales/_add";
 	}
 
 	/**
@@ -119,9 +140,9 @@ public class PurchaseController extends BaseController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/productList")
+	@RequestMapping(value = "/productStockList")
 	@ResponseBody
-	public JSONObject productList(HttpServletRequest request){
+	public JSONObject productStockList(HttpServletRequest request){
 		/**
 		 * 获取参数
 		 * */
@@ -129,9 +150,13 @@ public class PurchaseController extends BaseController {
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
 		Integer catId = ReqUtils.getParamToInteger(request, "catId", null);
 		String pid = ReqUtils.getParam(request, "pid", null);
-
-		PagePojo<ProductModel> page = iproductService.getProductModelPage(pid,catId, pageNo, pageSize);
-
+		String wid = ReqUtils.getParam(request, "wid", null);
+		Conditions conn = new Conditions("pid",SqlExpr.EQUAL,pid);
+		if (catId != null) {
+			conn.add(new Conditions("catId",SqlExpr.IN,iProductCategoryService.getValidSubclass(catId)), SqlJoin.AND);
+		}
+		conn.add(new Conditions("wid",SqlExpr.EQUAL,wid),SqlJoin.AND);
+		PagePojo<ProductStockModel> page = iProductStockService.getProductStockModelPage(conn, pageNo, pageSize);
 		//render结果
 		return JsonBean.success(page);
 	}
@@ -145,79 +170,54 @@ public class PurchaseController extends BaseController {
 	 */
 	@RequestMapping(value = "/add",method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject add(HttpServletRequest request, PurchaseModel purchaseModel){
-		if(StringUtils.isBlank(purchaseModel.getWid())){
-			return JsonBean.error("仓库信息必填");
+	public JSONObject add(HttpServletRequest request, SalesModel salesModel){
+		if(salesModel.getBuyUid() == null){
+			return JsonBean.error("客户信息必填");
+		}
+		if(StringUtils.isBlank(salesModel.getSalesName())){
+			return JsonBean.error("销售员信息必填");
 		}
 		String productData = ReqUtils.getParam(request,"productData",null);
-		List<PurchaseProduct> purchaseProducts = JSON.parseArray(productData, PurchaseProduct.class);
-		if (purchaseProducts == null || purchaseProducts.size() == 0) {
+		List<SalesProduct> salesProductList = JSON.parseArray(productData, SalesProduct.class);
+		if (salesProductList == null || salesProductList.size() == 0) {
 			return JsonBean.error("商品信息不能为空");
 		}
-		purchaseProducts = CommonUtil.removeNullFromList(purchaseProducts);
+		salesProductList = CommonUtil.removeNullFromList(salesProductList);
 		List<Object> pidList = new ArrayList<Object>();
-		for (PurchaseProduct purchaseProduct:purchaseProducts){
-			if (pidList.contains(purchaseProduct.getPid())) {
-				return JsonBean.error("商品编号【"+purchaseProduct.getPid()+"】的商品重复");
+		for (SalesProduct salesProduct:salesProductList){
+			if (pidList.contains(salesProduct.getPid())) {
+				return JsonBean.error("商品编号【"+salesProduct.getPid()+"】的商品重复");
 			}
-			pidList.add(purchaseProduct.getPid());
+			pidList.add(salesProduct.getPid());
 		}
-		purchaseModel.setProductList(purchaseProducts);
-		RecordBean<PurchaseModel> data = iPurchaseyService.addPurchaseModel(purchaseModel);
+		salesModel.setSalesProductList(salesProductList);
+		Integer operatorId = ReqUtils.getSysUid(request);
+		String operatorName = ReqUtils.getSysName(request);
+		RecordBean<SalesModel> data = iSalesService.addSalesModel(salesModel,operatorId,operatorName);
 		if(data.isSuccessCode()) {
 			return JsonBean.success("修改成功");
 		}
 		return JsonBean.error(data.getMsg());
 	}
-	
-	/**
-	 * 
-	 * 编辑页面
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/getView")
-	public String editView(HttpServletRequest request, Model model){
-		String peId = ReqUtils.getParam(request, "peId", null);
-		Purchase purchase = new Purchase();
-		if(StringUtils.isNotBlank(peId)){
-			purchase = iPurchaseyService.getPurchaseModel(peId);
-		}
-		model.addAttribute("data",purchase);
-		return "modules/purchase/_add";
-	}
 
 
 	/**
-	 * 获取活动详情页
+	 * 获取销售单信息
 	 * @param request
 	 * @param model
 	 * @return
 	 */
 	@RequestMapping(value = "/info")
 	public String info(HttpServletRequest request, Model model){
-		String peId = ReqUtils.getParam(request, "peId", null);
-		Purchase purchase = new Purchase();
-		if(StringUtils.isNotBlank(peId)){
-			purchase = iPurchaseyService.getPurchaseModel(peId);
+		String sId = ReqUtils.getParam(request, "sId", null);
+		SalesModel salesModel = new SalesModel();
+		if(StringUtils.isNotBlank(sId)){
+			salesModel = iSalesService.getSalesModel(sId);
 		}
-		model.addAttribute("data",purchase);
-		return "modules/purchase/_info";
+		System.out.println(JSON.toJSON(salesModel));
+		model.addAttribute("data",salesModel);
+		return "modules/sales/_info";
 	}
 
-	/**
-	 *
-	 * 获取产品的下一级类型
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/getCatList")
-	@ResponseBody
-	public JSONObject getCatList(HttpServletRequest request){
-		Integer type = ReqUtils.getParamToInteger(request,"type",null);
-		List<ProductCategory> categorySummaryList= iPurchaseyService.getProductCategoryList(type);
-		return JsonBean.success("success",categorySummaryList);
-	}
 
 }

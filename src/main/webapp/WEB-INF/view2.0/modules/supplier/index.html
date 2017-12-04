@@ -1,4 +1,4 @@
-<#include "../../../_layout/_layout2.0.html"><#t>
+<#include "../../_layout/_layout2.0.html"><#t>
 <@header/>
 <div class="admin-main">
 	<!-- 按钮组 -->
@@ -31,7 +31,7 @@
 		</form>
 	</blockquote>
 	<!-- 表格区域 -->
-	<table id="supplier-goods-table" lay-filter="supplier-goods-table"></table>
+	<table id="supplier-table" lay-filter="supplier-table"></table>
 	<script type="text/html" id="bar">
 		{{# if(d.status === 0){}}
 		{{
@@ -53,9 +53,9 @@ layui.use(['table','laydate','common','form'], function(){
     var common = layui.common, table = layui.table ,form = layui.form;
     //列表渲染
     var tableIns = table.render({
-        id: 'supplier-goods-table',
-        elem: '#supplier-goods-table'
-        ,url: '${ctx}supplier/goods/list'
+        id: 'supplier-table',
+        elem: '#supplier-table'
+        ,url: '${ctx}supplier/list'
         ,height: 'full-140'
         ,page: true
         ,method: 'post'
@@ -75,8 +75,8 @@ layui.use(['table','laydate','common','form'], function(){
             ,{field:'url', title: '网址', width:80}
             ,{field:'qq', title: 'QQ', width:80}
             ,{field:'address', title: '地址', minWidth:200}
-            ,{field:'createTime', title: '添加时间', width:150,templet: '#createTimeTpl',sort: true}
-            ,{field:'stopTime', title: '停用时间', width:150,templet: '#stopTimeTpl',sort: true}
+            ,{field:'createTime', title: '添加时间', width:150,templet: '<div>{{dateFormat(d.createTime)}}</div>',sort: true}
+            ,{field:'stopTime', title: '停用时间', width:150,templet: '<div>{{dateFormat(d.stopTime)}}</div>',sort: true}
             ,{fixed: 'right',field:'status', title: '状态', width:80,templet: '#statusTpl'}
             ,{fixed: 'right', width:200, title: '操作', toolbar: '#bar'}
         ]],
@@ -89,13 +89,13 @@ layui.use(['table','laydate','common','form'], function(){
             $("#filterForm")[0].reset();
             dataReload();
         },add: function () {
-            common.editForm("${ctx}supplier/goods/getView","添加合作商",700,350,function (index, layero) {
+            common.editForm("${ctx}supplier/getView","添加合作商",900,400,function (index, layero) {
                 var formEm = $(layero).find('iframe').contents().find("#edit-form");
                 if (!form.onVerify(formEm)){
                     return false;
                 }
                 /**表单提交 **/
-                $.post('${ctx}supplier/goods/add', formEm.serialize(), function(result){
+                $.post('${ctx}supplier/add', formEm.serialize(), function(result){
                     if(result.code == 0){
                         formEm[0].reset();	//清空弹框表单内容
                         dataReload();
@@ -105,13 +105,13 @@ layui.use(['table','laydate','common','form'], function(){
                 });
             });
         },edit: function (data) {
-            common.editForm("${ctx}supplier/goods/getView?id="+data[0].id,"编辑合作商",700,350,function (index, layero) {
+            common.editForm("${ctx}supplier/getView?id="+data[0].id,"编辑合作商",700,350,function (index, layero) {
                 var formEm = $(layero).find('iframe').contents().find("#edit-form");
                 if (!form.onVerify(formEm)){
                     return false;
                 }
                 /**表单提交 **/
-                $.post('${ctx}supplier/goods/edit', formEm.serialize(), function(result){
+                $.post('${ctx}supplier/edit', formEm.serialize(), function(result){
                     if(result.code == 0){
                         formEm[0].reset();	//清空弹框表单内容
                         dataReload(true);
@@ -130,7 +130,7 @@ layui.use(['table','laydate','common','form'], function(){
                 startOrStop(data[0].id,data[0].status);
             });
         },info: function (data) {
-			common.layerShowIframe("${ctx}supplier/goods/info?id="+data[0].id,"合作商信息",true)
+			common.layerShowIframe("${ctx}supplier/info?id="+data[0].id,"合作商信息",true)
         }
     }
     //绑定操作按钮
@@ -139,7 +139,7 @@ layui.use(['table','laydate','common','form'], function(){
         active[type] ? active[type].call(this) : '';
     });
     //监听工具条
-    table.on('tool(supplier-goods-table)', function(obj){
+    table.on('tool(supplier-table)', function(obj){
         var type = obj.event;
         active[type] ? active[type].call(this, [obj.data]) : '';
     });
@@ -156,7 +156,7 @@ layui.use(['table','laydate','common','form'], function(){
     var startOrStop = function (id,status) {
         $.ajax({
             type: "POST",
-            url: "${ctx}supplier/goods/changeStatus",
+            url: "${ctx}supplier/changeStatus",
             data: {ids:id,status:status},
             success: function(json) {
                 if (json.code == -1){
@@ -183,22 +183,4 @@ layui.use(['table','laydate','common','form'], function(){
 	{{# if(d.status === 0){ }}
 	{{ '<span style="color: red;">停用</span>' }}
 	{{# } }}
-</script>
-<script type="text/html" id="createTimeTpl">
-	{{# var fn = function(time){
-	var newDate = new Date();
-	newDate.setTime(time);
-	return newDate.Format("yyyy-MM-dd hh:mm:ss");
-	}
-	}}
-	{{fn(d.createTime)}}
-</script>
-<script type="text/html" id="stopTimeTpl">
-	{{# var fn = function(time){
-	var newDate = new Date();
-	newDate.setTime(time);
-	return newDate.Format("yyyy-MM-dd hh:mm:ss");
-	}
-	}}
-	{{fn(d.stopTime)}}
 </script>

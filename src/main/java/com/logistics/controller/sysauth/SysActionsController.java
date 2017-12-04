@@ -1,20 +1,8 @@
 package com.logistics.controller.sysauth;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
 import com.logistics.base.utils.JsonBean;
 import com.logistics.base.utils.ReqUtils;
@@ -22,8 +10,17 @@ import com.logistics.service.auth.ISysActionService;
 import com.logistics.service.auth.impl.AuthServiceImpl;
 import com.logistics.service.vo.Option;
 import com.logistics.service.vo.sys.SysAction;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import cn.assist.easydao.pojo.PagePojo;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 系统功能管理
@@ -167,5 +164,10 @@ public class SysActionsController {
 		String[] ids = request.getParameterValues("ids");
 		boolean result = sysActionService.delSysAction(ids);
 		return result ? JsonBean.success("删除成功") : JsonBean.error("删除失败");
+	}
+
+	@RequestMapping(value = "/catIcon")
+	public String catIcon(HttpServletRequest request){
+		return "modules/sys-auth/action/fontclass";
 	}
 }

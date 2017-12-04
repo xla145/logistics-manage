@@ -18,7 +18,7 @@
 				<input type="password" name="password" lay-verify="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
 			</div>
 			<div class="layui-form-item">
-				<div class="layui-input-inline">
+				<div class="layui-input-inline" style="width: 270px;">
 					<label class="beg-login-icon"><i class="layui-icon">&#xe635;</i></label>
 					<input type="text" name="code" required lay-verify="required" autocomplete="off" class="layui-input layui-codes" placeholder="验证码">
 					<img alt="验证码" id="scode" src="${ctx}getCode" onclick="javascript:flushCode()"/>

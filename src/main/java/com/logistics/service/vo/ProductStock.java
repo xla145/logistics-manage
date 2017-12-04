@@ -25,13 +25,14 @@ public class ProductStock extends BasePojo {
 	private static final long serialVersionUID = 1L;
 	@Id
 	private Integer id;
-	private String productId;
+	private String pid;
 	private Integer catId;
 	private String stock;
 	private String remaining;
 	private Date createTime;
 	private Date updateTime;
 	private String remark;
+	private String wid;
 
 	public void setId(Integer id){
 		this.id=id;
@@ -39,12 +40,15 @@ public class ProductStock extends BasePojo {
 	public Integer getId(){
 		return id;
 	}
-	public void setProductId(String productId){
-		this.productId=productId;
+
+	public String getPid() {
+		return pid;
 	}
-	public String getProductId(){
-		return productId;
+
+	public void setPid(String pid) {
+		this.pid = pid;
 	}
+
 	public void setCatId(Integer catId){
 		this.catId=catId;
 	}
@@ -80,6 +84,14 @@ public class ProductStock extends BasePojo {
 	}
 	public String getRemark(){
 		return remark;
+	}
+
+	public String getWid() {
+		return wid;
+	}
+
+	public void setWid(String wid) {
+		this.wid = wid;
 	}
 }
 

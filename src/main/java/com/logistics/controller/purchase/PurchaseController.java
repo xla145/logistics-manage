@@ -1,39 +1,37 @@
-package com.yuelinghui.controller.vipActivity;
+package com.logistics.controller.purchase;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
-import cn.assist.easydao.common.SqlJoin;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import com.yuelinghui.base.utils.CommonUtil;
-import com.yuelinghui.base.utils.JsonBean;
-import com.yuelinghui.base.utils.RecordBean;
-import com.yuelinghui.base.utils.ReqUtils;
-import com.yuelinghui.controller.BaseController;
-import com.yuelinghui.service.activtiy.IProductActivityService;
-import com.yuelinghui.service.model.ProductActivityModel;
-import com.yuelinghui.service.model.ProductModel;
-import com.yuelinghui.service.model.VipActivityModel;
-import com.yuelinghui.service.product.ProductService;
-import com.yuelinghui.service.product.vo.CategorySummary;
-import com.yuelinghui.service.supplier.SupplierService;
-import com.yuelinghui.service.vipActivity.IVipActivityService;
-import com.yuelinghui.service.vo.VipActivityProduct;
-import com.yuelinghui.service.vo.product.Product;
-import com.yuelinghui.service.vo.travel.OrderTravelPersonnel;
+import com.logistics.base.utils.CommonUtil;
+import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.RecordBean;
+import com.logistics.base.utils.ReqUtils;
+import com.logistics.controller.BaseController;
+import com.logistics.service.model.ProductModel;
+import com.logistics.service.model.PurchaseModel;
+import com.logistics.service.product.IProductService;
+import com.logistics.service.purchase.IPurchaseService;
+import com.logistics.service.supplier.ISupplierService;
+import com.logistics.service.vo.Product;
+import com.logistics.service.vo.ProductCategory;
+import com.logistics.service.vo.Purchase;
+import com.logistics.service.vo.PurchaseProduct;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -42,31 +40,31 @@ import java.util.*;
  *
  */
 @Controller
-@RequestMapping(value = "/vip/activity")
-public class VipActivityController extends BaseController{
+@RequestMapping(value = "/purchase")
+public class PurchaseController extends BaseController {
 
 	@Autowired
-	private IVipActivityService iVipActivityService;
+	private ISupplierService isupplierService;
 	@Autowired
-	private SupplierService supplierService;
+	private IProductService iproductService;
 	@Autowired
-	private ProductService productService;
+	private IPurchaseService iPurchaseyService;
 	
 	@RequestMapping(value = "/index")
 	public String index(HttpServletRequest request, Model model){
-		return "modules/vip-activity/index";
+		return "modules/purchase/index";
 	}
 
 	@RequestMapping(value = "/productIndex")
 	public String productIndex(HttpServletRequest request, Model model){
-		Integer activityId = ReqUtils.getParamToInteger(request,"activityId",null);
-		model.addAttribute("activityId",activityId);
-		return "modules/vip-activity/product_index";
+		String peId = ReqUtils.getParam(request,"peId",null);
+		model.addAttribute("peId",peId);
+		return "modules/purchase/product_index";
 	}
 	
 	/**
 	 *
-	 * 获取活动列表
+	 * 获取采购单列表
 	 * @param request
 	 * @return
 	 */
@@ -78,18 +76,12 @@ public class VipActivityController extends BaseController{
 		 * */
 		int pageNo = ReqUtils.getParamToInt(request, "pageNo", 1);
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
-		String releaseTime = ReqUtils.getParam(request, "releaseTime", null);
-		String activityTime = ReqUtils.getParam(request, "activityTime", null);
-		String title = ReqUtils.getParam(request, "title", null);
-		Integer status = ReqUtils.getParamToInteger(request, "status", null);
+		String createTime = ReqUtils.getParam(request, "createTime", null);
 				
 		//查询条件
 		Map<String,Object> map = new HashMap<String,Object>();
-		map.put("releaseTime", releaseTime);
-		map.put("title", title);
-		map.put("status", status);
-		map.put("activityTime", activityTime);
-		PagePojo<VipActivityModel> page = iVipActivityService.getVipActivityPage(map, pageNo, pageSize);
+		map.put("createTime", createTime);
+		PagePojo<Purchase> page = iPurchaseyService.getPurchasePage(map, pageNo, pageSize);
 		
 		//render结果
 		return JsonBean.success(page);
@@ -97,24 +89,26 @@ public class VipActivityController extends BaseController{
 
 	/**
 	 *
-	 * 获取会员活动商品列表
+	 * 获取采购单的商品列表
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/activityProductList")
+	@RequestMapping(value = "/purchaseProductList")
 	@ResponseBody
-	public JSONObject activityProductList(HttpServletRequest request){
+	public JSONObject purchaseProductList(HttpServletRequest request){
 		/**
 		 * 获取参数
 		 * */
 		int pageNo = ReqUtils.getParamToInt(request, "pageNo", 1);
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
-		int activityId = ReqUtils.getParamToInt(request, "activityId", 0);
+		String peId = ReqUtils.getParam(request, "peId", null);
 
+		PagePojo<PurchaseProduct> page = new PagePojo<PurchaseProduct>();
 		//查询条件
-		Conditions conn = new Conditions("activityId", SqlExpr.EQUAL,activityId);
-		PagePojo<VipActivityProduct> page = iVipActivityService.getVipActivityProductPage(conn, pageNo, pageSize);
-
+		if (StringUtils.isNotBlank(peId)) {
+			Conditions conn = new Conditions("peId", SqlExpr.EQUAL,peId);
+			page = iPurchaseyService.getPurchaseProductPage(conn, pageNo, pageSize);
+		}
 		//render结果
 		return JsonBean.success(page);
 	}
@@ -136,11 +130,7 @@ public class VipActivityController extends BaseController{
 		Integer catId = ReqUtils.getParamToInteger(request, "catId", null);
 		String pid = ReqUtils.getParam(request, "pid", null);
 
-//		Integer[] catIds = iVipActivityService.getProductCategory(catId);
-		//查询条件
-//		Conditions conn = new Conditions("catId", SqlExpr.IN,catIds);
-//		conn.add(new Conditions("pid",SqlExpr.EQUAL,pid), SqlJoin.AND);
-		PagePojo<ProductModel> page = productService.getProductModelPage(pid,catId, pageNo, pageSize);
+		PagePojo<ProductModel> page = iproductService.getProductModelPage(pid,catId, pageNo, pageSize);
 
 		//render结果
 		return JsonBean.success(page);
@@ -155,35 +145,32 @@ public class VipActivityController extends BaseController{
 	 */
 	@RequestMapping(value = "/add",method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject add(HttpServletRequest request, VipActivityModel vipActivityModel){
-		if(StringUtils.isBlank(vipActivityModel.getTitle())){
-			return JsonBean.error("会员活动标题必填");
+	public JSONObject add(HttpServletRequest request, PurchaseModel purchaseModel){
+		if (StringUtils.isBlank(purchaseModel.getPurchaseName())){
+			return JsonBean.error("采购人员信息必填");
 		}
-		if(StringUtils.isBlank(vipActivityModel.getActivityTime())){
-			return JsonBean.error("会员活动时间必填");
-		}
-		if(StringUtils.isBlank(vipActivityModel.getVipName())){
-			return JsonBean.error("会员等级必填");
+		if (purchaseModel.getPeDate() == null) {
+			return JsonBean.error("单据日期信息必填");
 		}
 		String productData = ReqUtils.getParam(request,"productData",null);
-		List<VipActivityProduct> vipActivityProducts = JSON.parseArray(productData, VipActivityProduct.class);
-		if (vipActivityProducts == null || vipActivityProducts.size() == 0) {
+		List<PurchaseProduct> purchaseProducts = JSON.parseArray(productData, PurchaseProduct.class);
+		if (purchaseProducts == null || purchaseProducts.size() == 0) {
 			return JsonBean.error("商品信息不能为空");
 		}
-		List<VipActivityProduct> vipActivityProductList= CommonUtil.removeNullFromList(vipActivityProducts);
+		purchaseProducts = CommonUtil.removeNullFromList(purchaseProducts);
 		List<Object> pidList = new ArrayList<Object>();
-		for (VipActivityProduct vipActivityProduct:vipActivityProductList){
-			if (pidList.contains(vipActivityProduct.getPid())) {
-				return JsonBean.error("商品编号+【"+vipActivityProduct.getPid()+"】的商品重复");
+		for (PurchaseProduct purchaseProduct:purchaseProducts){
+			if (pidList.contains(purchaseProduct.getPid())) {
+				return JsonBean.error("商品编号【"+purchaseProduct.getPid()+"】的商品重复");
 			}
-			pidList.add(vipActivityProduct.getPid());
+			pidList.add(purchaseProduct.getPid());
 		}
-		vipActivityModel.setVipActivityProductList(vipActivityProductList);
-		vipActivityModel.setOperatorId(CommonUtil.getSysUid(request));
-		vipActivityModel.setOperatorName(CommonUtil.getSysName(request));
-		RecordBean<VipActivityModel> data = iVipActivityService.addVipActivityModel(vipActivityModel);
+		purchaseModel.setProductList(purchaseProducts);
+		Integer operatorId = ReqUtils.getSysUid(request);
+		String operatorName = ReqUtils.getSysName(request);
+		RecordBean<PurchaseModel> data = iPurchaseyService.addPurchaseModel(purchaseModel,operatorId,operatorName);
 		if(data.isSuccessCode()) {
-			return JsonBean.success("保存成功");
+			return JsonBean.success("修改成功");
 		}
 		return JsonBean.error(data.getMsg());
 	}
@@ -197,13 +184,13 @@ public class VipActivityController extends BaseController{
 	 */
 	@RequestMapping(value = "/getView")
 	public String editView(HttpServletRequest request, Model model){
-		Integer activityId = ReqUtils.getParamToInteger(request, "id", null);
-		VipActivityModel vipActivityModel = new VipActivityModel();
-		if(activityId != null){
-			vipActivityModel = iVipActivityService.getVipActivityModel(activityId);
+		String peId = ReqUtils.getParam(request, "peId", null);
+		Purchase purchase = new Purchase();
+		if(StringUtils.isNotBlank(peId)){
+			purchase = iPurchaseyService.getPurchaseModel(peId);
 		}
-		model.addAttribute("data",vipActivityModel);
-		return "modules/vip-activity/_add";
+		model.addAttribute("data",purchase);
+		return "modules/purchase/_add";
 	}
 
 
@@ -215,74 +202,13 @@ public class VipActivityController extends BaseController{
 	 */
 	@RequestMapping(value = "/info")
 	public String info(HttpServletRequest request, Model model){
-		Integer activityId = ReqUtils.getParamToInteger(request, "id", null);
-		VipActivityModel vipActivityModel = new VipActivityModel();
-		if(activityId != null){
-			vipActivityModel = iVipActivityService.getVipActivityModel(activityId);
+		String peId = ReqUtils.getParam(request, "peId", null);
+		Purchase purchase = new Purchase();
+		if(StringUtils.isNotBlank(peId)){
+			purchase = iPurchaseyService.getPurchaseModel(peId);
 		}
-		model.addAttribute("data",vipActivityModel);
-		return "modules/vip-activity/_info";
-	}
-	
-	/**
-	 * 
-	 * 编辑数据
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/edit",method = RequestMethod.POST)
-	@ResponseBody
-	public JSONObject edit(HttpServletRequest request, VipActivityModel vipActivityModel){
-		if(StringUtils.isBlank(vipActivityModel.getTitle())){
-			return JsonBean.error("会员活动标题必填");
-		}
-		if(StringUtils.isBlank(vipActivityModel.getActivityTime())){
-			return JsonBean.error("会员活动时间必填");
-		}
-		if(StringUtils.isBlank(vipActivityModel.getVipName())){
-			return JsonBean.error("会员等级必填");
-		}
-		String productData = ReqUtils.getParam(request,"productData",null);
-		System.out.println(productData);
-		List<VipActivityProduct> vipActivityProducts = JSON.parseArray(productData, VipActivityProduct.class);
-		if (vipActivityProducts == null || vipActivityProducts.size() == 0) {
-			return JsonBean.error("商品信息不能为空");
-		}
-		List<VipActivityProduct> vipActivityProductList = CommonUtil.removeNullFromList(vipActivityProducts);
-		List<Object> pidList = new ArrayList<Object>();
-		for (VipActivityProduct vipActivityProduct:vipActivityProductList){
-			if (pidList.contains(vipActivityProduct.getPid())) {
-				return JsonBean.error("商品编号【"+vipActivityProduct.getPid()+"】的商品重复");
-			}
-			pidList.add(vipActivityProduct.getPid());
-		}
-		vipActivityModel.setVipActivityProductList(vipActivityProductList);
-		vipActivityModel.setOperatorId(CommonUtil.getSysUid(request));
-		vipActivityModel.setOperatorName(CommonUtil.getSysName(request));
-		RecordBean<VipActivityModel> data = iVipActivityService.updateVipActivityModel(vipActivityModel);
-		if(data.isSuccessCode()) {
-			return JsonBean.success("修改成功");
-		}
-		return JsonBean.error(data.getMsg());
-	}
-
-	/**
-	 * 
-	 * 活动启用或停用
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/changeStatus")
-	@ResponseBody
-	public JSONObject changeStatus(HttpServletRequest request){
-		String[] ids = request.getParameterValues("ids");
-		Integer status = ReqUtils.getParamToInteger(request, "status",null);
-		RecordBean<String> result = iVipActivityService.changeStatus(ids, status);
-		if (result.isSuccessCode()) {
-			return JsonBean.success(result.getMsg());
-		}
-		return JsonBean.error(result.getMsg());
+		model.addAttribute("data",purchase);
+		return "modules/purchase/_info";
 	}
 
 	/**
@@ -295,7 +221,7 @@ public class VipActivityController extends BaseController{
 	@ResponseBody
 	public JSONObject getCatList(HttpServletRequest request){
 		Integer type = ReqUtils.getParamToInteger(request,"type",null);
-		List<CategorySummary> categorySummaryList= iVipActivityService.getProductCategoryList(type);
+		List<ProductCategory> categorySummaryList= iPurchaseyService.getProductCategoryList(type);
 		return JsonBean.success("success",categorySummaryList);
 	}
 

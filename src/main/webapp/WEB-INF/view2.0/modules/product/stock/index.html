@@ -1,13 +1,6 @@
-<#include "../../_layout/_layout2.0.html"><#t>
+<#include "../../../_layout/_layout2.0.html"><#t>
 <@header/>
 <div class="admin-main">
-	<!-- 按钮组 -->
-	<blockquote class="layui-elem-quote">
-		<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 发布商品</a>
-		<!--<a href="#" class="layui-btn layui-btn-sm layui-btn-normal operator-btn" data-type="edit"><i class="layui-icon">&#xe642;</i> 编辑</a>-->
-		<!--<a href="#" class="layui-btn layui-btn-sm layui-btn-danger operator-btn" data-type="delete"><i class="layui-icon">&#xe640;</i> 删除</a>-->
-		<a href="#" class="layui-btn layui-btn-sm layui-btn-normal operator-btn" data-type="export"><i class="layui-icon">&#xe642;</i> 导出商品</a>
-	</blockquote>
 	<!-- 筛选组 -->
 	<blockquote class="layui-elem-quote filter-bar">
 		<form class="layui-form" action="/table.html" id="filterForm">
@@ -27,11 +20,20 @@
 				</div>
 			</div>
 		    <div class="layui-inline">
-		      <label class="layui-filtrate-title">商品名字：</label>
+		      <label class="layui-filtrate-title">商品编号：</label>
 		      <div class="layui-input-inline">
-		        <input type="text" name="name" class="layui-input">
+		        <input type="text" name="pid" class="layui-input">
 		      </div>
 		    </div>
+			<div class="layui-input-inline">
+				<label class="layui-filtrate-title">仓库：</label>
+				<div class="layui-input-inline">
+					<select name="wid">
+						<option value="">全部</option>
+						<@module name="option" class="com.logistics.label.impl.GetWarehouseNode" />
+					</select>
+				</div>
+			</div>
 			<div class="layui-inline">
 				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
 				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
@@ -39,40 +41,20 @@
 		</form>
 	</blockquote>
 	<!-- 表格区域 -->
-	<table id="product-table" lay-filter="product-table"></table>
-	<script type="text/html" id="bar">
-		<a class='layui-btn layui-btn-xs layui-btn-normal' lay-event='edit'>编辑</a>
-		<a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='del'>删除</a>
-		<a class='layui-btn layui-btn-xs' lay-event='info'>详情</a>
-	</script>
+	<table id="product-stock-table" lay-filter="product-stock-table"></table>
 </div>
 <@footer>
 <script>
 //入口
-layui.use(['laydate','upload','common','table'], function(){
+layui.use(['table'], function(){
   var $ = layui.jquery;
-  var laydate = layui.laydate,
-      common = layui.common,
-      table = layui.table,
-	  form = layui.form;
+  var table = layui.table,form = layui.form,common = layui.common;
     //常规用法
-  laydate.render({elem: '#release-time',type: 'datetime',range: true});
-  //自定义验证
-  form.verify({
-	price: function(value){
-		if(value == "") {
-			return '请填写优惠券面额！';
-		}
-		if(/^[0-9]+(.[0-9]{2})?$/.test(value)){
-			return '面额请保留两位小数！';
-		}
-	}
-  });
   //列表渲染
   var tableIns = table.render({
-        id: 'product-table',
-        elem: '#product-table'
-        ,url: '${ctx}product/list'
+        id: 'product-stock-table',
+        elem: '#product-stock-table'
+        ,url: '${ctx}product/stock/list'
         ,height: 'full-140'
         ,page: true
         ,method: 'post'
@@ -86,13 +68,11 @@ layui.use(['laydate','upload','common','table'], function(){
         ,cols: [[
             {checkbox: true, fixed: true}
             ,{fixed: true,field:'pid', title: '商品编号', width:155}
-            ,{field:'name', title: '商品名称', width:120}
-            ,{field:'price', title: '价格', width:80}
-            ,{field:'unit', title: '包装单位', width:80}
-            ,{field:'supplierName', title: '商品供应商', width:120}
-          	,{field:'unit', title: '包装单位', width:100}
-          	,{field:'weight', title: '权重', width:80,sort:true}
-            ,{fixed: 'right', width:200, title: '操作', toolbar: '#bar'}
+          	,{field:'productName', title: '商品名称', width:155}
+            ,{field:'catName', title: '商品类型', width:120}
+            ,{field:'wid', title: '仓库', width:155}
+            ,{field:'stock', title: '库存', width:80}
+            ,{field:'remaining', title: '剩余库存', width:120}
         ]],
     });
     // 获取分类数据
@@ -133,48 +113,9 @@ layui.use(['laydate','upload','common','table'], function(){
             dataReload();
         },
         reset: function () {
+            $("#catId").val("");
             $("#filterForm")[0].reset();
             dataReload();
-        },
-        add: function(){
-            common.layerShowIframe("${ctx}product/getView","添加商品信息",true);
-        },
-        edit: function (data) {
-            data = data || table.checkStatus('product-table').data;
-            if (data == "" || data.length != 1) {
-                layer.msg("请选择一条数据进行编辑！");
-                return;
-            }
-            common.layerShowIframe("${ctx}product/getView?pid="+data[0].pid,"修改商品信息",true);
-        },
-        del: function (data) {
-            data = data || table.checkStatus('product-table').data;
-            if (data == "") {
-                layer.msg("请选择一条数据进行删除！");
-                return;
-            }
-            var ids = new Array();
-            layui.each(data, function (i,j) {
-                ids.push(j.pid);
-            })
-            layer.confirm('真的删除该商品吗？', function(index){
-                layer.close(index);
-                common.post("${ctx}product/del",{ids: ids},function (result) {
-                    if (result.code != 0) {
-                        layer.msg(result.msg)
-                        return;
-                    }
-                    dataReload(true);
-                })
-            });
-        },
-        info: function (data) {
-            common.layerShowIframe("${ctx}product/info?pid="+data[0].pid,"商品信息详情",true);
-        },
-		export: function () {
-            var formEm = $("#filterForm").serialize();
-            var url = "${ctx}product/export?"+formEm;
-            window.open(url);
         }
     }
   //绑定操作按钮
@@ -197,22 +138,6 @@ layui.use(['laydate','upload','common','table'], function(){
 		where: common.formatForm($('#filterForm'))
 	});
   }
-  //上下架
-  var upOrDownProduct = function (pid,status) {
-	common.post("${ctx}goods/upOrDownProduct",{ids: pid, status: status},function (result) {
-		if (result.code != 0) {
-			layer.msg(result.msg);
-			return;
-		}
-		dataReload(true);
-	})
-  }
-  var _tools = {
-	searchData: function (isEdit) {
-        dataReload(isEdit);
-	}
-  }
-  window.tools = _tools
 });
 </script>
 </@footer>

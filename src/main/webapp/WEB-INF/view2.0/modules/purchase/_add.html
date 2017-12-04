@@ -3,30 +3,20 @@
 <div style="margin: 15px" >
 	<form class="layui-form layui-form-pane" id="form-save">
 		<div class="layui-form-item">
-			<label class="layui-form-label"><span>*</span>默认仓库：</label>
-			<div class="layui-input-block">
-				<input type="text" name="title" class="layui-input" lay-verify="title" value="${data.title!''}">
+			<label class="layui-form-label"><span>*</span>单据日期：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="peDate" class="layui-input"  value="${data.peDate!''}" id="activity-time">
 				<input type="hidden" name="peId" value="${data.peId!''}" id="peId">
 			</div>
-		</div>
-		<div class="layui-form-item">
-			<label class="layui-form-label"><span>*</span>活动时间：</label>
+			<label class="layui-form-label"><span>*</span>采购员：</label>
 			<div class="layui-input-inline" style="width: 250px;">
-				<input type="text" class="layui-input" id="activity-time" name="activityTime" style="width: 250px;" value="${data.activityTime!''}">
-			</div>
-			<label class="layui-form-label"><span>*</span>默认仓库：</label>
-			<div class="layui-input-inline">
-				<select name="vip" lay-verify="required" lay-filter="vip">
-					<option value="">请选择</option>
-					<@module name="option" class="com.yuelinghui.label.impl.GetVipGradeNode" type="1" checked="${data.vip!''}"/>
-				</select>
-				<input type="hidden" name="vipName" value="${data.vipName!''}" id="vipName">
+				<input type="text" class="layui-input" name="purchaseName"  value="${data.purchaseName!''}">
 			</div>
 		</div>
 		<blockquote class="layui-elem-quote">
 			<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="addProduct"><i class="layui-icon">&#xe654;</i> 添加商品</a>
 		</blockquote>
-		<table id="activity-product-table" lay-filter="activity-product-table"></table>
+		<table id="product-table" lay-filter="product-table"></table>
 		<div class="layui-form-item layui-fixed">
 			<div class="layui-input-block">
 				<button class="layui-btn layui-btn-sm layui-btn-normal operator-btn" type="button" data-type="submit">确定</button>
@@ -34,7 +24,10 @@
 			</div>
 		</div>
 	</form>
-	<script type="text/html" id="activity-bar">
+	<div class="product-amount">
+		合计：<span class="count">0</span> 总价：<span class="amount">0.00</span>
+	</div>
+	<script type="text/html" id="product-bar">
 		<a class='layui-btn layui-btn-normal layui-btn-xs' lay-event='yes'>确定</a>
 		<a class='layui-btn layui-btn-xs' lay-event='update'>修改</a>
 		<a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='del'>删除</a>
@@ -47,7 +40,7 @@
 		var $ = layui.jquery;
 		var form = layui.form,laydate = layui.laydate,table = layui.table,common = layui.common;
         //常规用法
-        laydate.render({elem: '#activity-time',type: 'datetime',range: true});
+        laydate.render({elem: '#activity-time',type: 'date'});
         form.on('select(vip)', function(data){
             var vipName = $(data.elem).find("option:selected").text();
 			$("#vipName").val(vipName);
@@ -67,7 +60,7 @@
             }
         });
         var data = [];
-        $.post("${ctx}vip/activity/activityProductList",{activityId:$("#activityId").val()},function (result) {
+        $.post("${ctx}purchase/purchaseProductList",{activityId:$("#activityId").val()},function (result) {
 			data = result.data;
             initData(data);
         })
@@ -75,8 +68,8 @@
 		var initData = function (data) {
             //列表渲染
             tableIns = table.render({
-                id: 'activity-product-table',
-                elem: '#activity-product-table'
+                id: 'product-table',
+                elem: '#product-table'
                 ,data: data
                 ,height: 'full-175'
                 ,page: true
@@ -91,19 +84,20 @@
                 ,cols: [[
                     {checkbox: true, fixed: true}
                     ,{field:'pid', title: '商品编码', width:150}
-                    ,{field:'productTitle', title: '商品标题', width:200}
                     ,{field:'catName', title: '商品类型', width:100}
                     ,{field:'productPrice', title: '售价', width:80}
-                    ,{field:'productOriginalPrice', title: '进货价', width:80}
-                    ,{field:'activityPrice', title: '活动价', width:120,templet: '#activityPriceTpl'}
-                    ,{fixed: 'right', width:150, title: '操作', toolbar: '#activity-bar'}
+                    ,{field:'buyCount', title: '采购数量', width:80,templet: '#buyCount'}
+                    ,{field:'wid', title: '仓库', width:120,templet: '#wid'}
+                    ,{fixed: 'right', width:150, title: '操作', toolbar: '#product-bar'}
                 ]],
             });
         }
+        var productCount = 0;
+        var productAmount = 0.00;
         //操作
         var active = {
             addProduct: function () {
-                common.editForm("${ctx}vip/activity/productIndex","选择商品",1000,500,function (index, layero) {
+                common.editForm("${ctx}purchase/productIndex","选择商品",1000,500,function (index, layero) {
                     var productData = $(layero).find('iframe').contents().find("#product-data").val();
                     tableIns.addData(JSON.parse(productData))
                     layer.close(index);
@@ -118,10 +112,10 @@
             },
             submit: function () {
                 var isEdit = false;
-                var activityId = $("#activityId").val();
-                var url = "${ctx}vip/activity/add";
-                if(activityId != "") { //根据pid是否W为空判断是添加还是更新
-                    url = "${ctx}vip/activity/edit"
+                var peId = $("#peId").val();
+                var url = "${ctx}purchase/add";
+                if(peId != "") { //根据pid是否W为空判断是添加还是更新
+                    url = "${ctx}purchase/edit"
                     isEdit = true;
                 }
                 var formEm = $("#form-save");
@@ -143,42 +137,42 @@
                 $("#form-save")[0].reset();
                 closeWindow(true);
             },
+
 			yes:function (obj) {
+                let price = obj.data.productPrice;
+                if (parseInt(productCount) >= parseInt(obj.data.buyCount)) {
+                    productCount -= parseInt(obj.data.buyCount);
+                    productAmount -= parseFloat(obj.data.buyCount*price);
+				}
                 var tr = obj.tr;
-                var activityPrice = tr.find(".activity-price").val() || obj.data.activityPrice;
-                if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(activityPrice)){
-                    layer.msg('价格只能是整数或小数！');
-                    return;
-                }
+                var wid = tr.find("#warehouse").val();
+                var productNumber = tr.find(".product-number").val() || obj.data.buyCount || 0;
                 obj.update({
-                    activityPrice: activityPrice
+                    buyCount: productNumber,
+					wid: wid
 				});
-                tr.find(".activity-price").parent().text(activityPrice);
-                tr.find(".activity-price").attr("type","hidden");
+                productCount += parseInt(productNumber);
+                productAmount += parseFloat(price*productNumber);
+                tr.find(".product-number").parent().text(productNumber);
+                tr.find(".product-number").attr("type","hidden");
+                $(".count").html(parseInt(productCount));
+                $(".amount").html(parseFloat(productAmount));
+                $(".edit-col").css("display","none");
             },
             update:function (obj) {
                 var tr = obj.tr;
-                var $this = tr.find('td').eq(6);
-                var activityPrice = ""
-                if (obj.data.activityPrice !== null) {
-                    activityPrice = obj.data.activityPrice;
+                var $this = tr.find('td').eq(4);
+                var productNumber = ""
+                if (obj.data.buyCount !== null) {
+                    productNumber = obj.data.buyCount;
 				}
                 $this.find('.layui-table-cell').text("")
-                var html = '<input type= "text" name="activityPrice" class="layui-input activity-price" lay-verify="activityPrice"/>';
+                var html = '<input type= "number" name="buyCount" class="layui-input product-number"/>';
                 $this.find('.layui-table-cell').append(html);
-                $this.find('.layui-table-cell .activity-price').val(activityPrice);
+                $this.find('.layui-table-cell .product-number').val(productNumber);
+                $(".edit-col").css("display","");
             }
 		}
-		$("table .activity-price").blur(function () {
-            var activityPrice = $(this).val();
-            if(!/^[0-9]+([.]{1}[0-9]+){0,1}$/.test(activityPrice)){
-                layer.msg('价格只能是整数或小数！');
-                return;
-            }
-            obj.update({
-                activityPrice: activityPrice
-            });
-        });
         var closeWindow = function (isEdit) {
             var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
             parent.layer.close(index);
@@ -190,14 +184,28 @@
             active[type] ? active[type].call(this) : '';
         });
         //监听工具条
-        table.on('tool(activity-product-table)', function(obj){
+        table.on('tool(product-table)', function(obj){
             var type = obj.event;
             active[type] ? active[type].call(this, obj) : '';
         });
 	});
+	function changeWid(wid,dom) {
+        $(dom).parent().find("#warehouse").val(wid);
+        $(dom).parent().parent().append($(dom).find("option:selected").text());
+    }
 </script>
-<script type="text/html" id="activityPriceTpl">
-	<input type="text" name="activityPrice" class="layui-input activity-price" lay-verify="activityPrice" value="{{# if(d.activityPrice !== null){ }}{{d.activityPrice}}{{# }; }}" />
+<script type="text/html" id="buyCount">
+	<div class="edit-col">
+		<input type="number" name="buyCount" class="layui-input product-number"  value="{{# if(d.buyCount !== null){ }}{{d.buyCount}}{{# }; }}" />
+	</div>
+</script>
+<script type="text/html" id="wid">
+	<div class="edit-col">
+		<input type="hidden" id="warehouse">
+		<select name="wid" lay-ignore class="wid" onchange="changeWid(this.value,this)">
+			<@module name="option" class="com.logistics.label.impl.GetWarehouseNode"  checked="{{d.wid}}"/>
+		</select>
+	</div>
 </script>
 </@footer>
 <style type="text/css">
@@ -207,10 +215,7 @@
         right: 20px;
         bottom: 10px;
     }
-    .activity-price {
-        height: 20px;
-        border: 1px solid #ff5722;
-        background-color: #fff;
-        border-radius: 2px;
-    }
+	.product-number,.wid {
+		height: 20px;
+	}
 </style>

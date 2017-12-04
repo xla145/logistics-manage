@@ -11,7 +11,7 @@
 				<div class="layui-input-inline" style="width: 120px;">
 					<select name="oneType" id="one-product-type" lay-filter="oneProductType">
 						<option value="">全部</option>
-						<@module name="option" class="com.yuelinghui.label.impl.GetProductNode"/>
+						<@module name="option" class="com.logistics.label.impl.GetProductCategoryNode"/>
 					</select>
 				</div>
 				<div class="layui-input-inline" style="width: 120px;">
@@ -19,11 +19,11 @@
 						<option value="">全部</option>
 					</select>
 				</div>
-				<div class="layui-input-inline" style="width: 120px;">
-					<select name="threeType" id="three-product-type" lay-filter="threeProductType">
-						<option value="">全部</option>
-					</select>
-				</div>
+				<!--<div class="layui-input-inline" style="width: 120px;">-->
+					<!--<select name="threeType" id="three-product-type" lay-filter="threeProductType">-->
+						<!--<option value="">全部</option>-->
+					<!--</select>-->
+				<!--</div>-->
 			</div>
 			<div class="layui-inline">
 				<label class="layui-filtrate-title">商品编号：</label>
@@ -59,14 +59,8 @@
         form.on('select(twoProductType)', function(data){
             var type = $(data.elem).find("option:selected").val() || $("#catId").val();
             $("#catId").val(type);
-            getCatList(type,"three-product-type");
         });
 
-        //获取三级商品类型
-        form.on('select(threeProductType)', function(data){
-            var type = $(data.elem).find("option:selected").val() || $("#catId").val();
-            $("#catId").val(type);
-        });
 
         // 获取产品类型
         var getCatList = function (type,id) {
@@ -74,7 +68,7 @@
                 return;
             }
             $("#"+id).empty();
-            $.get("${ctx}vip/activity/getCatList",{type:type},function (result) {
+            $.get("${ctx}purchase/getCatList",{type:type},function (result) {
                 var html = "<option value=''>请选择</option>";
                 layui.each(result.data,function (i,j) {
                     html+="<option value='"+j.catId+"'>"+j.name+"</option>"
@@ -87,7 +81,7 @@
         var tableIns = table.render({
 			id: 'activity-table',
             elem: '#activity-table'
-            ,url: '${ctx}vip/activity/productList'
+            ,url: '${ctx}purchase/productList'
             ,height: 'full-90'
             ,page: true
             ,method: 'post'
@@ -101,10 +95,8 @@
             ,cols: [[
                 {checkbox: true, fixed: true}
                 ,{fixed: true,field:'pid', title: '商品编号', width:150}
-                ,{field:'productTitle', title: '商品标题', width:250}
+                ,{field:'productName', title: '商品名称', width:250}
                 ,{field:'productPrice', title: '售价', width:80}
-                ,{field:'productOriginalPrice', title: '进货价', width:80,}
-                ,{field:'stock', title: '剩余库存', width:120}
             ]],
         });
         //操作

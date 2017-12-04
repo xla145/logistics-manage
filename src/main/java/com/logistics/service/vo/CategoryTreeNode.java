@@ -1,4 +1,4 @@
-package com.yuelinghui.service.product.vo;
+package com.logistics.service.vo;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,13 +12,12 @@ import java.math.*;
 
 /** sales_product
 	ID	INT(11)
+	SALES_ID	VARCHAR(30)
 	PID	VARCHAR(30)
-	CAT_ID	INT(11)
 	W_ID	INT(11)
 	BUY_COUNT	INT(11)
 	SALES_PRICE	DECIMAL(10)
 	PRODUCT_PRICE	DECIMAL(10)
-	SALES_ID	VARCHAR(30)
 	CREATE_TIME	DATETIME(19)
 	UPDATE_TIME	DATETIME(19)
 	REMARK	VARCHAR(255)
@@ -28,13 +27,13 @@ public class SalesProduct extends BasePojo {
 	private static final long serialVersionUID = 1L;
 	@Id
 	private Integer id;
+	private String sId;
 	private String pid;
+	private String wid;
 	private Integer catId;
-	private Integer wId;
 	private Integer buyCount;
 	private Long salesPrice;
 	private Long productPrice;
-	private String salesId;
 	private Date createTime;
 	private Date updateTime;
 	private String remark;
@@ -45,24 +44,31 @@ public class SalesProduct extends BasePojo {
 	public Integer getId(){
 		return id;
 	}
-	public void setPid(String pid){
-		this.pid=pid;
+
+	public String getsId() {
+		return sId;
 	}
-	public String getPid(){
+
+	public void setsId(String sId) {
+		this.sId = sId;
+	}
+
+	public String getPid() {
 		return pid;
 	}
-	public void setCatId(Integer catId){
-		this.catId=catId;
+
+	public void setPid(String pid) {
+		this.pid = pid;
 	}
-	public Integer getCatId(){
-		return catId;
+
+	public String getWid() {
+		return wid;
 	}
-	public void setWId(Integer wId){
-		this.wId=wId;
+
+	public void setWid(String wid) {
+		this.wid = wid;
 	}
-	public Integer getWId(){
-		return wId;
-	}
+
 	public void setBuyCount(Integer buyCount){
 		this.buyCount=buyCount;
 	}
@@ -81,12 +87,6 @@ public class SalesProduct extends BasePojo {
 	public Long getProductPrice(){
 		return productPrice;
 	}
-	public void setSalesId(String salesId){
-		this.salesId=salesId;
-	}
-	public String getSalesId(){
-		return salesId;
-	}
 	public void setCreateTime(Date createTime){
 		this.createTime=createTime;
 	}
@@ -104,6 +104,14 @@ public class SalesProduct extends BasePojo {
 	}
 	public String getRemark(){
 		return remark;
+	}
+
+	public Integer getCatId() {
+		return catId;
+	}
+
+	public void setCatId(Integer catId) {
+		this.catId = catId;
 	}
 }
 

@@ -1,10 +1,14 @@
-package com.yuelinghui.label.impl;
+package com.logistics.label.impl;
 
-import com.yuelinghui.base.helper.SpringFactory;
-import com.yuelinghui.label.ModuleData;
-import com.yuelinghui.service.supplier.SupplierService;
-import com.yuelinghui.service.vo.Option;
-import com.yuelinghui.service.vo.Supplier;
+
+import cn.assist.easydao.common.Conditions;
+import cn.assist.easydao.common.SqlExpr;
+import com.logistics.base.constant.SupplierConstant;
+import com.logistics.base.helper.SpringFactory;
+import com.logistics.label.ModuleData;
+import com.logistics.service.supplier.ISupplierService;
+import com.logistics.service.vo.Option;
+import com.logistics.service.vo.Supplier;
 import freemarker.template.TemplateModel;
 
 import java.util.ArrayList;
@@ -18,17 +22,13 @@ import java.util.Map;
  * @author caibin
  *
  */
-public class GetSupplierNode extends ModuleData{
+public class GetSupplierNode extends ModuleData {
 
 	@Override
 	public Map<String, Object> getModelData(Map<String, Object> params) throws Exception {
-		TemplateModel type = (TemplateModel) params.get("type");
 		TemplateModel checked = (TemplateModel) params.get("checked");
-		SupplierService supplierService = SpringFactory.getBean("SupplierService");
-		if (type == null) {
-			return null;
-		}
-		List<Supplier> list = supplierService.supplierListByType(Integer.parseInt(type.toString()));
+		ISupplierService supplierService = SpringFactory.getBean("ISupplierService");
+		List<Supplier> list = supplierService.supplierList(new Conditions("status", SqlExpr.EQUAL, SupplierConstant.STATUS_START));
 		List<Option> options = new ArrayList<Option>();
 		if(list != null){
 			for (Supplier supplier : list) {

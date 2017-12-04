@@ -1,16 +1,17 @@
 package com.logistics.service.model;
 
+import com.logistics.service.vo.ProductAccessLog;
 import com.logistics.service.vo.ProductStock;
 
-public class ProductStockModel extends ProductStock {
+public class ProductAccessLogModel extends ProductAccessLog {
 
-    private Integer total_product;
+    private Integer totalProduct;
 
-    public Integer getTotal_product() {
-        return total_product;
+    public Integer getTotalProduct() {
+        return totalProduct;
     }
 
-    public void setTotal_product(Integer total_product) {
-        this.total_product = total_product;
+    public void setTotalProduct(Integer totalProduct) {
+        this.totalProduct = totalProduct;
     }
 }

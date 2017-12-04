@@ -1,4 +1,4 @@
-<#include "../../../_layout/_layout2.0.html"><#t>
+<#include "../../_layout/_layout2.0.html"><#t>
 <@header/>
 <div style="margin: 15px;">
 	<blockquote class="site-text site-title layui-elem-quote">合作商信息</blockquote>
@@ -69,7 +69,7 @@
 		</#if>
 	</form>
 	<blockquote class="site-text site-title layui-elem-quote">商品列表：</blockquote>
-	<table id="product-activity-table" lay-filter="product-activity-table"></table>
+	<table id="product-table" lay-filter="product-table"></table>
 </div>
 <@footer>
 <script>
@@ -81,9 +81,9 @@
 
         //列表渲染
         var productActivityTable = table.render({
-            id: 'product-activity-table',
-            elem: '#product-activity-table'
-            ,url: '${ctx}supplier/goods/productGoodsList'
+            id: 'product-table',
+            elem: '#product-table'
+            ,url: '${ctx}supplier/productGoodsList'
             ,page: true
 			,where: {supplierId:$("#supplierId").val()}
             ,method: 'post'

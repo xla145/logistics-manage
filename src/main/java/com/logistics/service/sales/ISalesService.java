@@ -1,101 +1,82 @@
-package com.logistics.service.purchase;
+package com.logistics.service.sales;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.pojo.PagePojo;
 import com.logistics.base.utils.RecordBean;
-import com.logistics.service.model.PurchaseModel;
+import com.logistics.service.model.SalesModel;
 import com.logistics.service.vo.ProductCategory;
-import com.logistics.service.vo.Purchase;
-import com.logistics.service.vo.PurchaseProduct;
+import com.logistics.service.vo.Sales;
+import com.logistics.service.vo.SalesProduct;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * 会员活动
+ * 销售单信息
  */
-public interface IPurchaseService {
+public interface ISalesService {
 
     /**
-     * 获取采购单
+     * 获取销售单
      * @param map
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public PagePojo<Purchase> getPurchasePage(Map<String, Object> map, int pageNo, int pageSize);
+    public PagePojo<Sales> getSalesPage(Map<String, Object> map, int pageNo, int pageSize);
 
 
     /**
-     * 获取采购单信息
+     * 获取销售单信息
      * @param conn
      * @return
      */
-    public List<Purchase> getPurchaseList(Conditions conn);
+    public List<Sales> getSalesList(Conditions conn);
 
     /**
-     * 添加采购单信息
-     * @param purchaseModel
+     * 添加销售单信息
+     * @param SalesModel
      * @return
      */
-    public RecordBean<PurchaseModel> addPurchaseModel(PurchaseModel purchaseModel);
+    public RecordBean<SalesModel> addSalesModel(SalesModel SalesModel,Integer operatorId,String operatorName);
 
 
 
     /**
-     * 获取catId 下属的所有有用的类型
-     * @param catId
-     * @return
-     */
-    public Integer[] getProductCategory(Integer catId);
-
-    /**
-     * 获取catId 下属的所有有用的类型
-     * @param catId
-     * @return
-     */
-    public List<ProductCategory> getProductCategoryList(Integer catId);
-
-
-    /**
-     * 批量添加采购单商品
-     * @param purchaseProducts
+     * 批量添加销售单商品
+     * @param salesProducts
      * @param peId
      * @return
      */
-    public RecordBean<String> batchAddPurchaseProduct(List<PurchaseProduct> purchaseProducts, String peId);
+    public RecordBean<String> batchAddSalesProduct(List<SalesProduct> salesProducts, String peId);
 
 
     /**
-     * 获取采购单商品
+     * 获取销售单商品
      * @param conn
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public PagePojo<PurchaseProduct> getPurchaseProductPage(Conditions conn, int pageNo, int pageSize);
+    public PagePojo<SalesProduct> getSalesProductPage(Conditions conn, int pageNo, int pageSize);
 
     /**
-     * 获取采购单的商品
+     * 获取销售单的商品
      * @param conn
      * @return
      */
-    public List<PurchaseProduct> getPurchaseProductList(Conditions conn);
+    public List<SalesProduct> getSalesProductList(Conditions conn);
 
     /**
-     * 获取采购单信息
+     * 获取销售单信息
      * @param peId
      * @return
      */
-    public PurchaseModel getPurchaseModel(String peId);
+    public SalesModel getSalesModel(String peId);
 
 
-    /**
-     * 添加商品库存
-     * @param purchaseProducts
-     * @return
-     */
-    public RecordBean<String> batchAddProductStock(List<PurchaseProduct> purchaseProducts);
+
+
 
 
 }

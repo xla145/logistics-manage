@@ -1,14 +1,18 @@
-package com.yuelinghui.controller.activty;
+package com.logistics.controller.product;
 
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
-import com.yuelinghui.base.constant.ProductGroupTypeConstant;
-import com.yuelinghui.base.utils.*;
-import com.yuelinghui.controller.BaseController;
-import com.yuelinghui.service.model.ProductActivityModel;
-import com.yuelinghui.service.activtiy.IProductActivityService;
-import com.yuelinghui.service.supplier.SupplierService;
-import com.yuelinghui.service.vo.Supplier;
+import com.logistics.base.auth.Auth;
+import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.RecordBean;
+import com.logistics.base.utils.ReqUtils;
+import com.logistics.controller.BaseController;
+import com.logistics.service.model.ProductModel;
+import com.logistics.service.product.IProductCategoryService;
+import com.logistics.service.product.IProductService;
+import com.logistics.service.supplier.ISupplierService;
+import com.logistics.service.vo.Product;
+import com.logistics.service.vo.ProductCategory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,28 +29,29 @@ import java.util.Map;
 
 /**
  * 
- * 好玩活动
+ * 商品管理
  * 
- * @author caibin
+ * @author
  *
  */
 @Controller
-@RequestMapping(value = "/activity")
-public class ActivityController extends BaseController{
+@RequestMapping(value = "/product")
+public class ProductController extends BaseController {
 
 	@Autowired
-	private IProductActivityService iProductActivityService;
+	private IProductService iProductService;
 	@Autowired
-	private SupplierService supplierService;
+	private ISupplierService iSupplierService;
+	@Autowired
+	private IProductCategoryService iProductCategoryService;
 	
 	@RequestMapping(value = "/index")
 	public String index(HttpServletRequest request, Model model){
-		return "modules/activity/index";
+		return "modules/product/index";
 	}
 	
 	/**
-	 * 
-	 * datagrid 数据测试
+	 * 商品数据获取
 	 * @param request
 	 * @return
 	 */
@@ -58,19 +63,20 @@ public class ActivityController extends BaseController{
 		 * */
 		int pageNo = ReqUtils.getParamToInt(request, "pageNo", 1);
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
-		String releaseTime = ReqUtils.getParam(request, "releaseTime", null);
-		String title = ReqUtils.getParam(request, "title", null);
+
+		String name = ReqUtils.getParam(request,"name",null);
 		Integer status = ReqUtils.getParamToInteger(request, "status", null);
-				
+		Integer catId = ReqUtils.getParamToInteger(request, "catId", null);
+
 		//查询条件
 		Map<String,Object> map = new HashMap<String,Object>();
-		map.put("releaseTime", releaseTime);
-		map.put("title", title);
+		map.put("name", name);
+		map.put("catId", catId);
 		map.put("status", status);
-		PagePojo<ProductActivityModel> page = iProductActivityService.getProductActivity(map, pageNo, pageSize);
+		PagePojo<Product> page = iProductService.getProductPage(map, pageNo, pageSize);
 		
 		//render结果
-		return JsonBean.success("success",page);
+		return JsonBean.success(page);
 	}
 	
 	/**
@@ -82,40 +88,25 @@ public class ActivityController extends BaseController{
 	 */
 	@RequestMapping(value = "/add",method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject add(HttpServletRequest request, ProductActivityModel productActivity){
-		if(StringUtils.isBlank(productActivity.getTitle())){
-			return JsonBean.error("商品标题必填");
+	public JSONObject add(HttpServletRequest request, Product product){
+		if (StringUtils.isBlank(product.getName())) {
+			return JsonBean.error("商品名字不能为空！");
 		}
-		if(productActivity.getPrice() == null){
-			return JsonBean.error("活动票价不能为空");
+		if (product.getCatId() == null) {
+			return JsonBean.error("商品分类不能为空！");
 		}
-		if(productActivity.getActivityEndTime() != null && productActivity.getActivityStartTime() != null && productActivity.getActivityStartTime().after(productActivity.getActivityEndTime())){
-			return JsonBean.error("活动时间开始不能大于活动时间结束时间！");
+		if (product.getPrice() == null) {
+			return JsonBean.error("商品价格不能为空！");
 		}
-		if(productActivity.getApplyStartTime() == null){
-			return JsonBean.error("报名开始时间不能为空");
+		if (product.getSupplierId() == null) {
+			return JsonBean.error("供应商不能为空！");
 		}
-		if (productActivity.getApplyEndTime() != null && productActivity.getApplyEndTime().before(productActivity.getApplyStartTime())){
-			return JsonBean.error("报名结束时间不能在报名开始时间之前");
+		if (StringUtils.isBlank(product.getImageUrl())) {
+			return JsonBean.error("商品图片不能为空不能为空！");
 		}
-		if (productActivity.getApplyEndTime() != null && productActivity.getApplyEndTime().after(productActivity.getActivityStartTime())){
-			return JsonBean.error("报名开始时间不能在活动开始之后");
-		}
-		if(productActivity.getWeight() == null){
-			return JsonBean.error("商品权重不能为空");
-		}
-		if(StringUtils.isBlank(productActivity.getAddress())){
-			return JsonBean.error("活动地点必填");
-		}
-		if(productActivity.getCatId() == null){
-			return JsonBean.error("活动类型必填");
-		}
-		if(productActivity.getImageList() == null || productActivity.getImageList().size() == 0){
-			return JsonBean.error("活动轮播图不能为空");
-		}
-		RecordBean<ProductActivityModel> data = iProductActivityService.addProductActivity(productActivity);
+		RecordBean<Product> data = iProductService.addProduct(product);
 		if(data.isSuccessCode()) {
-			return JsonBean.success("保存成功");
+			return JsonBean.success(data.getMsg());
 		}
 		return JsonBean.error(data.getMsg());
 	}
@@ -131,69 +122,62 @@ public class ActivityController extends BaseController{
 	@RequestMapping(value = "/getView")
 	public String editView(HttpServletRequest request, ModelMap modelMap){
 		String pid = ReqUtils.getParam(request, "pid", null);
-		ProductActivityModel product = new ProductActivityModel();
+		Product product = new Product();
 		modelMap.addAttribute("data",product);
 		if(pid != null){
-			product = iProductActivityService.getProductActivity(pid);
+			product = iProductService.getProductModel(pid);
 			modelMap.addAttribute("data",product);
 		}
-		return "modules/activity/_add";
+		return "modules/product/_add";
 	}
 
 
+	/**
+	 * 获取产品的详情
+	 * @param request
+	 * @param modelMap
+	 * @return
+	 */
 	@RequestMapping(value = "/info")
 	public String info(HttpServletRequest request, ModelMap modelMap){
 		String pid = ReqUtils.getParam(request, "pid", null);
-		ProductActivityModel product = iProductActivityService.getProductActivity(pid);
-		modelMap.addAttribute("data",product);
-		return "modules/activity/_info";
+		ProductModel productModel = new ProductModel();
+		if (pid != null) {
+			productModel = iProductService.getProductModel(pid);
+		}
+		modelMap.addAttribute("data",productModel);
+		return "modules/product/_info";
 	}
 	
 	/**
 	 * 
 	 * 编辑数据
-	 * 
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "/edit",method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject edit(HttpServletRequest request, ProductActivityModel product){
-		if(StringUtils.isBlank(product.getTitle())){
-			return JsonBean.error("商品标题必填");
+	public JSONObject edit(HttpServletRequest request, Product product){
+		if (StringUtils.isBlank(product.getName())) {
+			return JsonBean.error("商品名字不能为空！");
 		}
-		if(product.getPrice() == null){
-			return JsonBean.error("活动票价不能为空");
+		if (product.getCatId() == null) {
+			return JsonBean.error("商品分类不能为空！");
 		}
-		if(product.getActivityEndTime() != null && product.getActivityStartTime().after(product.getActivityEndTime())){
-			return JsonBean.error("活动时间开始不能大于活动时间结束时间！");
+		if (product.getPrice() == null) {
+			return JsonBean.error("商品价格不能为空！");
 		}
-		if(product.getApplyStartTime() == null){
-			return JsonBean.error("报名开始时间不能为空");
+		if (product.getSupplierId() == null) {
+			return JsonBean.error("供应商不能为空！");
 		}
-		if (product.getApplyEndTime() != null && product.getApplyEndTime().before(product.getApplyStartTime())){
-			return JsonBean.error("报名结束时间不能在报名开始时间之前");
+		if (StringUtils.isBlank(product.getImageUrl())) {
+			return JsonBean.error("商品图片不能为空不能为空！");
 		}
-		if (product.getApplyEndTime() != null &&  product.getApplyEndTime().after(product.getActivityStartTime())){
-			return JsonBean.error("报名开始时间不能在活动开始之后");
+		RecordBean<Product> data = iProductService.updateProduct(product);
+		if(data.isSuccessCode()) {
+			return JsonBean.success(data.getMsg());
 		}
-		if(product.getCatId() == null){
-			return JsonBean.error("活动类型必填");
-		}
-		if(product.getWeight() == null){
-			return JsonBean.error("商品权重不能为空");
-		}
-		if(StringUtils.isBlank(product.getAddress())){
-			return JsonBean.error("活动地点必填");
-		}
-		if(product.getImageList() == null || product.getImageList().size() == 0){
-			return JsonBean.error("活动轮播图不能为空");
-		}
-		RecordBean<ProductActivityModel> result = iProductActivityService.updateProductActivity(product);
-		if (result.isSuccessCode()) {
-			return JsonBean.success(result.getMsg());
-		}
-		return JsonBean.error(result.getMsg());
+		return JsonBean.error(data.getMsg());
 	}
 	
 	/**
@@ -202,31 +186,12 @@ public class ActivityController extends BaseController{
 	 * @param request
 	 * @return
 	 */
-//	@Auth(id = 5)
+	@Auth(id = 5)
 	@RequestMapping(value = "/del")
 	@ResponseBody
 	public JSONObject del(HttpServletRequest request){
 		String[] ids = request.getParameterValues("ids");
-		RecordBean<String> result = iProductActivityService.delProductActivity(ids);
-		if (result.isSuccessCode()) {
-			return JsonBean.success(result.getMsg());
-		}
-		return JsonBean.error(result.getMsg());
-	}
-	
-	/**
-	 * 
-	 * 活动上下架
-	 * @param request
-	 * @return
-	 */
-//	@Auth(id = 5)
-	@RequestMapping(value = "/changeStatus")
-	@ResponseBody
-	public JSONObject changeStatus(HttpServletRequest request){
-		String[] ids = request.getParameterValues("ids");
-		Integer status = ReqUtils.getParamToInteger(request, "status",null);
-		RecordBean<String> result = iProductActivityService.upOrDownProduct(ids, status);
+		RecordBean<String> result = iProductService.delProduct(ids);
 		if (result.isSuccessCode()) {
 			return JsonBean.success(result.getMsg());
 		}
@@ -234,19 +199,16 @@ public class ActivityController extends BaseController{
 	}
 
 	/**
-	 * 复制活动产品
+	 *
+	 * 获取产品的下一级类型
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/copyProduct")
+	@RequestMapping(value = "/getCatList")
 	@ResponseBody
-	public JSONObject copyProduct(HttpServletRequest request){
-		String pid = ReqUtils.getParam(request, "pid",null);
-		RecordBean<String> result = iProductActivityService.copyProductActivity(pid);
-		if (result.isSuccessCode()) {
-			return JsonBean.success(result.getMsg());
-		}
-		return JsonBean.error(result.getMsg());
+	public JSONObject getCatList(HttpServletRequest request){
+		Integer type = ReqUtils.getParamToInteger(request,"type",null);
+		List<ProductCategory> categorySummaryList= iProductCategoryService.getProductCategoryListByValid(type);
+		return JsonBean.success("success",categorySummaryList);
 	}
-
 }

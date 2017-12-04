@@ -80,6 +80,7 @@ public class SysActionService implements ISysActionService {
 		treeData.setOrigin(sysAction);
 		treeNode.setData(treeData);
 		Conditions childrenConn = new Conditions("parent_id", SqlExpr.EQUAL, id);
+		childrenConn.add(new Conditions("status",SqlExpr.EQUAL,1),SqlJoin.AND);
 		List<SysAction> childrenSysActionList =  BaseDao.dao.queryForListEntity(SysAction.class, childrenConn);
 		for (SysAction childrenSysAction : childrenSysActionList) {
 			//递归查询所有子节点
@@ -173,6 +174,7 @@ public class SysActionService implements ISysActionService {
 	 * @return
 	 */
 	public PagePojo<SysAction> getSysAction(Conditions conn, int pageNo, int pageSize){
+		conn.add(new Conditions("status",SqlExpr.UNEQUAL,-1),SqlJoin.AND);
 		//查询条件
 		Sort sort = new Sort("weight", SqlSort.ASC);
 		return BaseDao.dao.queryForListPage(SysAction.class, conn, sort, pageNo, pageSize);

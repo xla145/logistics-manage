@@ -40,6 +40,15 @@ stampToDate = function (stamp) {
     }
     return dateArr.join(" , ");
 }
+dateFormat = function (time,format) {
+    format = format || "yyyy-MM-dd hh:mm:ss";
+    if (time == undefined || time == "") {
+        return "";
+    }
+    var date = new Date(time);
+
+    return date.Format(format)
+}
 
 
 

@@ -14,20 +14,14 @@ import java.math.*;
 	PID	VARCHAR(30)
 	CAT_ID	INT(11)
 	NAME	VARCHAR(150)
-	TITLE	VARCHAR(150)
-	SUB_TITLE	VARCHAR(512)
+	REFERENCE_PRICE	DECIMAL(10,2)
 	PRICE	DECIMAL(10,2)
-	ORIGINAL_PRICE	DECIMAL(11,2)
-	STATUS	INT(11)
-	LABEL	VARCHAR(50)
-	INFO	VARCHAR(715827882)
+	UNIT	VARCHAR(10)
 	REMARK	VARCHAR(255)
 	SUPPLIER_ID	INT(11)
 	SUPPLIER_NAME	VARCHAR(50)
 	IMAGE_URL	VARCHAR(500)
 	CREATE_TIME	DATETIME(19)
-	RELEASE_TIME	DATETIME(19)
-	PLACE_TIME	DATETIME(19)
 	UPDATE_TIME	DATETIME(19)
 	WEIGHT	INT(11)
 */
@@ -38,20 +32,14 @@ public class Product extends BasePojo {
 	private String pid;
 	private Integer catId;
 	private String name;
-	private String title;
-	private String subTitle;
+	private BigDecimal referencePrice;
 	private BigDecimal price;
-	private BigDecimal originalPrice;
-	private Integer status;
-	private String label;
-	private String info;
+	private String unit;
 	private String remark;
 	private Integer supplierId;
 	private String supplierName;
 	private String imageUrl;
 	private Date createTime;
-	private Date releaseTime;
-	private Date placeTime;
 	private Date updateTime;
 	private Integer weight;
 
@@ -73,17 +61,11 @@ public class Product extends BasePojo {
 	public String getName(){
 		return name;
 	}
-	public void setTitle(String title){
-		this.title=title;
+	public void setReferencePrice(BigDecimal referencePrice){
+		this.referencePrice=referencePrice;
 	}
-	public String getTitle(){
-		return title;
-	}
-	public void setSubTitle(String subTitle){
-		this.subTitle=subTitle;
-	}
-	public String getSubTitle(){
-		return subTitle;
+	public BigDecimal getReferencePrice(){
+		return referencePrice;
 	}
 	public void setPrice(BigDecimal price){
 		this.price=price;
@@ -91,29 +73,11 @@ public class Product extends BasePojo {
 	public BigDecimal getPrice(){
 		return price;
 	}
-	public void setOriginalPrice(BigDecimal originalPrice){
-		this.originalPrice=originalPrice;
+	public void setUnit(String unit){
+		this.unit=unit;
 	}
-	public BigDecimal getOriginalPrice(){
-		return originalPrice;
-	}
-	public void setStatus(Integer status){
-		this.status=status;
-	}
-	public Integer getStatus(){
-		return status;
-	}
-	public void setLabel(String label){
-		this.label=label;
-	}
-	public String getLabel(){
-		return label;
-	}
-	public void setInfo(String info){
-		this.info=info;
-	}
-	public String getInfo(){
-		return info;
+	public String getUnit(){
+		return unit;
 	}
 	public void setRemark(String remark){
 		this.remark=remark;
@@ -144,18 +108,6 @@ public class Product extends BasePojo {
 	}
 	public Date getCreateTime(){
 		return createTime;
-	}
-	public void setReleaseTime(Date releaseTime){
-		this.releaseTime=releaseTime;
-	}
-	public Date getReleaseTime(){
-		return releaseTime;
-	}
-	public void setPlaceTime(Date placeTime){
-		this.placeTime=placeTime;
-	}
-	public Date getPlaceTime(){
-		return placeTime;
 	}
 	public void setUpdateTime(Date updateTime){
 		this.updateTime=updateTime;

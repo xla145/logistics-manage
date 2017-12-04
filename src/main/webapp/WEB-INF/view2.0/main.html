@@ -4,70 +4,47 @@
 </@header>
     <div id="layui-main">
         <div class="panel_box layui-row layui-col-space10">
-            <div class="panel_1 layui-col-md2">
-                <a href="javascript:;" data-url="page/message/message.html">
-                    <div class="panel_icon">
-                        <i class="layui-icon" data-icon="&#xe63a;">&#xe63a;</i>
+            <div class="panel_1 layui-col-md3">
+                <a href="javascript:;" data-url="page/user/allUsers.html">
+                    <div class="panel_icon" style="background-color:#2f8ca7;">
+                        <i class="layui-icon icon-dollar" data-icon="icon-supplierfeatures"></i>
                     </div>
-                    <div class="panel_word newMessage">
-                        <span></span>
-                        <cite>新消息</cite>
+                    <div class="panel_word product-stock">
+                        <span>100000.00</span>
+                        <cite>总收入</cite>
                     </div>
                 </a>
             </div>
-            <div class="panel_1 layui-col-md2">
+            <div class="panel_1 layui-col-md3">
                 <a href="javascript:;" data-url="page/user/allUsers.html">
                     <div class="panel_icon" style="background-color:#FF5722;">
-                        <i class="layui-icon icon-supplierfeatures" data-icon="icon-supplierfeatures"></i>
+                        <i class="layui-icon icon-productfeatures" data-icon="icon-supplierfeatures"></i>
                     </div>
-                    <div class="panel_word userAll">
-                        <span></span>
-                        <cite>新增人数</cite>
+                    <div class="panel_word product-stock">
+                        <span>100</span>
+                        <cite>存货总数</cite>
                     </div>
                 </a>
             </div>
-            <div class="panel_1 layui-col-md2">
+            <div class="panel_1 layui-col-md3">
                 <a href="javascript:;" data-url="page/user/allUsers.html">
                     <div class="panel_icon" style="background-color:#009688;">
-                        <i class="layui-icon" data-icon="&#xe613;">&#xe613;</i>
+                        <i class="layui-icon icon-machinery" data-icon="icon-machinery"></i>
                     </div>
-                    <div class="panel_word userAll">
-                        <span></span>
-                        <cite>用户总数</cite>
+                    <div class="panel_word sum-purchase">
+                        <span>100</span>
+                        <cite>采购单总数</cite>
                     </div>
                 </a>
             </div>
-            <div class="panel_1 layui-col-md2">
+            <div class="panel_1 layui-col-md3">
                 <a href="javascript:;" data-url="page/img/images.html">
                     <div class="panel_icon" style="background-color:#5FB878;">
-                        <i class="layui-icon" data-icon="&#xe64a;">&#xe64a;</i>
+                        <i class="layui-icon icon-store" data-icon="icon-store"></i>
                     </div>
-                    <div class="panel_word imgAll">
-                        <span></span>
-                        <cite>图片总数</cite>
-                    </div>
-                </a>
-            </div>
-            <div class="panel_1 layui-col-md2">
-                <a href="javascript:;" data-url="page/news/newsList.html">
-                    <div class="panel_icon" style="background-color:#F7B824;">
-                        <i class="layui-icon icon-form" data-icon="icon-form"></i>
-                    </div>
-                    <div class="panel_word waitNews">
-                        <span></span>
-                        <cite>待审核文章</cite>
-                    </div>
-                </a>
-            </div>
-            <div class="panel_1 layui-col-md2 max_panel">
-                <a href="javascript:;" data-url="page/news/newsList.html">
-                    <div class="panel_icon" style="background-color:#2F4056;">
-                        <i class="layui-icon icon-rfq" data-icon=".icon-rfq"></i>
-                    </div>
-                    <div class="panel_word allNews">
-                        <span></span>
-                        <em>文章总数</em>
-                        <cite>文章列表</cite>
+                    <div class="panel_word sum-sales">
+                        <span>1000</span>
+                        <cite>销售单总数</cite>
                     </div>
                 </a>
             </div>
@@ -75,35 +52,17 @@
         <div class="layui-row layui-col-space10">
             <div class="sysNotice layui-col-md6">
                 <div class="layui-collapse" lay-accordion>
-                    <h2 class="layui-colla-title">会员注册</h2>
+                    <h2 class="layui-colla-title">产品分布</h2>
                     <div class="layui-colla-item">
-                        <div class="layui-colla-content layui-show" id="member-text" style="width: 500px;height: 300px;"></div>
+                        <div class="layui-colla-content layui-show" id="member-text" style="width: 90%;height: 400px;margin: 0px auto;"></div>
                     </div>
                 </div>
             </div>
             <div class="sysNotice layui-col-md6">
                 <div class="layui-collapse" lay-accordion>
-                    <h2 class="layui-colla-title">订单</h2>
+                    <h2 class="layui-colla-title">采购单</h2>
                     <div class="layui-colla-item">
-                        <div class="layui-colla-content layui-show" id="order-text" style="width: 500px;height: 300px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="layui-row layui-col-space10">
-            <div class="sysNotice layui-col-md6">
-                <div class="layui-collapse" lay-accordion>
-                    <h2 class="layui-colla-title">会员注册</h2>
-                    <div class="layui-colla-item">
-                        <div class="layui-colla-content layui-show" id="rich-text" style="width: 800px;height: 400px; margin: 10px;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="sysNotice layui-col-md6">
-                <div class="layui-collapse" lay-accordion>
-                    <h2 class="layui-colla-title">系统基本参数</h2>
-                    <div class="layui-colla-item">
-                        <div class="layui-colla-content layui-show"></div>
+                        <div class="layui-colla-content layui-show" id="order-text" style="width: 90%;height: 400px;margin: 0px auto;"></div>
                     </div>
                 </div>
             </div>
@@ -113,7 +72,6 @@
 <script src="${assets}echarts/echarts.min.js" type="text/javascript"></script>
 <script>
     layui.use(['layer','element'], function() {
-
 
         var websocket = null;
         //判断浏览器是否支持websocket
@@ -144,34 +102,39 @@
             active[type] ? active[type].call(this) : '';
         });
 
+        websocket.onmessage= function(event) {
+            var json = JSON.parse(event.data);
+            $(".product-stock span").text(json.sumRemaining);
+            $(".sum-sales span").text(json.sumSales);
+            $(".sum-purchase span").text(json.sumPurchase);
+        }
 
-        // 基于准备好的dom，初始化echarts实例
+
+//        // 基于准备好的dom，初始化echarts实例
         var member = echarts.init(document.getElementById('member-text'));
 
         var order = echarts.init(document.getElementById('order-text'));
 
-
-        var rich = echarts.init(document.getElementById('rich-text'));
 
 
         // 指定图表的配置项和数据
         var option_1 = {
             tooltip: {},
             legend: {
-                data:[{name:'销量'},{name:'销量1'}]
+                data:[{name:'采购'},{name:'销售'}]
             },
             xAxis: {
                 data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
             },
             yAxis: {},
             series: [{
-                name: '销量',
+                name: '采购',
                 type: 'line',
-                data: [5, 20, 36, 10, 10, 20]
+                data: [10, 50, 100, 150, 100, 150]
             },{
-                name: '销量1',
+                name: '销售',
                 type: 'line',
-                data: [10, 20, 50, 50, 70, 100]
+                data: [5, 20, 50, 50, 70, 100]
             }]
         };
 
@@ -193,7 +156,7 @@
             xAxis : [
                 {
                     type : 'category',
-                    data : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    data : ['广州50号', '广州40号', '广州30号', '广州20号', '广西1号' ],
                     axisTick: {
                         alignWithLabel: true
                     }
@@ -206,55 +169,15 @@
             ],
             series : [
                 {
-                    name:'直接访问',
+                    name:'产品数量',
                     type:'bar',
                     barWidth: '60%',
-                    data:[10, 52, 200, 334, 390, 330, 220]
+                    data:[10, 52, 200, 334, 390]
                 }
             ]
         };
 
-        layui.each(JSON.parse(event.data),function (index,data) {
-            rich.setOption({
-                title : {
-                    text: '用户注册信息',
-                    x:'center'
-                },
-                tooltip : {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left',
-                    data: ['自注册','用户邀请','邀请卡注册','其他']
-                },
-                series : [
-                    {
-                        name: '访问来源',
-                        type: 'pie',
-                        radius : '55%',
-                        center: ['50%', '60%'],
-                        data:[
-                            {value:data[0], name:'自注册'},
-                            {value:data[1], name:'用户邀请'},
-                            {value:data[2], name:'邀请卡注册'},
-                            {value:data[3], name:'其他'}
-                        ],
-                        itemStyle: {
-                            emphasis: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            });
-        })
-
-
-        // 使用刚指定的配置项和数据显示图表。
+//        // 使用刚指定的配置项和数据显示图表。
         order.setOption(option_1);
 
         member.setOption(option_2);

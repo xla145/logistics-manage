@@ -1,72 +1,29 @@
 <#include "../../_layout/_layout2.0.html"><#t>
 <@header/>
 <div style="margin: 15px;">
-	<blockquote class="site-text site-title layui-elem-quote">合作商信息</blockquote>
+	<blockquote class="site-text site-title layui-elem-quote">仓库信息</blockquote>
+	<input type="hidden" name="id" value="${data.wid!''}" id="wid">
 	<form class="layui-form layui-form-pane" id="edit-form">
-		<input type="hidden" name="id" value="${data.id!''}" id="supplierId">
 		<div class="layui-form-item">
-			<label class="layui-form-label"><span>*</span>合作商名称:</label>
+			<label class="layui-form-label"><span>*</span>仓库名称:</label>
 			<div class="layui-input-inline">
-				<input type="text" name="name" placeholder="请输入合作商名称" lay-verify="required" autocomplete="off" class="layui-input" value="${data.name!''}">
+				<input type="text" name="name" autocomplete="off" class="layui-input" value="${data.name!''}">
 			</div>
-			<label class="layui-form-label"><span>*</span>联系人:</label>
+			<label class="layui-form-label"><span>*</span>负责人:</label>
 			<div class="layui-input-inline">
-				<input type="text" name="people" placeholder="请输入联系人" lay-verify="required" autocomplete="off" class="layui-input" value="${data.people!''}">
+				<input type="text" name="principal" autocomplete="off" class="layui-input" value="${data.principal!''}">
 			</div>
 		</div>
 		<div class="layui-form-item">
 			<label class="layui-form-label">电话:</label>
 			<div class="layui-input-inline">
-				<input type="text" name="mobile" placeholder="请输入电话号码" autocomplete="off" class="layui-input" value="${data.mobile!''}">
+				<input type="text" name="mobile" autocomplete="off" class="layui-input" value="${data.mobile!''}" readonly>
 			</div>
-			<label class="layui-form-label">传真:</label>
-			<div class="layui-input-inline">
-				<input type="text" name="fax" placeholder="请输入传真" autocomplete="off" class="layui-input" value="${data.fax!''}">
-			</div>
-		</div>
-		<div class="layui-form-item">
-			<label class="layui-form-label">网址:</label>
-			<div class="layui-input-inline">
-				<input type="text" name="url" placeholder="请输入网址" autocomplete="off" class="layui-input" value="${data.url!''}">
-			</div>
-			<label class="layui-form-label">邮箱:</label>
-			<div class="layui-input-inline">
-				<input type="text" name="email"  placeholder="请输入邮箱" autocomplete="off" class="layui-input" value="${data.email!''}">
-			</div>
-		</div>
-		<div class="layui-form-item">
-			<label class="layui-form-label">QQ:</label>
-			<div class="layui-input-inline">
-				<input type="text" name="qq" placeholder="请输入QQ" autocomplete="off" class="layui-input" value="${data.qq!''}">
-			</div>
-			<label class="layui-form-label"><span>*</span>结算方式:</label>
-			<div class="layui-input-inline">
-				<select name="settType" id="settlement_type" lay-filter="expenses">
-					<option value="1" <#if data.settType?? && data.settType == 1>selected</#if>>日结算</option>
-					<option value="2" <#if data.settType?? && data.settType == 2>selected</#if>>月结算</option>
-					<option value="3" <#if data.settType?? && data.settType == 3>selected</#if>>半年结算</option>
-					<option value="4" <#if data.settType?? && data.settType == 4>selected</#if>>单笔结算</option>
-				</select>
-			</div>
-		</div>
-		<div class="layui-form-item">
 			<label class="layui-form-label"><span>*</span>地址:</label>
-			<div class="layui-input-inline" style="width: 500px;">
-				<input type="text" name="address" placeholder="请输入地址" autocomplete="off" class="layui-input" lay-verify="required" value="${data.address!''}">
+			<div class="layui-input-inline">
+				<input type="text" name="address" autocomplete="off" class="layui-input" value="${data.address!''}" readonly>
 			</div>
 		</div>
-		<#if data.stopTime??>
-		<div class="layui-form-item">
-			<label class="layui-form-label">添加时间:</label>
-			<div class="layui-input-inline">
-				<input type="text" autocomplete="off" class="layui-input" value="${data.createTime?string('yyyy-MM-dd HH:mm:ss')}">
-			</div>
-			<label class="layui-form-label">停止时间:</label>
-			<div class="layui-input-inline">
-				<input type="text" autocomplete="off" class="layui-input" value="${data.stopTime?string('yyyy-MM-dd HH:mm:ss')}">
-			</div>
-		</div>
-		</#if>
 	</form>
 	<blockquote class="site-text site-title layui-elem-quote">商品列表：</blockquote>
 	<table id="product-table" lay-filter="product-table"></table>
@@ -74,18 +31,18 @@
 <@footer>
 <script>
     //入口
-    layui.use(['laydate','form','table'], function() {
+    layui.use(['form','table'], function() {
         var $ = layui.jquery;
-        var form = layui.form, laydate = layui.laydate,table = layui.table;
+        var form = layui.form,table = layui.table;
         form.render();
 
         //列表渲染
-        var productActivityTable = table.render({
+        var productTable = table.render({
             id: 'product-table',
             elem: '#product-table'
             ,url: '${ctx}supplier/productGoodsList'
             ,page: true
-			,where: {supplierId:$("#supplierId").val()}
+			,where: {wid:$("#wid").val()}
             ,method: 'post'
             ,request: {
                 pageName: 'pageNo' //页码的参数名称，默认：page

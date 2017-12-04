@@ -4,15 +4,9 @@
 	<form class="layui-form layui-form-pane" id="edit-form">
 		<input type="hidden" name="uid" value="${data.uid!''}">
 		<div class="layui-form-item">
-	      <label class="layui-form-label">登录名</label>
+	      <label class="layui-form-label">客户名</label>
 	      <div class="layui-input-inline">
 	        <input type="text" name="name" class="layui-input" value="${data.name!''}">
-	      </div>
-	    </div>
-	    <div class="layui-form-item">
-	      <label class="layui-form-label">真实姓名</label>
-	      <div class="layui-input-inline">
-	        <input type="text" name="realName" class="layui-input" value="${data.realName!''}">
 	      </div>
 	    </div>
 	    <div class="layui-form-item">
@@ -21,26 +15,15 @@
 	        <input type="text" name="mobile" class="layui-input" value="${data.mobile!''}">
 	      </div>
 	    </div>
-	    <div class="layui-form-item">
-	      <label class="layui-form-label">联系qq</label>
-	      <div class="layui-input-inline">
-	        <input type="text" name="qq" class="layui-input" value="${data.qq!''}">
-	      </div>
-	    </div>
-	     <div class="layui-form-item">
-	      <label class="layui-form-label">联系邮箱</label>
-	      <div class="layui-input-inline">
-	        <input type="text" name="email" class="layui-input" value="${data.email!''}">
-	      </div>
-	    </div>
 		<div class="layui-form-item">
-			<label class="layui-form-label">是否有效</label>
-			<div class="layui-input-inline">
-				<input type="checkbox" name="isValid" lay-skin="switch"  lay-text="有效|无效" value="1" <#if data.isValid == 1>checked</#if>>
+			<label class="layui-form-label">性别:</label>
+			<div class="layui-input-block">
+				<input type="radio" value="1" name="sex" title="男" <#if data.sex??&&data.sex==1>checked=""</#if>>
+				<input type="radio" value="2" name="sex" title="女" <#if data.sex??&&data.sex==2>checked=""</#if>>
 			</div>
 		</div>
 		<div class="layui-form-item layui-form-text">
-			<label class="layui-form-label">一句话介绍</label>
+			<label class="layui-form-label">备注</label>
 			<div class="layui-input-block">
 				<textarea name="remark" placeholder="请输入内容" class="layui-textarea">${data.remark!''}</textarea>
 			</div>

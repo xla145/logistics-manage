@@ -1,18 +1,17 @@
-package com.yuelinghui.controller.travel;
+package com.logistics.controller.product;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
 import cn.assist.easydao.common.SqlJoin;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
-import com.yuelinghui.base.constant.ProductConstant;
-import com.yuelinghui.base.utils.JsonBean;
-import com.yuelinghui.base.utils.RecordBean;
-import com.yuelinghui.base.utils.ReqUtils;
-import com.yuelinghui.controller.BaseController;
-import com.yuelinghui.service.product.vo.ProductCategory;
-import com.yuelinghui.service.travel.IProductTravelCategoryService;
-import com.yuelinghui.service.travel.impl.ProductTravelCategoryServiceImpl;
+import com.logistics.base.constant.ProductConstant;
+import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.RecordBean;
+import com.logistics.base.utils.ReqUtils;
+import com.logistics.controller.BaseController;
+import com.logistics.service.product.IProductCategoryService;
+import com.logistics.service.vo.ProductCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,20 +23,26 @@ import java.util.List;
 
 /**
  *
- * 定制旅游信息
- * @author caibin
+ * 产品分类管理
+ * @author
  *
  */
 @Controller
-@RequestMapping(value = "/travel/category")
-public class TravelCategoryController extends BaseController {
+@RequestMapping(value = "/product/category")
+public class ProductCategoryController extends BaseController {
 
 	@Autowired
-	private IProductTravelCategoryService iProductCategoryService;
-	
+	private IProductCategoryService iProductCategoryService;
+
+	/**
+	 * 跳转产品页面
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/index")
 	public String index(HttpServletRequest request, Model model){
-		return "modules/travel/category/index";
+		return "modules/product/category/index";
 	}
 	
 	@RequestMapping(value = "list")
@@ -46,13 +51,13 @@ public class TravelCategoryController extends BaseController {
 		//参数获取
 		int pageNo = ReqUtils.getParamToInt(request, "pageNo", 1);
 		int pageSize = ReqUtils.getParamToInt(request, "pageSize", 15);
-		String name = ReqUtils.getParam(request, "name", null);
+		Integer catId = ReqUtils.getParamToInteger(request, "catId", 0);
 
 		//查询条件
-		Conditions conn = new Conditions("name", SqlExpr.EQUAL,name);
-		conn.add(new Conditions("parent_id",SqlExpr.EQUAL, ProductConstant.TRAVEL_THEME), SqlJoin.AND);
-		PagePojo<ProductCategory> page = iProductCategoryService.productCategoryPage(conn, pageNo, pageSize);
-		return JsonBean.success("", page);
+		Integer[] catIds = iProductCategoryService.getAllParents(catId);
+		Conditions conn = new Conditions("parent_id", SqlExpr.IN,catIds);
+		PagePojo<ProductCategory> page = iProductCategoryService.getProductCategoryPage(conn, pageNo, pageSize);
+		return JsonBean.success(page);
 	}
 	/**
 	 * 
@@ -64,6 +69,8 @@ public class TravelCategoryController extends BaseController {
 	@RequestMapping(value = "/add")
 	@ResponseBody
 	public JSONObject add(HttpServletRequest request, ProductCategory productCategory){
+		Integer isShow = ReqUtils.getParamToInteger(request,"isShow",0);
+		productCategory.setIsShow(isShow);
 		RecordBean<ProductCategory> result = iProductCategoryService.addProductCategory(productCategory);
 		if (result.isSuccessCode()) {
 			return JsonBean.success(result.getMsg());
@@ -87,7 +94,7 @@ public class TravelCategoryController extends BaseController {
 			productCategory = iProductCategoryService.getProductCategory(catId);
 			model.addAttribute("data", productCategory);
 		}
-		return "modules/travel/category/_add";
+		return "modules/product/category/_add";
 	}
 
 	/**
@@ -100,6 +107,8 @@ public class TravelCategoryController extends BaseController {
 	@RequestMapping(value = "/edit")
 	@ResponseBody
 	public JSONObject edit(HttpServletRequest request, ProductCategory productCategory){
+		Integer isShow = ReqUtils.getParamToInteger(request,"isShow",0);
+		productCategory.setIsShow(isShow);
 		RecordBean<ProductCategory> result = iProductCategoryService.updateProductCategory(productCategory);
 		if (result.isSuccessCode()) {
 			return JsonBean.success(result.getMsg());
@@ -136,8 +145,8 @@ public class TravelCategoryController extends BaseController {
 	@ResponseBody
 	public JSONObject getItem(HttpServletRequest request){
 		Integer id = ReqUtils.getParamToInteger(request,"id",0);
-		List<ProductCategory> items = iProductCategoryService.productCategoryList(id);
-		return JsonBean.success("success",items);
+		List<ProductCategory> productCategoryItems = iProductCategoryService.getProductCategoryList(id);
+		return JsonBean.success("success",productCategoryItems);
 	}
 
 }

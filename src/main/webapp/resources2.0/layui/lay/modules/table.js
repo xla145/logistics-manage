@@ -68,7 +68,6 @@ layui.define(['laytpl', 'laypage', 'layer', 'form'], function(exports){
         if(data){
             var oldData = that.cacheData || [], options = {};
             layui.each(data,function (i,j) {
-                console.log(j)
                 oldData.push(j);
             })
             console.log(oldData)

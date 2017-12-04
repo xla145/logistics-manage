@@ -14,7 +14,7 @@ import java.util.Map;
  * @author caibin
  *
  */
-public interface SupplierService {
+public interface ISupplierService {
 
 	/**
 	 * 分页查询 供应商
@@ -79,6 +79,6 @@ public interface SupplierService {
 	 *
 	 * @return
 	 */
-	List<Supplier> supplierListByType(Integer type);
+	List<Supplier> supplierList(Conditions con);
 	
 }

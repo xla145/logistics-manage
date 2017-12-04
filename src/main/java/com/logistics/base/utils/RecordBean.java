@@ -22,6 +22,7 @@ public class RecordBean<T> {
 		this.code = code;
 		this.msg = msg;
 	}
+
 	RecordBean(int code, String msg, T data){
 		this.code = code;
 		this.msg = msg;
@@ -41,6 +42,9 @@ public class RecordBean<T> {
 	
 	public static <T> RecordBean<T> success(String msg) {
 		return new RecordBean<T>(OK, msg);
+	}
+	public static <T> RecordBean<T> success(T data) {
+		return new RecordBean<T>(OK,"success",data );
 	}
 	public static <T> RecordBean<T> success(String msg, T data) {
 		return new RecordBean<T>(OK, msg, data);

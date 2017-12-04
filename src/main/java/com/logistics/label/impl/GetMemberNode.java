@@ -6,7 +6,9 @@ import cn.assist.easydao.common.SqlExpr;
 import com.logistics.base.constant.SupplierConstant;
 import com.logistics.base.helper.SpringFactory;
 import com.logistics.label.ModuleData;
+import com.logistics.service.member.IMemberService;
 import com.logistics.service.supplier.ISupplierService;
+import com.logistics.service.vo.Member;
 import com.logistics.service.vo.Option;
 import com.logistics.service.vo.Supplier;
 import freemarker.template.TemplateModel;
@@ -22,19 +24,19 @@ import java.util.Map;
  * @author caibin
  *
  */
-public class GetSupplierNode extends ModuleData {
+public class GetMemberNode extends ModuleData {
 
 	@Override
 	public Map<String, Object> getModelData(Map<String, Object> params) throws Exception {
 		TemplateModel checked = (TemplateModel) params.get("checked");
-		ISupplierService supplierService = SpringFactory.getBean("ISupplierService");
-		List<Supplier> list = supplierService.supplierList(new Conditions("status", SqlExpr.EQUAL, SupplierConstant.STATUS_START));
+		IMemberService iMemberService = SpringFactory.getBean("IMemberService");
+		List<Member> list = iMemberService.getMemberList(new Conditions());
 		List<Option> options = new ArrayList<Option>();
 		if(list != null){
-			for (Supplier supplier : list) {
+			for (Member member : list) {
 				Option option = new Option();
-				option.setId(supplier.getId()+"");
-				option.setName(supplier.getName());
+				option.setId(member.getUid()+"");
+				option.setName(member.getName());
 				options.add(option);
 			}
 		}

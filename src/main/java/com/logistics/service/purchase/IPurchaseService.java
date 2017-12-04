@@ -4,9 +4,9 @@ import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.pojo.PagePojo;
 import com.logistics.base.utils.RecordBean;
 import com.logistics.service.model.PurchaseModel;
-import com.logistics.service.vo.Product;
 import com.logistics.service.vo.ProductCategory;
 import com.logistics.service.vo.Purchase;
+import com.logistics.service.vo.PurchaseProduct;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * 会员活动
  */
-public interface IPurchaseyService {
+public interface IPurchaseService {
 
     /**
      * 获取采购单
@@ -27,7 +27,7 @@ public interface IPurchaseyService {
 
 
     /**
-     * 获取会员活动
+     * 获取采购单信息
      * @param conn
      * @return
      */
@@ -38,14 +38,8 @@ public interface IPurchaseyService {
      * @param purchaseModel
      * @return
      */
-    public RecordBean<PurchaseModel> addPurchaseModel(PurchaseModel purchaseModel);
+    public RecordBean<PurchaseModel> addPurchaseModel(PurchaseModel purchaseModel,Integer operatorId,String operatorName);
 
-    /**
-     * 修改会员活动
-     * @param purchaseModel
-     * @return
-     */
-    public RecordBean<PurchaseModel> updatePurchaseModel(PurchaseModel purchaseModel);
 
 
     /**
@@ -64,44 +58,37 @@ public interface IPurchaseyService {
 
 
     /**
-     * 批量添加活动商品信息
-     * @param vipActivityProductList
-     * @param activityId
+     * 批量添加采购单商品
+     * @param purchaseProducts
+     * @param peId
      * @return
      */
-    public RecordBean<String> batchAddPurchaseProduct(List<Product> vipActivityProductList, Integer activityId);
+    public RecordBean<String> batchAddPurchaseProduct(List<PurchaseProduct> purchaseProducts, String peId);
 
 
     /**
-     * 获取活动下的商品
+     * 获取采购单商品
      * @param conn
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public PagePojo<Product> getVipActivityProductPage(Conditions conn, int pageNo, int pageSize);
+    public PagePojo<PurchaseProduct> getPurchaseProductPage(Conditions conn, int pageNo, int pageSize);
 
     /**
-     * 获取活动下的商品
+     * 获取采购单的商品
      * @param conn
      * @return
      */
-    public List<Product> getVipActivityProductList(Conditions conn);
+    public List<PurchaseProduct> getPurchaseProductList(Conditions conn);
 
     /**
-     * 获取活动信息
-     * @param activityId
+     * 获取采购单信息
+     * @param peId
      * @return
      */
-    public PurchaseModel getVipActivityModel(Integer activityId);
+    public PurchaseModel getPurchaseModel(String peId);
 
-    /**
-     * 活动的停用或启用
-     * @param activityId
-     * @param status
-     * @return
-     */
-    public RecordBean<String> changeStatus(String[] activityId, Integer status);
 
 
 

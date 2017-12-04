@@ -15,7 +15,8 @@ import java.util.Map;
 /**
  *
  */
-public class TestSorketHandle extends TextWebSocketHandler {
+
+public class SocketMessageHandle extends TextWebSocketHandler {
 
     private static final Map<Integer,WebSocketSession> users ;//这个会出现性能问题，最好用Map来存储，key用userid
 
@@ -101,6 +102,23 @@ public class TestSorketHandle extends TextWebSocketHandler {
             try {
                 if (user.getValue().isOpen()) {
                     user.getValue().sendMessage(new TextMessage(getChartJson(message)));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 给所有在线用户发送消息
+     *
+     * @param message
+     */
+    public void sendMessageToUsers(String message) {
+        for (Map.Entry<Integer,WebSocketSession> user : users.entrySet()) {
+            try {
+                if (user.getValue().isOpen()) {
+                    user.getValue().sendMessage(new TextMessage(message));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

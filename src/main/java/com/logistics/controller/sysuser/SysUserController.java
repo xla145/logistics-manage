@@ -3,9 +3,7 @@ import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
 import com.logistics.base.constant.BaseConstant;
-import com.logistics.base.utils.JsonBean;
-import com.logistics.base.utils.PageUtils;
-import com.logistics.base.utils.ReqUtils;
+import com.logistics.base.utils.*;
 import com.logistics.controller.BaseController;
 import com.logistics.service.sys.sysuser.ISysUserService;
 import com.logistics.service.vo.sys.SysAction;
@@ -143,6 +141,9 @@ public class SysUserController extends BaseController{
 	@RequestMapping(value = "/edit")
 	@ResponseBody
 	public JSONObject edit(HttpServletRequest request, SysAction.SysUser sysUser){
+		Integer isValid = ReqUtils.getParamToInteger(request,"isValid",0);
+		System.out.println(isValid);
+		sysUser.setIsValid(isValid);
 		sysUser.setUpdateTime(new Date());
 		boolean result = sysUserService.editSysUsers(sysUser);
 		return result ? JsonBean.success("更新成功") : JsonBean.error("更新失败");
@@ -193,6 +194,27 @@ public class SysUserController extends BaseController{
 		Integer uid = (Integer) request.getSession().getAttribute(BaseConstant.SYS_UID);
 		SysAction.SysUser sysUser = sysUserService.getSysUser(uid);
 		model.addAttribute("data",sysUser);
-		return "/modules/sysuser/_info";
+		return "modules/sysuser/_info";
+	}
+
+	/**
+	 *
+	 *获取修改密码页面
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkPwd")
+	@ResponseBody
+	public JSONObject checkPwd(HttpServletRequest request){
+		Integer uid = ReqUtils.getSysUid(request);
+		String pwd = ReqUtils.getParam(request,"pwd",null);
+		if (StringUtils.isBlank(pwd)) {
+			return JsonBean.error("解锁密码不能为空！");
+		}
+		SysAction.SysUser sysUser = sysUserService.getSysUser(uid);
+		if (MD5.encode(pwd).equalsIgnoreCase(sysUser.getPswd())) {
+			return JsonBean.success("解锁成功！");
+		}
+		return JsonBean.error("解锁密码不正确！");
 	}
 }

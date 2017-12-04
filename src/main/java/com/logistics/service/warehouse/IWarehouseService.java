@@ -1,74 +1,76 @@
-package com.logistics.service.supplier;
+package com.logistics.service.warehouse;
 
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.pojo.PagePojo;
 import com.logistics.base.utils.DataObj;
+import com.logistics.base.utils.RecordBean;
 import com.logistics.service.vo.Supplier;
+import com.logistics.service.vo.Warehouse;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * 供应商管理
+ * 仓库管理
  */
-public interface SupplierService {
+public interface IWarehouseService {
 
 	/**
-	 * 分页查询 供应商
-	 * 
+	 * 分页查询 仓库
+	 * @param conn
 	 * @param pageNo 查询页码
 	 * @param pageSize 每页数量
 	 * @return
 	 */
-	public PagePojo<Supplier> getSupplierPage(Map<String,Object> map, int pageNo, int pageSize);
-	
+	public PagePojo<Warehouse> getWarehousePage(Conditions conn, int pageNo, int pageSize);
+
 	/**
-	 * 分页查询 供应商
+	 * 分页查询 仓库
 	 * @param conn 查询条件
 	 * @return
 	 */
-	public List<Supplier> getSupplierList(Conditions conn);
+	public List<Warehouse> getWarehouseList(Conditions conn);
 
 	/**
 	 * 获取供应商信息
-	 * @param id
+	 * @param wid
 	 * @return
 	 */
-	
-	public Supplier getSupplier(Integer id);
-	
-	/**
-	 * 添加供应商信息
-	 * 
-	 * @param supplier 添加供应商信息
-	 * @return
-	 */
-	public DataObj<Supplier> addSupplier(Supplier supplier);
 
+	public Warehouse getWarehouse(String wid);
 
 	/**
-	 * 修改供应商信息
+	 * 添加仓库信息
 	 *
-	 * @param supplier 供应商信息
+	 * @param warehouse
 	 * @return
 	 */
-	public DataObj<Supplier> updateSupplier(Supplier supplier);
-
-	/**
-	 * 删除供应商信息
-	 * 
-	 * @param ids 供应商信息
-	 * @return
-	 */
-	public DataObj<String> delSupplier(String[] ids);
+	public RecordBean<Warehouse> addWarehouse(Warehouse warehouse);
 
 
 	/**
-	 * 供应商状态修改
+	 * 修改仓库信息
+	 *
+	 * @param warehouse 仓库信息
+	 * @return
+	 */
+	public RecordBean<Warehouse> updateWarehouse(Warehouse warehouse);
+
+	/**
+	 * 删除仓库信息
+	 *
+	 * @param ids 仓库信息
+	 * @return
+	 */
+	public RecordBean<String> delWarehouse(String[] ids);
+
+
+	/**
+	 * 仓库信息状态修改
 	 * @param ids
 	 * @param status
 	 * @return
 	 */
-	public DataObj<String> changeStatus(String[] ids,Integer status);
+	public RecordBean<String> changeStatus(String[] ids, Integer status);
 
 }

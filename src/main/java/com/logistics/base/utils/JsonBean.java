@@ -64,6 +64,15 @@ public class JsonBean {
 		return json;
 	}
 
+	public static JSONObject success(PagePojo<?> pagePojo) {
+		JSONObject json = new JSONObject();
+		json.put("code", JsonBean.OK);
+		json.put("msg", "success");
+		json.put("data", JSONArray.toJSON(pagePojo.getPgaeData()));
+		json.put("count",pagePojo.getTotal());
+		return json;
+	}
+
 	public static JSONObject success(String msg, List<?> list) {
 		JSONObject json = new JSONObject();
 		json.put("code", JsonBean.OK);

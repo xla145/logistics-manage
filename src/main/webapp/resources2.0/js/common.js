@@ -62,62 +62,34 @@ layui.config({
             }
             return index;
         },
-        addForm: function (content,title,url,width,height,offset,isFull,callback) {//弹出窗口 类型为1
+        addForm: function (content,title,width,height,callback,isFull) {//弹出窗口 类型为1
             var index = layer.open({
                 content: $('#'+content),
                 type: 1,
                 title: title,
-                offset: offset ,
+                shade:0.8,
+                // offset: offset ,
                 area: [width+'px',height+'px'],
                 btn: ['保存', '取消'],
                 maxmin: false,
-                yes: function(index, layero) {
-                    var formEm = $(layero).find('form');
-                    if (!form.onVerify(formEm)) {
-                        return false;
-                    }
-                    /**表单提交 **/
-                    $.post(url, formEm.serialize(), function (result) {
-                        if (result.code == 0) {
-                            formEm[0].reset();	//清空弹框表单内容
-                            layer.close(index);	//关闭弹框
-                            callback;
-                            return;
-                        }
-                        layer.msg(result.msg);
-                    });
-                }
+                yes: callback
             });
             if (isFull){
                 layer.full(index)
             }
         },
-        editForm: function (content,title,url,formId,callback,isFull) {//弹出窗口 类型为1
+        editForm: function (content,title,width,height,callback,isFull) {//弹出窗口 类型为1
             var index = layer.open({
                 type: 2,
                 title: title,
                 shadeClose: true,
-                shade: false,
+                shade: 0.8,
                 maxmin: true, //开启最大化最小化按钮
-                offset: ['0px'],
-                area: ['1000px', '600px'],
+                // offset: ['0px'],
+                area: [width+'px',height+'px'],
                 content: content,
                 btn: ['保存', '取消'],
-                yes: function(index, layero) {
-                    var formEm = $(layero).find('iframe').contents().find(formId);
-                    if (!form.onVerify(formEm)) {
-                        return false;
-                    }
-                    /**表单提交 **/
-                    $.post(url, formEm.serialize(), function (result) {
-                        if (result.code == 0) {
-                            formEm[0].reset();	//清空弹框表单内容
-                            layer.close(index);	//关闭弹框
-                            callback;
-                        }
-                        layer.msg(result.msg);
-                    });
-                }
+                yes: callback
             });
             if (isFull){
                 layer.full(index)
@@ -180,7 +152,6 @@ layui.config({
                 var e = $(this).find("option"), f = 0;
                 for (var i = 1; i < e.length; i++) {
                     var d = $(this).siblings("div.layui-form-select").find("dd");
-                    console.log(d)
                     var value = $(e[i]).val(),text = $(e[i]).text();
                     var img = '<span><i class="layui-icon">&#'+value+';</i>'+text+'</span>'
                     $(d[i]).attr("lay-value",'&#'+value+';');

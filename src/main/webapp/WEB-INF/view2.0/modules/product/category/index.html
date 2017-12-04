@@ -1,0 +1,247 @@
+<#include "../../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 添加</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-normal operator-btn" data-type="edit"><i class="layui-icon">&#xe642;</i> 编辑</a>
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" id="filterForm">
+			<div class="layui-inline">
+			  <label class="layui-filtrate-title">类型名称：</label>
+			  <div class="layui-input-inline">
+				  <input type="text" class="layui-input" name="name">
+			  </div>
+			</div>
+			<!--<div class="layui-inline">-->
+			  <!--<label class="layui-filtrate-title">姓名：</label>-->
+			  <!--<div class="layui-input-inline">-->
+				<!--<input type="text" name="name" class="layui-input">-->
+			  <!--</div>-->
+			<!--</div>-->
+			<!--<div class="layui-inline">-->
+			  <!--<label class="layui-filtrate-title">状态：</label>-->
+			  <!--<div class="layui-input-inline">-->
+				<!--<select name="status">-->
+				  <!--<option value=" ">全部</option>-->
+				  <!--<option value="5">待处理</option>-->
+				  <!--<option value="15">已处理</option>-->
+				<!--</select>-->
+			  <!--</div>-->
+			<!--</div>-->
+			<!--<div class="layui-inline">-->
+				<!--<label class="layui-filtrate-title">客户来源：</label>-->
+				<!--<div class="layui-input-inline">-->
+					<!--<select name="source">-->
+						<!--<option value=" ">全部</option>-->
+						<!--<option value="2">公众号</option>-->
+						<!--<option value="1">独立开发</option>-->
+					<!--</select>-->
+				<!--</div>-->
+			<!--</div>-->
+			<div class="layui-inline">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-small operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+			</div>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<!--<table id="test2"></table>-->
+	<table class="layui-table" id="table-category" lay-filter="table-category"></table>
+	<script type="text/html" id="tool">
+		<a class="layui-btn layui-btn-mini layui-btn-normal" lay-event="edit">编辑</a>
+		<a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+	</script>
+</div>
+<@footer>
+<script>
+//入口
+layui.use(['table','common','laydate'], function(){
+  var $ = layui.jquery;
+  var table = layui.table,
+      common = layui.common,
+      laypage = layui.laypage,
+	  layer = layui.layer,
+      form = layui.form;
+
+  var tableIns = table.render({ //其它参数在此省略
+    id: 'table-category',
+    elem: '#table-category',
+    url: '${ctx}travel/category/list',
+    method: 'post',
+  	request: {
+	  pageName: 'pageNo' //页码的参数名称，默认：page
+	  ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+  	},
+    cols: [[
+        {checkbox: true, fixed: true}
+        ,{field:'catId', title: '分类id', width:100, sort: true, fixed: true}
+        ,{field:'name', title: '分类名称', width:150}
+//        ,{field:'parentId', title: '父id', width:100}
+//        ,{field:'isShow', title: '是否显示', width:100}
+        ,{field:'weight', title: '排序', width:100,sort: true}
+//        ,{field:'image', title: '图片', width:120}
+//        ,{fixed: 'right', field:'status', title: '状态', sort: true, width:135,templet: '#statusTpl'}
+        ,{fixed: 'right', title: '操作',width:120, align:'center', toolbar: '#tool'}
+    ]],
+    height: 'full-145',
+    even: true,
+    page: true,
+    size: 'sm',
+    limits: [15,30,60,90,150]
+    ,limit: 15 //默认采用30
+  });
+  //操作
+  var active = {
+	search: function () {
+		dataReload();
+	},
+	reset: function () {
+		$("#filterForm")[0].reset();
+		dataReload();
+	},
+	add: function(){
+		layer.open({
+			content: '${ctx}travel/category/getView',
+			type: 2,
+			title: '添加分类',
+			btn: ['保存', '取消'],
+			area:['300px','200px'],
+			maxmin: false,
+			yes: function(index, layero) {
+				var formEm = $(layero).find('iframe').contents().find("#product-category-form");
+				if (!form.onVerify(formEm)) {
+					return false;
+				}
+				/**表单提交 **/
+				$.post('${ctx}travel/category/add', formEm.serialize(), function (result) {
+					if (result.code == 0) {
+						formEm[0].reset();	//清空弹框表单内容
+						layer.close(index);	//关闭弹框
+						dataReload();
+						return;
+					}
+					layer.msg(result.msg);
+				});
+			}
+		})
+	},
+    edit: function(data){
+	  data = data || table.checkStatus('table-category').data;
+	  if (data == "") {
+		layer.msg("请选择一条数据进行编辑！");
+		return;
+	  }
+	  layer.open({
+		  content: '${ctx}travel/category/getView?catId='+data[0].catId,
+		  type: 2,
+		  title: '修改分类',
+		  btn: ['保存', '取消'],
+		  area:['300px','200px'],
+		  maxmin: false,
+		  yes: function(index, layero) {
+			  var formEm = $(layero).find('iframe').contents().find("#product-category-form");
+			  if (!form.onVerify(formEm)) {
+				  return false;
+			  }
+			  /**表单提交 **/
+			  $.post('${ctx}travel/category/edit', formEm.serialize(), function (result) {
+				  if (result.code == 0) {
+					  formEm[0].reset();	//清空弹框表单内容
+					  layer.close(index);	//关闭弹框
+//					  dataReload();
+                      $(".layui-laypage-btn")[0].click();
+					  return;
+				  }
+				  layer.msg(result.msg);
+			  });
+		  }
+	  })
+  	},
+	del: function (data) {
+		data = data || table.checkStatus('table-category').data;
+		if (data == "") {
+			layer.msg("请选择一条数据进行删除！");
+			return;
+		}
+		var ids = new Array();
+		layui.each(data, function (i) {
+			ids.push(data[i].catId);
+		})
+		layer.confirm('真的删除行么', function(index){
+			layer.close(index);
+			common.post("${ctx}travel/category/del",{ids: ids},function (result) {
+				if (result.code != 0) {
+					layer.msg(result.msg)
+					return;
+				}
+				dataReload();
+			})
+		});
+	}
+  }
+  //绑定操作按钮
+  $('.operator-btn').on('click', function(){
+	var type = $(this).data('type');
+	active[type] ? active[type].call(this) : '';
+  });
+  //监听工具条
+  table.on('tool(table-category)', function(obj){
+	var type = obj.event;
+	active[type] ? active[type].call(this, [obj.data]) : '';
+  });
+  //加载数据
+  var dataReload = function () {
+    console.log(tableIns)
+//    console.log(laypage.curr+"=====================")
+    tableIns.reload({
+	  where: common.formatForm($('#filterForm'))
+    });
+//      $(".layui-laypage-btn")[0].click();
+  }
+
+  var _tools = {
+      searchData: function () {
+          dataReload();
+      }
+  }
+  window.custom_tool = _tools;
+});
+</script>
+<script type="text/html" id="planTimeTpl">
+	{{# var fn = function(time){
+		var newDate = new Date();
+		newDate.setTime(time);
+		return newDate.Format("yyyy-MM-dd hh:mm:ss");
+	  }
+	}}
+	{{fn(d.planTime)}}
+</script>
+<script type="text/html" id="createTimeTpl">
+	{{# var fn = function(time){
+	var newDate = new Date();
+	newDate.setTime(time);
+	return newDate.Format("yyyy-MM-dd hh:mm:ss");
+	}
+	}}
+	{{fn(d.createTime)}}
+</script>
+<script type="text/html" id="statusTpl">
+	{{# if(d.status === 5){ }}
+	<span style='color: #5FB878;'>待处理</span>
+	{{# } }}
+	{{# if(d.status === 15){ }}
+	<span style='color: #FF5722;'>已处理</span>
+	{{# } }}
+</script>
+<script type="text/html" id="sourceTpl">
+	{{# if(d.source === 1){ }}
+		{{ "独立开发" }}
+	{{# } }}
+	{{# if(d.source === 2){ }}
+		{{ "公众号" }}
+	{{# } }}
+</script>
+</@footer>

@@ -1,0 +1,192 @@
+<#include "../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 添加限时购</a>
+		<!--<a href="javascript:void(0)" class="layui-btn layui-btn-sm layui-btn-normal operator-btn" data-type="copy"><i class="layui-icon">&#xe630;</i> 复制</a>-->
+		<!--<a href="javascript:void(0)" class="layui-btn layui-btn-sm layui-btn-primary operator-btn" data-type="info"><i class="layui-icon">&#xe621;</i> 详情</a>-->
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+			<div class="layui-inline">
+				<label class="layui-filtrate-title">活动标题：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="title" class="layui-input">
+				</div>
+			</div>
+		    <div class="layui-inline">
+		      <label class="layui-filtrate-title">活动时间：</label>
+			  <div class="layui-input-inline">
+				 <input type="text" class="layui-input" id="activity-time" name="activityTime" style="width: 250px;">
+			  </div>
+		    </div>
+			<div class="layui-inline">
+				<label class="layui-filtrate-title">发布时间：</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input" id="release-time" name="releaseTime" style="width: 250px;">
+				</div>
+			</div>
+		    <div class="layui-inline">
+		      <label class="layui-filtrate-title">状态：</label>
+		      <div class="layui-input-inline">
+		        <select name="status">
+				  <option value=" ">全部</option>
+				  <option value="0">停用</option>
+				  <option value="10">启用</option>
+				</select>
+		      </div>
+		    </div>
+			<div class="layui-inline">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+			</div>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<table id="vip-activity-table" lay-filter="vip-activity-table"></table>
+	<script type="text/html" id="bar">
+		{{# if(d.status === 10){}}
+		{{"<a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='downActivity'>停用</a>"}}
+		{{# } }}
+		{{# if(d.status === 0 || d.status === 15){}}
+		{{
+		"<a class='layui-btn layui-btn-xs layui-btn-xs' lay-event='upActivity'>启用</a>"
+		+"<a class='layui-btn layui-btn-xs layui-btn-normal' lay-event='edit'>编辑</a>"
+		}}
+		{{# } }}
+		<a class='layui-btn layui-btn-xs' lay-event='info'>详情</a>
+	</script>
+</div>
+<@footer>
+<script>
+    //入口
+    layui.use(['table','layer','form','laydate','common'], function(){
+        var table = layui.table, layer = layui.layer, form = layui.form, laydate = layui.laydate,common = layui.common;
+        //常规用法
+        laydate.render({elem: '#activity-time',type: 'datetime',range: true});
+        laydate.render({elem: '#release-time',type: 'datetime',range: true});
+
+        //列表渲染
+        var tableIns = table.render({
+			id: 'vip-activity-table',
+            elem: '#vip-activity-table'
+            ,url: '${ctx}vip/activity/list'
+            ,height: 'full-140'
+            ,page: true
+            ,method: 'post'
+            ,request: {
+                pageName: 'pageNo' //页码的参数名称，默认：page
+                ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            }
+            ,limits: [15,30,60,90,120]
+            ,limit: 15 //默认采用30
+            ,size: 'sm'
+            ,cols: [[
+                {checkbox: true, fixed: true}
+                ,{field:'title', title: '活动标题', minWidth:200}
+                ,{field:'activityTime', title: '活动时间', minWidth:260}
+                ,{field:'operatorName', title: '发布账户', width:120}
+                ,{field:'releaseTime', title: '发布时间', width:150,templet: '#timeTpl',sort: true}
+                ,{field:'vipName', title: '参与会员', width:120}
+                ,{field:'productNum', title: '参与商品总数', width:120}
+                ,{fixed: 'right',field:'status', title: '状态', width:80,templet: '#statusTpl'}
+                ,{fixed: 'right', width:150, title: '操作', toolbar: '#bar'}
+            ]],
+        });
+        //操作
+        var active = {
+            search: function () {
+                dataReload();
+            },
+            reset: function () {
+                $("#filterForm")[0].reset();
+                dataReload();
+            },
+            add: function(){
+                common.layerShowIframe("${ctx}vip/activity/getView","添加会员活动信息",true);
+            },
+            edit: function (data) {
+                data = data || table.checkStatus('vip-activity-table').data;
+                if (data == "" || data.length != 1) {
+                    layer.msg("请选择一条数据进行编辑！");
+                    return;
+                }
+                common.layerShowIframe("${ctx}vip/activity/getView?id="+data[0].id,"修改会员活动信息",true);
+            },
+            upActivity: function (data) {
+                console.log(data)
+                layer.confirm("你确定要启用该活动吗？", function(index){
+                    layer.close(index)
+                    upOrDownActivity(data[0].id,data[0].status);
+                });
+            },
+			downActivity: function (data) {
+                console.log(data)
+                layer.confirm("你确定要停用该活动吗？", function(index){
+                    layer.close(index)
+                    upOrDownActivity(data[0].id,data[0].status);
+                });
+            },
+			info: function (data) {
+                data = data || table.checkStatus('activity-table').data;
+                if(data.length != 1){
+                    layer.msg("请选择一条数据进行查看！");
+                    return;
+                }
+                common.layerShowIframe("${ctx}vip/activity/info?id="+data[0].id,"活动信息详情",true);
+            }
+        }
+        //绑定操作按钮
+        $('.operator-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(vip-activity-table)', function(obj){
+            var type = obj.event;
+            active[type] ? active[type].call(this, [obj.data]) : '';
+        });
+        //加载数据
+        var dataReload = function (isEdit) {
+            if (isEdit) {
+                $(".layui-laypage-btn")[0].click();
+                return;
+            }
+            tableIns.reload({
+                where: common.formatForm($('#filterForm'))
+            });
+        }
+        //上下架
+        var upOrDownActivity = function (id,status) {
+            common.post("${ctx}vip/activity/changeStatus",{ids: id, status: status},function (result) {
+                if (result.code != 0) {
+                    layer.msg(result.msg);
+                    return;
+                }
+                dataReload(true);
+            })
+        }
+        window._tools = {
+            searchData: function (isEdit) {
+                dataReload(isEdit);
+            }
+        }
+    });
+</script>
+</@footer>
+<script type="text/html" id="statusTpl">
+	{{# if(d.status === 0){ }}
+	{{ '<span style="color: grey;">初始状态</span>' }}
+	{{# } }}
+	{{# if(d.status === 10){ }}
+	{{ '<span style="color: green;">启用</span>' }}
+	{{# } }}
+	{{# if(d.status === 15){ }}
+	{{ '<span style="color: red;">停用</span>' }}
+	{{# } }}
+</script>
+<script type="text/html" id="timeTpl">
+	{{dateFormat(d.releaseTime)}}
+</script>

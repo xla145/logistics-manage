@@ -1,0 +1,75 @@
+<#include "../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div style="margin: 15px" >
+	<form class="layui-form layui-form-pane" id="form-save">
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>活动标题：</label>
+			<div class="layui-input-block">
+				<input type="text" name="title" class="layui-input" lay-verify="title" value="${data.title!''}" readonly>
+				<input type="hidden" name="id" value="${data.id!''}" id="activityId">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>活动时间：</label>
+			<div class="layui-input-inline" style="width: 250px;">
+				<input type="text" class="layui-input" id="activity-time" name="activityTime" style="width: 250px;" value="${data.activityTime!''}" readonly>
+			</div>
+			<label class="layui-form-label"><span>*</span>会员类型：</label>
+			<div class="layui-input-inline">
+				<select name="vip" lay-verify="required" lay-filter="vip">
+					<option value="">请选择</option>
+					<@module name="option" class="com.yuelinghui.label.impl.GetVipGradeNode" type=1 checked="${data.vip!1}"/>
+				</select>
+				<input type="hidden" name="vipName" value="${data.vipName!''}" id="vipName">
+			</div>
+		</div>
+	</form>
+	<blockquote class="layui-elem-quote">
+		商品列表
+	</blockquote>
+	<table id="activity-product-table" lay-filter="activity-product-table"></table>
+</div>
+<@footer>
+<script>
+    //入口
+    layui.use(['form','table'], function() {
+        var $ = layui.jquery;
+        var form = layui.form,table = layui.table;
+        //常规用法
+
+        var data = [];
+        $.post("${ctx}vip/activity/activityProductList",{activityId:$("#activityId").val()},function (result) {
+            data = result.data;
+            initData(data);
+        })
+        var tableIns ;
+        var initData = function (data) {
+            //列表渲染
+            tableIns = table.render({
+                id: 'activity-product-table',
+                elem: '#activity-product-table'
+                ,data: data
+                ,height: 'full-175'
+                ,page: true
+                ,method: 'post'
+                ,request: {
+                    pageName: 'pageNo' //页码的参数名称，默认：page
+                    ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,limits: [15,30,60,90,120]
+                ,limit: 15 //默认采用30
+                ,size: 'sm'
+                ,cols: [[
+                    {checkbox: true, fixed: true}
+                    ,{field:'pid', title: '商品编码', width:150}
+                    ,{field:'productTitle', title: '商品标题', width:200}
+                    ,{field:'catName', title: '商品类型', width:100}
+                    ,{field:'productPrice', title: '售价', width:80}
+                    ,{field:'productOriginalPrice', title: '原价', width:80}
+                    ,{field:'activityPrice', title: '活动价', width:120}
+                ]],
+            });
+        }
+    });
+</script>
+</@footer>

@@ -1,10 +1,10 @@
-package com.logistics.label.impl;
+package com.yuelinghui.label.impl;
 
-import com.logistics.base.helper.SpringFactory;
-import com.logistics.label.ModuleData;
-import com.logistics.service.supplier.SupplierService;
-import com.logistics.service.vo.Option;
-import com.logistics.service.vo.Supplier;
+import com.yuelinghui.base.helper.SpringFactory;
+import com.yuelinghui.label.ModuleData;
+import com.yuelinghui.service.supplier.SupplierService;
+import com.yuelinghui.service.vo.Option;
+import com.yuelinghui.service.vo.Supplier;
 import freemarker.template.TemplateModel;
 
 import java.util.ArrayList;

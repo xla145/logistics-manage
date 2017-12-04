@@ -1,17 +1,14 @@
-package com.logistics.service.supplier.impl;
-import cn.assist.easydao.common.Conditions;
-import cn.assist.easydao.common.Sort;
-import cn.assist.easydao.common.SqlExpr;
-import cn.assist.easydao.common.SqlSort;
+package com.yuelinghui.service.supplier.impl;
+import cn.assist.easydao.common.*;
 import cn.assist.easydao.dao.BaseDao;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSON;
-import com.logistics.base.constant.ProductConstant;
-import com.logistics.base.constant.ProductGroupTypeConstant;
-import com.logistics.base.constant.SupplierConstant;
-import com.logistics.base.utils.DataObj;
-import com.logistics.service.supplier.SupplierService;
-import com.logistics.service.vo.Supplier;
+import com.yuelinghui.base.constant.ProductConstant;
+import com.yuelinghui.base.constant.ProductGroupTypeConstant;
+import com.yuelinghui.base.constant.SupplierConstant;
+import com.yuelinghui.base.utils.DataObj;
+import com.yuelinghui.service.supplier.SupplierService;
+import com.yuelinghui.service.vo.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -129,6 +126,7 @@ public class SupplierServiceImpl implements SupplierService{
 	@Override
 	public List<Supplier> supplierListByType(Integer type) {
 		Conditions con = new Conditions("product_group_type",SqlExpr.EQUAL,type);
+		con.add(new Conditions("status",SqlExpr.EQUAL,SupplierConstant.STATUS_START), SqlJoin.AND);
 		return BaseDao.dao.queryForListEntity(Supplier.class,con);
 	}
 }

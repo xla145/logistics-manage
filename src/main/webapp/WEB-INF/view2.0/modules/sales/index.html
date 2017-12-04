@@ -1,0 +1,172 @@
+<#include "../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="add"><i class="layui-icon">&#xe654;</i> 添加采购单</a>
+		<!--<a href="javascript:void(0)" class="layui-btn layui-btn-sm layui-btn-normal operator-btn" data-type="copy"><i class="layui-icon">&#xe630;</i> 复制</a>-->
+		<!--<a href="javascript:void(0)" class="layui-btn layui-btn-sm layui-btn-primary operator-btn" data-type="info"><i class="layui-icon">&#xe621;</i> 详情</a>-->
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+			<div class="layui-inline">
+				<label class="layui-filtrate-title">商品标题：</label>
+				<div class="layui-input-inline">
+					<input type="text" name="title" class="layui-input">
+				</div>
+			</div>
+		    <!--<div class="layui-inline">-->
+		      <!--<label class="layui-filtrate-title">活动时间：</label>-->
+			  <!--<div class="layui-input-inline">-->
+				 <!--<input type="text" class="layui-input" id="activity-time" name="activityTime" style="width: 250px;">-->
+			  <!--</div>-->
+		    <!--</div>-->
+			<!--<div class="layui-inline">-->
+				<!--<label class="layui-filtrate-title">发布时间：</label>-->
+				<!--<div class="layui-input-inline">-->
+					<!--<input type="text" class="layui-input" id="release-time" name="releaseTime" style="width: 250px;">-->
+				<!--</div>-->
+			<!--</div>-->
+		    <!--<div class="layui-inline">-->
+		      <!--<label class="layui-filtrate-title">状态：</label>-->
+		      <!--<div class="layui-input-inline">-->
+		        <!--<select name="status">-->
+				  <!--<option value=" ">全部</option>-->
+				  <!--<option value="0">停用</option>-->
+				  <!--<option value="10">启用</option>-->
+				<!--</select>-->
+		      <!--</div>-->
+		    <!--</div>-->
+			<div class="layui-inline">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="reset"><i class="layui-icon">&#x1002;</i>重置</a>
+			</div>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<table id="purchase-table" lay-filter="purchase-table"></table>
+	<script type="text/html" id="bar">
+		{{# if(d.status === 10){}}
+		{{"<a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='downActivity'>停用</a>"}}
+		{{# } }}
+		{{# if(d.status === 0 || d.status === 15){}}
+		{{
+		"<a class='layui-btn layui-btn-xs layui-btn-xs' lay-event='upActivity'>启用</a>"
+		+"<a class='layui-btn layui-btn-xs layui-btn-normal' lay-event='edit'>编辑</a>"
+		}}
+		{{# } }}
+		<a class='layui-btn layui-btn-xs' lay-event='info'>详情</a>
+	</script>
+</div>
+<@footer>
+<script>
+    //入口
+    layui.use(['table','layer','form','laydate','common'], function(){
+        var table = layui.table, layer = layui.layer, form = layui.form, laydate = layui.laydate,common = layui.common;
+        //常规用法
+        laydate.render({elem: '#activity-time',type: 'datetime',range: true});
+        laydate.render({elem: '#release-time',type: 'datetime',range: true});
+
+        //列表渲染
+        var tableIns = table.render({
+			id: 'purchase-table',
+            elem: '#purchase-table'
+            ,url: '${ctx}purchase/list'
+            ,height: 'full-140'
+            ,page: true
+            ,method: 'post'
+            ,request: {
+                pageName: 'pageNo' //页码的参数名称，默认：page
+                ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            }
+            ,limits: [15,30,60,90,120]
+            ,limit: 15 //默认采用30
+            ,size: 'sm'
+            ,cols: [[
+                {checkbox: true, fixed: true}
+                ,{field:'peId', title: '单据号', minWidth:100}
+                ,{field:'peDate', title: '单据日期 ', width:150,templet: '<div>{{dateFormat(d.peDate,"yyyy-MM-dd")}}</div>',sort: true}
+                ,{field:'purchaseName', title: '采购员 ', width:120}
+                ,{field:'totalAmount', title: '采购金额 ', width:120}
+                ,{field:'createTime', title: '创建时间  ', width:150,templet: '<div>{{dateFormat(d.createTime)}}</div>'}
+                ,{field:'opearName', title: '作废人', minWidth:120}
+                ,{fixed: 'right',field:'status', title: '单据状态 ', width:80,templet: '#statusTpl'}
+                ,{fixed: 'right', width:150, title: '操作', toolbar: '#bar'}
+            ]],
+        });
+        //操作
+        var active = {
+            search: function () {
+                dataReload();
+            },
+            reset: function () {
+                $("#filterForm")[0].reset();
+                dataReload();
+            },
+            add: function(){
+                common.layerShowIframe("${ctx}purchase/getView","添加采购单信息",true);
+            },
+            edit: function (data) {
+                data = data || table.checkStatus('purchase-table').data;
+                if (data == "" || data.length != 1) {
+                    layer.msg("请选择一条数据进行编辑！");
+                    return;
+                }
+                common.layerShowIframe("${ctx}purchase/getView?id="+data[0].id,"修改采购单信息",true);
+            },
+			info: function (data) {
+                data = data || table.checkStatus('activity-table').data;
+                if(data.length != 1){
+                    layer.msg("请选择一条数据进行查看！");
+                    return;
+                }
+                common.layerShowIframe("${ctx}purchase/info?peId="+data[0].peId,"采购单详情",true);
+            }
+        }
+        //绑定操作按钮
+        $('.operator-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(purchase-table)', function(obj){
+            var type = obj.event;
+            active[type] ? active[type].call(this, [obj.data]) : '';
+        });
+        //加载数据
+        var dataReload = function (isEdit) {
+            if (isEdit) {
+                $(".layui-laypage-btn")[0].click();
+                return;
+            }
+            tableIns.reload({
+                where: common.formatForm($('#filterForm'))
+            });
+        }
+        //上下架
+        var upOrDownActivity = function (id,status) {
+            common.post("${ctx}purchase/changeStatus",{ids: id, status: status},function (result) {
+                if (result.code != 0) {
+                    layer.msg(result.msg);
+                    return;
+                }
+                dataReload(true);
+            })
+        }
+        window._tools = {
+            searchData: function (isEdit) {
+                dataReload(isEdit);
+            }
+        }
+    });
+</script>
+</@footer>
+<script type="text/html" id="statusTpl">
+	{{# if(d.status === -1){ }}
+	{{ '<span style="color: grey;">作废</span>' }}
+	{{# } }}
+	{{# if(d.status === 1){ }}
+	{{ '<span style="color: green;">正常</span>' }}
+	{{# } }}
+</script>

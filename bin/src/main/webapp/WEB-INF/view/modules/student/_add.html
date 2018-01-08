@@ -1,0 +1,62 @@
+<div style="margin: 15px; display:none" id="add-form">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">姓名</label>
+			<div class="layui-input-block">
+				<input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">性别</label>
+			<div class="layui-input-block">
+				<input type="radio" name="sex" value="1" title="男">
+				<input type="radio" name="sex" value="0" title="女" checked>
+			</div>
+		</div>
+		<div class="layui-form-item">
+	      <label class="layui-form-label">年龄</label>
+	      <div class="layui-input-inline">
+	        <input type="number" name="age" class="layui-input">
+	      </div>
+	    </div>
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">出身日期</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="birthday" id="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+	      </div>
+	    </div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">地址</label>
+			<div class="layui-input-block">
+				<select name="address" lay-verify="required">
+					<option value=""></option>
+					<option value="北京">北京</option>
+					<option value="上海">上海</option>
+					<option value="广州">广州</option>
+					<option value="广州">深圳</option>
+					<option value="杭州">杭州</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">爱好</label>
+			<div class="layui-input-block">
+				<input type="checkbox" name="hobby" title="写作" value="写作">
+				<input type="checkbox" name="hobby" title="阅读" value="阅读">
+				<input type="checkbox" name="hobby" title="发呆" value="发呆">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">是否有效</label>
+			<div class="layui-input-block">
+				<input type="checkbox" name="isValid" lay-skin="switch"  lay-text="有效|无效" value="1">
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label">一句话介绍</label>
+			<div class="layui-input-block">
+				<textarea name="info" placeholder="请输入内容" class="layui-textarea"></textarea>
+			</div>
+		</div>
+	</form>
+</div>

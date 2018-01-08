@@ -12,7 +12,7 @@ import cn.assist.easydao.pojo.BasePojo;
 	PID	VARCHAR(30)
 	PRODUCT_NUM	INT(11)
 	CAT_ID	INT(11)
-	W_ID	VARCHAR(255)
+	WID	VARCHAR(255)
 	SYMBOL	TINYINT(2)
 	OPERATOR_ID	INT(11)
 	OPERATOR_NAME	VARCHAR(20)
@@ -27,7 +27,7 @@ public class ProductAccessLog extends BasePojo {
 	private Integer productNum;
 	private Integer catId;
 	private String wid;
-	private Integer symbol;
+	private boolean symbol;
 	private Integer operatorId;
 	private String operatorName;
 	private String remark;
@@ -56,14 +56,18 @@ public class ProductAccessLog extends BasePojo {
 	public Integer getCatId(){
 		return catId;
 	}
-	public Integer getSymbol() {
+	public void setWid(String wid){
+		this.wid=wid;
+	}
+	public String getWid(){
+		return wid;
+	}
+	public void setSymbol(boolean symbol){
+		this.symbol=symbol;
+	}
+	public boolean getSymbol(){
 		return symbol;
 	}
-
-	public void setSymbol(Integer symbol) {
-		this.symbol = symbol;
-	}
-
 	public void setOperatorId(Integer operatorId){
 		this.operatorId=operatorId;
 	}
@@ -81,14 +85,6 @@ public class ProductAccessLog extends BasePojo {
 	}
 	public String getRemark(){
 		return remark;
-	}
-
-	public String getWid() {
-		return wid;
-	}
-
-	public void setWid(String wid) {
-		this.wid = wid;
 	}
 }
 

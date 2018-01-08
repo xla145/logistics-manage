@@ -41,6 +41,14 @@ public interface IPurchaseService {
     public RecordBean<PurchaseModel> addPurchaseModel(PurchaseModel purchaseModel,Integer operatorId,String operatorName);
 
 
+    /**
+     * 添加采购单信息
+     * @param purchaseModel
+     * @return
+     */
+    public RecordBean<PurchaseModel> editPurchaseModel(PurchaseModel purchaseModel,Integer operatorId,String operatorName);
+
+
 
     /**
      * 获取catId 下属的所有有用的类型
@@ -89,7 +97,22 @@ public interface IPurchaseService {
      */
     public PurchaseModel getPurchaseModel(String peId);
 
+    /**
+     * 批量添加采购单商品
+     * @param status
+     * @param peId
+     * @param reason
+     * @return
+     */
+    public RecordBean<String> auditPurchase(String peId,Integer status,String reason);
 
+
+    /**
+     * 添加审核单
+     * @param peId
+     * @return
+     */
+    public RecordBean<String> addAuditOrder(String peId);
 
 
 }

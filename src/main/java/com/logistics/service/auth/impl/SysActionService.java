@@ -1,33 +1,23 @@
 package com.logistics.service.auth.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import cn.assist.easydao.common.*;
+import cn.assist.easydao.dao.BaseDao;
+import cn.assist.easydao.pojo.PagePojo;
+import com.logistics.base.utils.CommonUtil;
+import com.logistics.base.utils.DateUtil;
+import com.logistics.service.auth.IAuthService;
+import com.logistics.service.auth.ISysActionService;
+import com.logistics.service.vo.sys.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cn.assist.easydao.common.Conditions;
-import cn.assist.easydao.common.Sort;
-import cn.assist.easydao.common.SqlExpr;
-import cn.assist.easydao.common.SqlJoin;
-import cn.assist.easydao.common.SqlSort;
-import cn.assist.easydao.dao.BaseDao;
-import cn.assist.easydao.pojo.PagePojo;
-
-import com.logistics.base.utils.CommonUtil;
-import com.logistics.base.utils.DateUtil;
-import com.logistics.service.auth.IAuthService;
-import com.logistics.service.auth.ISysActionService;
-import com.logistics.service.vo.sys.SysAction;
-import com.logistics.service.vo.sys.SysUserAction;
-import com.logistics.service.vo.sys.SysUserRole;
-import com.logistics.service.vo.sys.TreeData;
-import com.logistics.service.vo.sys.TreeNode;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -63,7 +53,12 @@ public class SysActionService implements ISysActionService {
 		}
 		return treeNodes;
 	}
-	
+
+	@Override
+	public List<SysAction> getAllAction() {
+		return BaseDao.dao.queryForListEntity(SysAction.class,new Conditions());
+	}
+
 	/**
 	 * 获取功能树
 	 * 
@@ -80,7 +75,6 @@ public class SysActionService implements ISysActionService {
 		treeData.setOrigin(sysAction);
 		treeNode.setData(treeData);
 		Conditions childrenConn = new Conditions("parent_id", SqlExpr.EQUAL, id);
-		childrenConn.add(new Conditions("status",SqlExpr.EQUAL,1),SqlJoin.AND);
 		List<SysAction> childrenSysActionList =  BaseDao.dao.queryForListEntity(SysAction.class, childrenConn);
 		for (SysAction childrenSysAction : childrenSysActionList) {
 			//递归查询所有子节点
@@ -114,6 +108,14 @@ public class SysActionService implements ISysActionService {
 	public List<SysUserAction> getSysUserAction(int uid) {
 		Conditions conn = new Conditions("uid", SqlExpr.EQUAL, uid);
 		return BaseDao.dao.queryForListEntity(SysUserAction.class, conn);
+	}
+
+	@Override
+	public List<SysAction> getSysUserActionByUid(int uid) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT sa.* FROM sys_user_action sua LEFT JOIN sys_action sa ON (sa.id = sua.action_id) ");
+		sql.append("WHERE sua.uid = ?");
+		return BaseDao.dao.queryForListEntity(SysAction.class,sql.toString(),uid);
 	}
 
 	/**
@@ -174,7 +176,6 @@ public class SysActionService implements ISysActionService {
 	 * @return
 	 */
 	public PagePojo<SysAction> getSysAction(Conditions conn, int pageNo, int pageSize){
-		conn.add(new Conditions("status",SqlExpr.UNEQUAL,-1),SqlJoin.AND);
 		//查询条件
 		Sort sort = new Sort("weight", SqlSort.ASC);
 		return BaseDao.dao.queryForListPage(SysAction.class, conn, sort, pageNo, pageSize);
@@ -188,9 +189,11 @@ public class SysActionService implements ISysActionService {
 	 * @return
 	 */
 	public boolean addSysAction(SysAction sysAction){
+		if (sysAction.getIcon().contains(".")) {
+			sysAction.setIcon(sysAction.getIcon().substring(sysAction.getIcon().indexOf(".")+1,sysAction.getIcon().length()));
+		}
 		sysAction.setCreateTime(new Date());
 		sysAction.setUpdateTime(new Date());
-		sysAction.setWeight(99);
 		int i = BaseDao.dao.insert(sysAction);
 		return i == 1;
 	}
@@ -202,6 +205,9 @@ public class SysActionService implements ISysActionService {
 	 * @return
 	 */
 	public boolean editSysAction(SysAction sysAction){
+		if (sysAction.getIcon().contains(".")) {
+			sysAction.setIcon(sysAction.getIcon().substring(sysAction.getIcon().indexOf(".")+1,sysAction.getIcon().length()));
+		}
 		sysAction.setUpdateTime(new Date());
 		int i = BaseDao.dao.update(sysAction);
 		return i == 1;

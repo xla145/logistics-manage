@@ -1,21 +1,18 @@
 package com.logistics.base.freemarker;
-import java.io.IOException;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.logistics.service.vo.sys.SysAction;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.logistics.base.constant.BaseConstant;
+import com.logistics.base.utils.ShiroUtils;
 import com.logistics.service.sys.sysuser.ISysUserService;
-
+import com.logistics.service.vo.sys.SysAction;
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * 显示用户登录名
@@ -33,7 +30,7 @@ public class ShowUserDirectiveModel implements TemplateDirectiveModel {
 	
 	@SuppressWarnings("rawtypes") 
 	public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-		int uid = (Integer)request.getSession().getAttribute(BaseConstant.SYS_UID);
+		int uid = ShiroUtils.getUserId();
 		SysAction.SysUser sysUser = sysUserService.getSysUser(uid);
 		if(sysUser == null){
 			return;

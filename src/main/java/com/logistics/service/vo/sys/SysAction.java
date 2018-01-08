@@ -21,13 +21,15 @@ public class SysAction extends BasePojo{
 	private String name;//功能名称                       
 	private String url;//功能url                          
 	private Integer type;//1：系统功能 2：导航菜单  
-	private Integer parentId;//父级菜单id                     
+	private Integer parentId;//父级菜单id
+    private String parentName;//父级菜单name
 	private String remark;//备注                             
 	private String icon;//图标
 	private Date createTime;//创建时间
 	private Date updateTime;//更新时间
 	private Integer status;//状态
 	private Integer weight;//权重
+    private String perms; // 授权(多个用逗号分隔，如：user:list,user:create)
 	
 	
 	public Integer getId() {
@@ -103,7 +105,23 @@ public class SysAction extends BasePojo{
 		this.weight = weight;
 	}
 
-	/**
+    public String getPerms() {
+        return perms;
+    }
+
+    public void setPerms(String perms) {
+        this.perms = perms;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    /**
      * 系统用户
      *
      * @author caibin

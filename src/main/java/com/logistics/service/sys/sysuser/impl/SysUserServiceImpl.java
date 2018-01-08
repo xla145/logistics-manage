@@ -4,6 +4,7 @@ import cn.assist.easydao.common.*;
 import cn.assist.easydao.dao.BaseDao;
 import cn.assist.easydao.pojo.PagePojo;
 import com.logistics.base.cache.MCache;
+import com.logistics.base.constant.SysUserConstant;
 import com.logistics.base.utils.CommonUtil;
 import com.logistics.base.utils.MD5;
 import com.logistics.base.utils.RecordBean;
@@ -24,7 +25,6 @@ import java.util.Map;
  */
 @Service("ISysUserService")
 public class SysUserServiceImpl implements ISysUserService {
-
 	/**
 	 * 登录
 	 * 
@@ -34,18 +34,13 @@ public class SysUserServiceImpl implements ISysUserService {
 	 */
 	public RecordBean<SysAction.SysUser> login(String username, String pswd){
 		String cipher = MD5.encode(pswd);
-		SysAction.SysUser sysUser = new SysAction.SysUser();
 		Conditions conn = new Conditions("name", SqlExpr.EQUAL, username);
-		sysUser = BaseDao.dao.queryForEntity(SysAction.SysUser.class, conn);
-		if (sysUser == null) {
-			return RecordBean.error("用户名不存在！");
-		}
 		conn.add(new Conditions("pswd", SqlExpr.EQUAL, cipher), SqlJoin.AND);
-		sysUser = BaseDao.dao.queryForEntity(SysAction.SysUser.class, conn);
+		SysAction.SysUser sysUser = BaseDao.dao.queryForEntity(SysAction.SysUser.class,conn);
 		if (sysUser == null) {
-			return RecordBean.error("用户名密码错误！");
+			return RecordBean.error("用户名或密码错误！");
 		}
-		if(sysUser.getIsValid() != ISysUserService.USET_DALID_YES){
+		if(sysUser.getIsValid() != SysUserConstant.USET_DALID_YES){
 			return RecordBean.error("登录失败，用户无效！");
 		}
 		return RecordBean.success("成功登录",sysUser);
@@ -57,10 +52,10 @@ public class SysUserServiceImpl implements ISysUserService {
 	 * @param username
 	 * @return
 	 */
-	public boolean getSysUser(String username) {
+	public SysAction.SysUser getSysUser(String username) {
 		Conditions conn = new Conditions("name", SqlExpr.EQUAL, username);
 		SysAction.SysUser sysUser = BaseDao.dao.queryForEntity(SysAction.SysUser.class, conn);
-		return sysUser != null;
+		return sysUser;
 	}
 	
 	/**
@@ -149,6 +144,9 @@ public class SysUserServiceImpl implements ISysUserService {
 	 * @param sysUser
 	 */
 	public boolean editSysUsers(SysAction.SysUser sysUser) {
+		if (sysUser.getIsValid() == null) {
+			sysUser.setIsValid(SysUserConstant.USET_DALID_NO);
+		}
 		int i = BaseDao.dao.update(sysUser);
 		return i == 1;
 	}
@@ -176,5 +174,15 @@ public class SysUserServiceImpl implements ISysUserService {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * 根据用户手机号获取用户信息
+	 * @param mobile
+	 * @return
+	 */
+	@Override
+	public SysAction.SysUser getSysUserByMobile(String mobile) {
+		return BaseDao.dao.queryForEntity(SysAction.SysUser.class,new Conditions("mobile",SqlExpr.EQUAL,mobile));
 	}
 }

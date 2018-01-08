@@ -3,7 +3,10 @@ package com.logistics.service.auth.impl;
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
 import cn.assist.easydao.dao.BaseDao;
+import cn.assist.easydao.pojo.PagePojo;
+import com.logistics.base.utils.CommonUtil;
 import com.logistics.base.utils.DateUtil;
+import com.logistics.base.utils.RecordBean;
 import com.logistics.service.auth.ISysRoleService;
 import com.logistics.service.vo.sys.*;
 import org.slf4j.Logger;
@@ -14,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 
 
 /**
@@ -34,7 +36,12 @@ public class SysRoleService implements ISysRoleService {
 		Conditions conn = new Conditions("id", SqlExpr.GT, 0);
 		return BaseDao.dao.queryForListEntity(SysRole.class, conn);
 	}
-	
+
+	@Override
+	public SysRole getSysRole(Integer roleId) {
+		return BaseDao.dao.queryForEntity(SysRole.class,roleId);
+	}
+
 	/**
 	 * 查询角色权限
 	 * 
@@ -121,6 +128,42 @@ public class SysRoleService implements ISysRoleService {
 			return i > 0;
 		}
 		return true;
+	}
+
+	@Override
+	public PagePojo<SysRole> getSysRolePage(Conditions conn, Integer pageNo, Integer pageSize) {
+		return BaseDao.dao.queryForListPage(SysRole.class,conn,null,pageNo,pageSize);
+	}
+
+	@Override
+	public RecordBean<SysRole> addSysRole(SysRole sysRole) {
+		int result = BaseDao.dao.insert(sysRole);
+		if (result == 0) {
+			return RecordBean.error("添加角色信息失败！");
+		}
+		return RecordBean.success("",sysRole);
+	}
+
+	@Override
+	public RecordBean<SysRole> editSysRole(SysRole sysRole) {
+		int result = BaseDao.dao.update(sysRole);
+		if (result == 0) {
+			return RecordBean.error("添加角色信息失败！");
+		}
+		return RecordBean.success("",sysRole);
+	}
+
+	@Override
+	public RecordBean<String> delSysRole(String[] ids) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("DELETE FROM sys_role WHERE id IN(");
+		sql.append(CommonUtil.arrayToSqlIn(ids));
+		sql.append(")");
+		int result = BaseDao.dao.update(sql.toString());
+		if (result == 0) {
+			return RecordBean.error("删除角色信息失败！");
+		}
+		return RecordBean.success("");
 	}
 
 	/**

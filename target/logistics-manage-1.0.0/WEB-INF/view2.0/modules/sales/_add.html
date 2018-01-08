@@ -1,0 +1,199 @@
+<#include "../../_layout/_layout2.0.html"><#t>
+<@header/>
+<div style="margin: 15px" >
+	<form class="layui-form layui-form-pane" id="form-save">
+		<div class="layui-form-item">
+			<label class="layui-form-label"><span>*</span>销售员：</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="salesName" value="${data.salesName!''}">
+			</div>
+			<label class="layui-form-label"><span>*</span>客户：</label>
+			<div class="layui-input-inline">
+				<select name="buyUid" lay-verify="required">
+					<option value="">请选择</option>
+					<@module name="option" class="com.logistics.label.impl.GetMemberNode"  checked="${data.buyUid!''}"/>
+				</select>
+			</div>
+		</div>
+		<blockquote class="layui-elem-quote">
+			<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="addProduct"><i class="layui-icon">&#xe654;</i> 选择商品</a>
+		</blockquote>
+		<table id="product-table" lay-filter="product-table"></table>
+		<div class="layui-form-item layui-fixed">
+			<div class="layui-input-block">
+				<button class="layui-btn layui-btn-sm layui-btn-normal operator-btn" type="button" data-type="submit">确定</button>
+				<button class="layui-btn layui-btn-sm layui-btn-primary operator-btn" type="button" data-type="reduce">取消</button>
+			</div>
+		</div>
+	</form>
+	<div class="product-amount">
+		合计：<span class="count">0</span> 总价：<span class="amount">0.00</span>
+	</div>
+	<script type="text/html" id="product-bar">
+		<a class='layui-btn layui-btn-normal layui-btn-xs' lay-event='yes'>确定</a>
+		<a class='layui-btn layui-btn-xs' lay-event='update'>修改</a>
+		<a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='del'>删除</a>
+	</script>
+</div>
+<@footer>
+<script>
+	//入口
+	layui.use(['laydate','upload','form','table','common'], function() {
+		var $ = layui.jquery;
+		var form = layui.form,laydate = layui.laydate,table = layui.table,common = layui.common;
+        //常规用法
+        form.render();
+        var data = [];
+        $.post("${ctx}sales/salesProductList",{sId:$("#sId").val()},function (result) {
+			data = result.data;
+            initData(data);
+        })
+        var tableIns ;
+		var initData = function (data) {
+            //列表渲染
+            tableIns = table.render({
+                id: 'product-table',
+                elem: '#product-table'
+                ,data: data
+                ,height: 'full-175'
+                ,page: true
+                ,method: 'post'
+                ,request: {
+                    pageName: 'pageNo' //页码的参数名称，默认：page
+                    ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,limits: [15,30,60,90,120]
+                ,limit: 15 //默认采用30
+                ,size: 'sm'
+                ,cols: [[
+                    {checkbox: true, fixed: true}
+                    ,{field:'pid', title: '商品编码', width:150}
+                    ,{field:'productPrice', title: '进货价', width:80}
+                    ,{field:'remaining', title: '剩余库存', width:100}
+                    ,{field:'salesPrice', title: '售价', width:80,templet: '#salesPrice'}
+                    ,{field:'buyCount', title: '数量', width:80,templet: '#buyCount'}
+                    ,{fixed: 'right', width:150, title: '操作', toolbar: '#product-bar'}
+                ]],
+            });
+        }
+        var productCount = 0;
+        var productAmount = 0.00;
+        //操作
+        var active = {
+            addProduct: function () {
+                common.editForm("${ctx}sales/productIndex","选择商品",1000,500,function (index, layero) {
+                    var productData = $(layero).find('iframe').contents().find("#product-data").val();
+                    if (productData !== "") {
+                        tableIns.addData(JSON.parse(productData))
+					}
+                    layer.close(index);
+                });
+                // tableIns.reload();
+       		},
+			del: function (obj) {
+                layer.confirm('真的删除该商品信息吗？', function(index){
+                    obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                    layer.close(index);
+                });
+            },
+            submit: function () {
+                var isEdit = false;
+                var peId = $("#peId").val();
+                var url = "${ctx}sales/add";
+                var formEm = $("#form-save");
+                if(!form.onVerify(formEm)){
+                    return false;
+                }
+                $.post(url,formEm.serialize()+"&productData="+JSON.stringify(tableIns.getTableData()),function(result){
+                    if(result.code == 0){
+                        formEm[0].reset();	//清空弹框表单内容
+                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                        parent.layer.close(index);
+                        parent._tools.searchData(isEdit);
+                        return;
+                    }
+                    layer.msg(result.msg);
+                });
+            },
+			reduce:function () {
+                $("#form-save")[0].reset();
+                closeWindow(true);
+            },
+
+			yes:function (obj) {
+                let price = obj.data.productPrice;
+                if (parseInt(productCount) >= parseInt(obj.data.buyCount)) {
+                    productCount -= parseInt(obj.data.buyCount);
+                    productAmount -= parseFloat(obj.data.buyCount*price);
+				}
+                var tr = obj.tr;
+                var buyCount = tr.find(".product-number").val() || obj.data.buyCount;
+                var salesPrice = tr.find(".sales-price").val() || obj.data.salesPrice;
+
+                if (buyCount > obj.data.remaining) {
+                    layer.msg("销售的数量不能大于剩余库存数！")
+					return;
+				}
+                obj.update({
+                    buyCount: buyCount, salesPrice: salesPrice
+				});
+                productCount += parseInt(buyCount);
+                productAmount += parseFloat(price*buyCount);
+                tr.find(".product-number").parent().parent().append(buyCount);
+                tr.find(".sales-price").parent().parent().append(salesPrice);
+                tr.find(".edit-col").css("display","none");
+                $(".count").html(parseInt(productCount));
+                $(".amount").html(parseFloat(productAmount));
+            },
+            update:function (obj) {
+                var tr = obj.tr;
+                var $this = tr.find('.edit-col');
+                var productNumber = ""
+				var salesPrice = 0.00
+                if (obj.data.buyCount !== null) {
+                    productNumber = obj.data.buyCount;
+				}
+                if (obj.data.salesPrice !== null) {
+                    salesPrice = obj.data.salesPrice;
+                }
+                $this.find('.layui-table-cell').text("");
+				$this.find(".product-number").val(productNumber);
+                $this.find(".sales-price").val(salesPrice);
+                $this.css("display","");
+            }
+		}
+        var closeWindow = function (isEdit) {
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            parent.layer.close(index);
+            parent.tools.searchData(isEdit);
+        }
+        //绑定操作按钮
+        $('.operator-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(product-table)', function(obj){
+            var type = obj.event;
+            active[type] ? active[type].call(this, obj) : '';
+        });
+	});
+</script>
+<script type="text/html" id="buyCount">
+	<div class="edit-col"><input type="number" name="buyCount" class="layui-input product-number"  value="{{# if(d.buyCount !== null){ }}{{d.buyCount}}{{# }; }}" /></div>
+</script>
+<script type="text/html" id="salesPrice">
+	<div class="edit-col"><input type="text" name="salesPrice" class="layui-input sales-price"  value="{{# if(d.salesPrice !== null){ }}{{d.salesPrice}}{{# }; }}" /></div>
+</script>
+</@footer>
+<style type="text/css">
+    .layui-form-item.layui-fixed {
+        margin-top: 20px;
+        position: fixed;
+        right: 20px;
+        bottom: 10px;
+    }
+	.sales-price,.product-number {
+		height: 20px;
+	}
+</style>

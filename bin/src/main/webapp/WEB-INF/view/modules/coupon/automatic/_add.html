@@ -1,0 +1,60 @@
+<div style="margin: 15px; display:none" id="add-form">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券名称:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="name" placeholder="请输入优惠券名称" lay-verify="required" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券码:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="couponCode" autocomplete="off" class="layui-input" readonly="readonly">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券类型:</label>
+			<div class="layui-input-inline">
+				<select name="type" id="type" lay-filter="expenses">
+				  <option value="3">活动劵</option>
+				  <option value="1">好物劵</option>
+				  <option value="2">通用劵</option> 
+				</select> 
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券有效期:</label>
+			  <div class="layui-input-inline">
+		        <input type="number" name="validPeriod" id="date" placeholder="有效期" autocomplete="off" class="layui-input" lay-verify="required">
+		      </div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">使用规则:</label>
+			<div class="layui-input-inline">
+				<select name="useRules" id="useRules"  lay-filter="expenses">
+				  <option value="3">活动劵</option>
+				  <option value="1">好物劵</option>
+				  <option value="2">通用劵</option>
+				</select> 
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">金额:</label>
+			<div class="layui-input-inline">
+				<input type="number" name="price" autocomplete="off" class="layui-input" lay-verify="required">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券使用提示:</label>
+			<div class="layui-input-inline">
+				<textarea name="alertContent" placeholder="请输入备注信息" class="layui-textarea" lay-verify="required"></textarea>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">生成张数:</label>
+			<div class="layui-input-inline">
+				<input type="number" name="sumNumber" autocomplete="off" class="layui-input" lay-verify="required">
+			</div>
+		</div>
+	</form>
+</div>

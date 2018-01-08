@@ -1,0 +1,32 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.id}"></td>
+		    <td>${list.orderId!''}</td>
+		    <td>${list.flowPoolName!''}</td>
+		    <td>${list.customerName!''}</td>
+		    <td>${list.channelName!''}</td>
+		    <td>${list.expensesName!''}</td>
+		    <td></td>
+		    <td>${list.entityCardsFee!''}</td>
+		    <td>${list.singleAmount?string("#.##")}</td>
+		    <td>${list.flowCardNum?c}</td>
+		    <td>${list.functionFee?c}</td>
+		    <td>${list.orderCycle?c}</td>
+		    <td>${list.orderAmount?string("#.##")}</td>
+		    <td>
+		    <#if list.orderStatus == 0>
+		   		未分配
+		    </#if>
+		    </td>
+		    <td></td>
+		    <td><#if list.orderTime??>${list.orderTime?string("yyyy-MM-dd HH:mm:ss")}</#if></td>
+		    <td>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-normal layui-btn-mini">详情</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-mini">自动分配</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-danger layui-btn-mini">手动分配</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-danger layui-btn-mini">驳回</a>
+		 	</td>
+		</tr>
+	</#list>
+</#if>

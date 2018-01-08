@@ -1,7 +1,8 @@
 package com.logistics.service.sys.sysuser;
-import com.logistics.base.utils.RecordBean;
+
 
 import cn.assist.easydao.pojo.PagePojo;
+import com.logistics.base.utils.RecordBean;
 import com.logistics.service.vo.sys.SysAction;
 
 import java.util.Map;
@@ -14,18 +15,6 @@ import java.util.Map;
  */
 public interface ISysUserService {
 
-	/**系统用户**/
-	public static final int USET_TYPE_ROOT = 1;
-	
-	/**客户**/
-	public static final int USET_TYPE_LOWER = 2;
-
-	/**用户无效**/
-	public static final int USET_DALID_NO = 0;
-	/**用户有效**/
-	public static final int USET_DALID_YES = 1;
-	
-	
 	/**
 	 * 登录
 	 * 
@@ -33,7 +22,7 @@ public interface ISysUserService {
 	 * @param pswd
 	 * @return
 	 */
-	public RecordBean<SysAction.SysUser> login(String username, String pswd);
+	RecordBean<SysAction.SysUser> login(String username, String pswd);
 		
 	
 	/**
@@ -42,27 +31,26 @@ public interface ISysUserService {
 	 * @param username
 	 * @return
 	 */
-	public boolean getSysUser(String username);
+	SysAction.SysUser getSysUser(String username);
 	
 	
 	/**
 	 * 根据uid查询系统用户信息
 	 * 
-	 * @param username
-	 * @param pswd
+	 * @param uid
 	 * @return
 	 */
-	public SysAction.SysUser getSysUser(int uid);
+	 SysAction.SysUser getSysUser(int uid);
 	
 	/**
 	 * 分页查询系统用户
 	 * 
-	 * @param sysUser
+	 * @param map
 	 * @param pageNo
 	 * @param pageSize
 	 * @return
 	 */
-	public PagePojo<SysAction.SysUser> getSysUsers(Map<String,Object> map, int pageNo, int pageSize);
+	 PagePojo<SysAction.SysUser> getSysUsers(Map<String, Object> map, int pageNo, int pageSize);
 	
 	
 	/**
@@ -71,7 +59,7 @@ public interface ISysUserService {
 	 * @param sysUser
 	 * @return
 	 */
-	public boolean addSysUsers(SysAction.SysUser sysUser);
+	 boolean addSysUsers(SysAction.SysUser sysUser);
 	
 	/**
 	 * 编辑系统用户
@@ -79,14 +67,14 @@ public interface ISysUserService {
 	 * @param sysUser
 	 * @return
 	 */
-	public boolean editSysUsers(SysAction.SysUser sysUser);
+	 boolean editSysUsers(SysAction.SysUser sysUser);
 
 	/**
 	 * 删除用户数据
 	 * @param ids
 	 * @return
 	 */
-	public int delSysUsers(String[] ids);
+	 int delSysUsers(String[] ids);
 
 	/**
 	 * 编辑系统用户
@@ -94,5 +82,12 @@ public interface ISysUserService {
 	 * @param sysUser
 	 * @return
 	 */
-	public boolean updatePwd(SysAction.SysUser sysUser);
+	 boolean updatePwd(SysAction.SysUser sysUser);
+
+	/**
+	 * 根据手机号获取用户信息
+	 * @param mobile
+	 * @return
+	 */
+	 SysAction.SysUser getSysUserByMobile(String mobile);
 }

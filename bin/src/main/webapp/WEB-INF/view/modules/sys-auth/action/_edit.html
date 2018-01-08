@@ -1,0 +1,52 @@
+<div style="margin: 15px;display:none2" id="edit-form">
+	<form class="layui-form">
+		<input type="hidden" name="id" value="${data.id!''}">
+		<div class="layui-form-item">
+			<label class="layui-form-label">功能名称</label>
+			<div class="layui-input-inline">
+				<input type="text" name="name" placeholder="请输入功能名称" value="${data.name!''}" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">功能URL</label>
+			<div class="layui-input-inline">
+				<input type="text" name="url" placeholder="请输入功能url" value="${data.url!''}" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">图标</label>
+			<div class="layui-input-inline">
+				<input type="text" name="icon" placeholder="请输入图标" value="${data.icon?html}" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">功能类型</label>
+			<div class="layui-input-inline">
+				<select name="type" lay-verify="required">
+					<option value=" ">请选择</option>
+					<option value="1" <#if data.type == 1>selected</#if>>系统功能</option>
+					<option value="2" <#if data.type == 2>selected</#if>>导航菜单</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">父级节点</label>
+			<div class="layui-input-inline">
+				<select name="parentId" lay-verify="required">
+					<option value="-1" <#if data.parentId < 1>selected</#if>>顶级菜单</option>
+					<#if options??>
+						<#list options as items>
+							<option value=${items.id!''} <#if (data.parentId+'') == items.id>selected</#if>>${items.name!''}</option>
+						</#list>
+					</#if>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block">
+				<textarea name="remark" placeholder="请输入备注信息" class="layui-textarea">${data.remark!''}</textarea>
+			</div>
+		</div>
+	</form>
+</div>

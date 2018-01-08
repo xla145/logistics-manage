@@ -1,0 +1,35 @@
+<!-- 表格区域 -->
+<div class="layui-form" id="twrap">
+  <table class="layui-table lay-even clear-padding" lay-skin="line">
+    <thead>
+      <tr>
+        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+        <th>序号</th>
+        <th>活动标题</th>
+        <th>发布时间</th>
+        <th>活动时间区间</th>
+        <th>价格</th>
+        <th fixed="right">是否下架</th>
+      </tr> 
+    </thead>
+    <tbody></tbody>
+  </table>
+  <!-- 分页容器 -->
+  <div class="layui-show"><div id="page"></div></div>
+</div>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid'], function(){
+  var datagrid = layui.datagrid();
+  var supplier_id = ${supplier_id!''};
+  var type = ${type!''};
+  //表格数据加载插件，可选参数：
+  datagrid.init({
+	  url: 'productAcitityList',
+	  pageSize: 15,
+	  pageEm: $('#page'),
+	  tempEm: $('#twrap'),
+	  params: {supplier_id: supplier_id; type:type}
+  });
+</script>

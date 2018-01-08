@@ -1,15 +1,16 @@
 package com.logistics.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.code.kaptcha.Constants;
+import com.google.code.kaptcha.Producer;
 import com.logistics.base.constant.BaseConstant;
 import com.logistics.base.utils.JsonBean;
-import com.logistics.base.utils.RecordBean;
-import com.logistics.base.utils.ReqUtils;
-import com.logistics.event.EventModel;
-import com.logistics.event.LoginEvent;
+import com.logistics.base.utils.MD5;
+import com.logistics.base.utils.ShiroUtils;
 import com.logistics.service.sys.sysuser.ISysUserService;
-import com.logistics.service.vo.sys.SysAction;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authc.*;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * 登录
@@ -40,25 +43,31 @@ public class LoginController {
 	private ISysUserService sysUserService;
 	@Autowired
 	private ApplicationContext applicationContext;
+	@Autowired
+	private Producer producer;
 	
 	@RequestMapping(value = "/login", method = {RequestMethod.GET})
-	public String loginGet(HttpServletRequest request, Model model){
+	public String loginGet(HttpServletRequest request,HttpServletResponse response, Model model) throws IOException {
 		return "login";
 	}
 
 	/**
-	 * 登录post
-	 * 
+	 * 系统用户登录
 	 * @param request
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/login", method = {RequestMethod.POST})
+	@RequestMapping(value = "/sys/login", method = {RequestMethod.POST})
 	@ResponseBody
-	public JSONObject loginPost(HttpServletRequest request, HttpServletResponse response, Model model){
+	public JSONObject loginPost(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 		String userName = request.getParameter("userName");
 		String password = request.getParameter("password");
 		String code = request.getParameter("code");
+		String kaptcha = ShiroUtils.getKaptcha(Constants.KAPTCHA_SESSION_KEY);
+		if(!code.equalsIgnoreCase(kaptcha)){
+			return JsonBean.error("验证码不正确");
+		}
+
 		if(StringUtils.isBlank(userName)){
 			return JsonBean.error("请输入用户名");
 		}
@@ -68,15 +77,18 @@ public class LoginController {
 		if (StringUtils.isBlank(code)) {
 			return JsonBean.error("请输入验证码");
 		}
-		if (!code.equalsIgnoreCase((String) request.getSession().getAttribute("code"))) {
-			return JsonBean.error("验证码不正确");
+
+		try{
+			Subject subject = ShiroUtils.getSubject();
+			//MD5加密
+			password = MD5.encode(password);
+			UsernamePasswordToken token = new UsernamePasswordToken(userName, password);
+			subject.login(token);
+		}catch (UnknownAccountException | LockedAccountException | IncorrectCredentialsException e) {
+			return JsonBean.error(e.getMessage());
+		} catch (AuthenticationException e) {
+			return JsonBean.error("账户验证失败");
 		}
-		RecordBean<SysAction.SysUser> recordBean = sysUserService.login(userName, password);
-		if(!recordBean.isSuccessCode()){
-			return JsonBean.error(recordBean.getMsg());
-		}
-		//登录成功
-		loginSuccess(request, response, recordBean.getData());
 		return JsonBean.success("登录成功");
 	}
 	
@@ -87,7 +99,7 @@ public class LoginController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/loginOut")
+	@RequestMapping(value = "/sys/loginOut")
 	@ResponseBody
 	public JSONObject loginOut(HttpServletRequest request, HttpServletResponse response, Model model){
 		Object uidObj = request.getSession().getAttribute(BaseConstant.SYS_UID);
@@ -97,32 +109,21 @@ public class LoginController {
 		request.getSession().invalidate();
 		return JsonBean.success("退出成功！");
 	}
-	
-	private void loginSuccess(HttpServletRequest request, HttpServletResponse response, SysAction.SysUser sysUser){
-		int uid = sysUser.getUid();
-		int cid = -1;
-		int userType = sysUser.getType();
-		//登录成功,存入登录用户UID
-		request.getSession().setAttribute(BaseConstant.SYS_UID, uid);
-		request.getSession().setMaxInactiveInterval(60*60);
-		JSONObject sysUserJSON = (JSONObject) JSONObject.toJSON(sysUser);
-		request.getSession().setAttribute(BaseConstant.SYS_USER, sysUserJSON.toJSONString());
-		
-		String ip = ReqUtils.getUserIp(request);
-		String userAgent = request.getHeader("user-agent");
-		String referer =  request.getHeader("Referer");
-		
-		logger.info("用户登录成功,userType：" + userType + ",cid:"+cid+",uid:" + uid + ",username:" + sysUser.getName() + ",ip:" + ip + ",userAgent:" + userAgent);
-		
-		EventModel eventModel = new EventModel();
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("referer",referer);
-		param.put("userAgent", userAgent);
-		param.put("ip", ip);
-		param.put("lastLoginTime", new Date());
-		eventModel.setParam(param);
-		eventModel.setSysUser(sysUser);
-		applicationContext.publishEvent(new LoginEvent(eventModel));  //发布登录事件
+
+	@RequestMapping("captcha.jpg")
+	public void captcha(HttpServletResponse response,HttpServletRequest request) throws ServletException, IOException {
+		response.setHeader("Cache-Control", "no-store, no-cache");
+		response.setContentType("image/jpeg");
+
+		//生成文字验证码
+		String text = producer.createText();
+		//生成图片验证码
+		BufferedImage image = producer.createImage(text);
+		//保存到shiro session
+		request.getSession().setAttribute(Constants.KAPTCHA_SESSION_KEY, text);
+
+		ServletOutputStream out = response.getOutputStream();
+		ImageIO.write(image, "jpg", out);
 	}
 	
 }

@@ -1,9 +1,10 @@
 package com.logistics.controller.sysauth;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.logistics.base.constant.BaseConstant;
 import com.logistics.base.utils.JsonBean;
 import com.logistics.base.utils.ReqUtils;
+import com.logistics.base.utils.ShiroUtils;
 import com.logistics.service.auth.ISysActionService;
 import com.logistics.service.auth.ISysRoleService;
 import com.logistics.service.vo.sys.SysRole;
@@ -42,7 +43,7 @@ public class SysRoleAuthController {
 		List<SysRole> roleList = sysRoleService.getSysRoles();
 		
 		model.addAttribute("roleList", roleList);
-		model.addAttribute("treeNode", com.alibaba.fastjson.JSONArray.toJSONString(list));
+		model.addAttribute("treeNode", JSONArray.toJSONString(list));
 		return "modules/sys-auth/role-auth/index";
 	}
 	
@@ -68,7 +69,7 @@ public class SysRoleAuthController {
 	@RequestMapping(value = "/editRoleAction")
 	@ResponseBody
 	public JSONObject editRoleAction(HttpServletRequest request,@RequestParam("actionIds[]") List<Integer> actionIds){
-		int uid = (Integer)request.getSession().getAttribute(BaseConstant.SYS_UID); 
+		int uid = ShiroUtils.getUserId();
 		int roleId = ReqUtils.getParamToInt(request, "roleId", 0);
 		if(roleId < 1){
 			return JsonBean.error("角色不存在!");

@@ -1,6 +1,6 @@
 package com.logistics.controller.sysauth;
 
-import com.logistics.base.constant.BaseConstant;
+import com.logistics.base.utils.ShiroUtils;
 import com.logistics.service.auth.IAuthService;
 import com.logistics.service.auth.ISysActionService;
 import net.sf.json.JSONArray;
@@ -30,7 +30,7 @@ public class SysNavBarController {
 	@RequestMapping(value = "/getNavbar")
 	@ResponseBody
 	public JSONArray index(HttpServletRequest request, Model model){
-		int uid = (Integer)request.getSession().getAttribute(BaseConstant.SYS_UID);
+		int uid = ShiroUtils.getUserId();
 		if(uid == 1){
 			return authService.getAllMenus();
 		}else{

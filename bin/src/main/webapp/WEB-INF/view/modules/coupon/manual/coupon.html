@@ -1,0 +1,94 @@
+<#include "../../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main" id="coupon-main">
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+		    <div class="layui-inline">
+		      <label class="layui-form-label">优惠券名称：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="name" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">优惠券类型：</label>
+		      <div class="layui-input-inline">
+		        <select name="status">
+				  <option value=" " selected="selected">全部</option>
+				  <#list couponTypeList as list>
+				  <option value="${list.id!''}">${list.name!''}</option>
+				  </#list>
+				</select> 
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">使用规则：</label>
+		      <div class="layui-input-inline">
+		        <select name="status">
+				  <option value=" " selected="selected">全部</option>
+				  <#list couponTypeList as list>
+				  <option value="${list.id!''}">${list.name!''}</option>
+				  </#list>
+				</select> 
+		      </div>
+		    </div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding" lay-skin="line">
+	    <thead>
+	      <tr>
+	        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+	        <th>序号</th>
+	        <th>优惠券名称</th>
+	        <th>优惠卷类型</th>
+	        <th>优惠卷有效期</th>
+	        <th>优惠券生成日期</th>
+	        <th>优惠券总张数</th>
+	        <th>使用规则</th>
+	        <th>金额</th>
+	        <th>优惠券使用提示</th>
+	        <th>优惠券剩余张数</th>
+	        <th fixed="right">操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+ //入口
+	 layui.use(['datagrid','laydate'], function(){
+	   var $ = layui.jquery;
+	  var form = layui.form()
+	  ,datagrid = layui.datagrid();
+	  
+	  //表格数据加载插件，可选参数：
+	  datagrid.init({
+		  url: 'couponList',
+		  pageSize: 15,
+		  pageEm: $('#page'),
+		  tempEm: $('#twrap'),
+		  filterForm: $('#filterForm')
+	  });
+	  
+	  //搜索， 依赖datagrid
+	  $('#search').bind('click', function(){
+		  datagrid.search();	  
+	  })
+	  
+	//操作
+	  $('#twrap').on('click', '.operate', function(){
+		  var id = $(this).siblings('.index-id').val();
+		  console.log("==================")
+		  this.parent().getCouponId(id);
+	  })	  
+	});
+</script>
+</@footer>   

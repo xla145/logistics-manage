@@ -1,0 +1,59 @@
+<#assign isLogin = 'login' />
+<#include "_layout/_layout.html"><#t>
+<@header>
+ <link rel="stylesheet" href="${assets}css/login.css" />
+ <style>body{background-color: #393D49;}</style>
+</@header>
+<div class="beg-login-bg">
+<div class="beg-login-box">
+	<header><h1>后台登录</h1></header>
+	<div class="beg-login-main">
+		<form action="${ctx}login" id="loginForm" class="layui-form" method="post">
+			<div class="layui-form-item">
+				<label class="beg-login-icon"><i class="layui-icon">&#xe612;</i></label>
+				<input type="text" name="userName" lay-verify="userName" autocomplete="off" placeholder="请输入登录名" class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<label class="beg-login-icon"><i class="layui-icon">&#xe642;</i></label>
+				<input type="password" name="password" lay-verify="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<div class="beg-pull-left"><button type="reset" class="layui-btn layui-btn-primary" style="padding: 0 30px;"><i class="layui-icon">&#x1006;</i> 重置</button></div>
+				<div class="beg-pull-right"><button type="submit" class="layui-btn layui-btn-primary" style="padding: 0 30px;" lay-submit><i class="layui-icon">&#x1005;</i> 登录</button></div>
+			</div>
+		</form>
+	</div>
+	<footer><p>xxoo © ooxx</p></footer>
+</div>
+</div>
+<@footer>
+<script>
+	layui.use(['layer', 'form'], function() {
+		var layer = layui.layer,
+			$ = layui.jquery,
+			form = layui.form();
+		
+		function keyLogin(){
+		  if (event.keyCode==13){
+			  $('#loginForm').submit();
+		  }
+		}
+		
+		var v= form.verify({
+			  userName: [/^[\S]{5,12}$/,'用户名不合法(6-12位)'],password: [/^[\S]{6,12}$/,'密码必须6到12位，且不能出现空格']
+		});
+		form.on('submit', function (data) {
+			var $form = $('#loginForm');
+			//add表单提交
+			$.post( $form.attr('action'), $form.serialize(),function(result){
+				if(result.code == 0){
+					window.location.href='${ctx}index.html';
+				}else{
+					layer.msg(result.msg, {icon: 2});
+				}
+			});
+			return false;
+		});
+	});
+</script>
+</@footer>

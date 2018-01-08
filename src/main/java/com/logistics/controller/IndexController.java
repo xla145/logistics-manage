@@ -1,8 +1,7 @@
 package com.logistics.controller;
 import com.alibaba.fastjson.JSONObject;
-import com.logistics.base.cache.MCacheKit;
-import com.logistics.base.constant.BaseConstant;
 import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.ShiroUtils;
 import com.logistics.service.auth.IAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,7 +48,7 @@ public class IndexController {
 	@RequestMapping(value = "/clearCache")
 	@ResponseBody
 	public JSONObject clearCache(HttpServletRequest request){
-		Integer uid = Integer.valueOf(request.getSession().getAttribute(BaseConstant.SYS_UID).toString());
+		Integer uid = ShiroUtils.getUserId();
 		iAuthService.reload(uid);
 		return JsonBean.success("清除缓存成功！");
 	}

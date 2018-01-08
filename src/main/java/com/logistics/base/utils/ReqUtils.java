@@ -1,18 +1,11 @@
 package com.logistics.base.utils;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import com.logistics.base.constant.BaseConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.logistics.base.utils.CommonUtil.getContentFromJSON;
+import javax.servlet.http.HttpServletRequest;
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * resuest 辅助类
@@ -150,12 +143,7 @@ public class ReqUtils {
 	 * @return
 	 */
 	public static Integer getSysUid(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		String sysUid = session.getAttribute(BaseConstant.SYS_UID).toString();
-		if (StringUtils.isNotBlank(sysUid)) {
-			return Integer.parseInt(sysUid);
-		}
-		return null;
+		return ShiroUtils.getUserId();
 	}
 
 	/**
@@ -164,11 +152,6 @@ public class ReqUtils {
 	 * @return
 	 */
 	public static String getSysName(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		String sysUser = session.getAttribute(BaseConstant.SYS_USER).toString();
-		if (StringUtils.isNotBlank(sysUser)) {
-			return CommonUtil.getContentFromJSON(sysUser,"name");
-		}
-		return "";
+		return ShiroUtils.getUserEntity().getName();
 	}
 }

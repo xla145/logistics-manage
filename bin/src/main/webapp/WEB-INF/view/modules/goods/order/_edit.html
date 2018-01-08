@@ -1,0 +1,120 @@
+<div style="margin: 15px;display:none2" id="edit-form">
+	<form class="layui-form">
+		<input type="hidden" name="id" value="${data.id!''}">
+		<div class="layui-form-item">
+	      <label class="layui-form-label">流量池名称</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="poolName" class="layui-input" value="${data.poolName!''}">
+	      </div>
+	    </div>
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">流量池描述</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="poolDesc" class="layui-input" value="${data.poolDesc!''}">
+	      </div>
+	    </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">运营商</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="flowProviderName" readOnly = "readOnly"  class="layui-input" value="${data.flowProviderName!''}">
+	      </div>
+	    </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">通道</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="channelName" readOnly = "readOnly" class="layui-input" value="${data.channelName!''}">
+	      </div>
+	    </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">到期时间</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="deadline" readOnly = "readOnly" class="layui-input" value="<#if data.deadline??>${data.deadline?string("yyyy-MM-dd")}</#if>">
+	      </div>
+	    </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">资费套餐</label>
+	      <div class="layui-input-block">
+	        <input type="text" name="expensesName" readOnly = "readOnly" class="layui-input" value="${data.expensesName!''}">
+	      </div>
+	    </div>
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">套餐流量</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="singleFlow" readOnly = "readOnly" class="layui-input" value="${data.singleFlow!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">MB</div>
+	    </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">池总流量</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="poolTotalFlow" readOnly = "readOnly" class="layui-input" value="${data.poolTotalFlow!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">MB</div>
+	    </div>
+		
+		<div class="layui-form-item">
+	      <label class="layui-form-label">已用流量</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="usedTotalFlow" readOnly = "readOnly" class="layui-input" value="${data.usedTotalFlow!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">MB</div>
+	    </div>
+		
+		<div class="layui-form-item">
+	      <label class="layui-form-label">剩余流量</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="leftTotalFlow" readOnly = "readOnly" class="layui-input" value="${data.leftTotalFlow!''}">
+	      </div>
+		<div class="layui-form-mid layui-word-aux">MB</div>
+	    </div>
+		
+		<div class="layui-form-item">
+	      <label class="layui-form-label">使用比例</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="usedRatio" readOnly = "readOnly" class="layui-input" value="${data.usedRatio!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">%</div>
+	    </div>
+		
+		<div class="layui-form-item">
+	      <label class="layui-form-label">卡数量</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="cardNum" readOnly = "readOnly" class="layui-input" value="${data.cardNum!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">张</div>
+	    </div>
+		
+		<div class="layui-form-item">
+	      <label class="layui-form-label">订单</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="orderIds" class="layui-input" value="${data.orderIds!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">请填入流量池的关联的订单ID,用英文逗号隔开不要留空格</div>
+	    </div>
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">预警值</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="warmMax" class="layui-input" value="${data.warmMax!''}">
+	      </div>
+	      <div class="layui-form-mid layui-word-aux">%</div>
+	    </div>
+		<div class="layui-form-item">
+	      <label class="layui-form-label">可视用户</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="customerIds" class="layui-input" value="${data.customerIds!''}">
+	      </div>
+	       <div class="layui-form-mid layui-word-aux">请填入可以查看该流量池的用户ID,用英文逗号隔开不要留空格</div>
+	    </div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block">
+				<textarea name="remark" class="layui-textarea">${data.remark!''}</textarea>
+			</div>
+		</div>
+	</form>
+</div>

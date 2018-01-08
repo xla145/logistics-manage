@@ -1,0 +1,64 @@
+<div style="margin: 15px;display:none2" id="edit-form">
+	<form class="layui-form">
+		<input type="hidden" name="uid" value="${data.uid!''}">
+		<div class="layui-form-item">
+			<label class="layui-form-label">姓名</label>
+			<div class="layui-input-block">
+				<input type="text" id='name_' name="name" placeholder="请输入" class="layui-input" value="${data.name!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">性别</label>
+			<div class="layui-input-block">
+				<input type="radio" name="sex" value="1" title="男" <#if data.sex == 1>checked</#if>>
+				<input type="radio" name="sex" value="0" title="女" <#if data.sex == 0>checked</#if>>
+			</div>
+		</div>
+		<div class="layui-form-item">
+	      <label class="layui-form-label">年龄</label>
+	      <div class="layui-input-inline">
+	        <input type="number" name="age" class="layui-input" value="${data.age!''}">
+	      </div>
+	    </div>
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">出身日期</label>
+	      <div class="layui-input-inline">
+	        <input type="text" name="birthday" id="date" placeholder="yyyy-mm-dd" value="${data.birthday!''}" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+	      </div>
+	    </div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">地址</label>
+			<div class="layui-input-block">
+				<select name="address" lay-verify="required">
+					<option value=""></option>
+					<option value="北京" <#if data.address == '北京'>selected</#if>>北京</option>
+					<option value="上海" <#if data.address == '上海'>selected</#if>>上海</option>
+					<option value="广州" <#if data.address == '广州'>selected</#if>>广州</option>
+					<option value="深圳" <#if data.address == '深圳'>selected</#if>>深圳</option>
+					<option value="杭州" <#if data.address == '杭州'>selected</#if>>杭州</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">爱好</label>
+			<div class="layui-input-block">
+				<#assign _hobby = data.hobby?split(',') />
+				<input type="checkbox" name="hobby" title="写作" value="写作" ${_hobby?seq_contains('写作')?string('checked', '')}>
+				<input type="checkbox" name="hobby" title="阅读" value="阅读" ${_hobby?seq_contains('阅读')?string('checked', '')}>
+				<input type="checkbox" name="hobby" title="发呆" value="发呆" ${_hobby?seq_contains('发呆')?string('checked', '')}>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">是否有效${data.isValid}</label>
+			<div class="layui-input-block">
+				<input type="checkbox" name="isValid" lay-skin="switch"  lay-text="有效|无效" value="1" <#if data.isValid == 1>checked</#if>>
+			</div>
+		</div>
+		<div class="layui-form-item layui-form-text">
+			<label class="layui-form-label">一句话介绍</label>
+			<div class="layui-input-block">
+				<textarea name="info" placeholder="请输入内容" class="layui-textarea">${data.info!''}</textarea>
+			</div>
+		</div>
+	</form>
+</div>

@@ -4,15 +4,16 @@ import cn.assist.easydao.common.*;
 import cn.assist.easydao.dao.BaseDao;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSON;
+import com.logistics.base.constant.AuditOrderConstant;
 import com.logistics.base.constant.ProductAccessLogConstant;
 import com.logistics.base.constant.PurchaseConstant;
 import com.logistics.base.utils.CommonUtil;
-import com.logistics.base.utils.JsonBean;
 import com.logistics.base.utils.RecordBean;
 import com.logistics.service.model.PurchaseModel;
 import com.logistics.service.product.IProductCategoryService;
 import com.logistics.service.product.IProductStockService;
 import com.logistics.service.purchase.IPurchaseService;
+import com.logistics.service.vo.AuditOrder;
 import com.logistics.service.vo.ProductCategory;
 import com.logistics.service.vo.Purchase;
 import com.logistics.service.vo.PurchaseProduct;
@@ -34,7 +35,7 @@ import java.util.Map;
 /**
  * 会员活动管理
  */
-@Service("IVipActivityService")
+@Service("IPurchaseService")
 public class PurchaseServiceImpl implements IPurchaseService {
 
     private static Logger logger = LoggerFactory.getLogger(PurchaseServiceImpl.class);
@@ -93,11 +94,46 @@ public class PurchaseServiceImpl implements IPurchaseService {
             batchAddPurchaseProduct(purchaseModel.getProductList(),peId);
             addProductAccessLog(purchaseModel.getProductList(),operatorId,operatorName);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("添加采购单异常【"+e.getMessage()+"】");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return RecordBean.error("添加采购单异常！");
         }
         return RecordBean.success("添加采购单成功！");
+
+    }
+
+    @Override
+    public RecordBean<PurchaseModel> editPurchaseModel(PurchaseModel purchaseModel, Integer operatorId, String operatorName) {
+        logger.info("添加采购单信息【"+ JSON.toJSON(purchaseModel)+"】");
+        try {
+            Purchase purchase = new Purchase();
+            purchase.setPeId(purchaseModel.getPeId());
+            purchase.setType(1);
+            purchase.setPeDate(purchaseModel.getPeDate());
+            purchase.setPurchaseName(purchaseModel.getPurchaseName());
+            double totalAmount = 0.00;
+            Integer buyCount = 0;
+            for (PurchaseProduct purchaseProduct:purchaseModel.getProductList()) {
+                buyCount += purchaseProduct.getBuyCount();
+                totalAmount += purchaseProduct.getBuyCount()*purchaseProduct.getProductPrice().doubleValue();
+            }
+            purchase.setUpdateTime(new Date());
+            purchase.setBuyCount(buyCount);
+            purchase.setTotalAmount(BigDecimal.valueOf(totalAmount));
+            int result = BaseDao.dao.update(purchase);
+            if (result < 0) {
+                return RecordBean.error("更新采购单信息失败！");
+            }
+            batchAddPurchaseProduct(purchaseModel.getProductList(),purchaseModel.getPeId());
+            addProductAccessLog(purchaseModel.getProductList(),operatorId,operatorName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("更新采购单异常【"+e.getMessage()+"】");
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return RecordBean.error("更新采购单异常！");
+        }
+        return RecordBean.success("更新采购单成功！");
 
     }
 
@@ -169,13 +205,38 @@ public class PurchaseServiceImpl implements IPurchaseService {
     @Override
     public PurchaseModel getPurchaseModel(String peId) {
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT pe_id,buy_count,total_amount,pe_date,purchase_name FROM purchase ");
+        sql.append("SELECT pe_id,pe_date,buy_count,total_amount,pe_date,purchase_name FROM purchase ");
         sql.append("WHERE pe_id = ?");
         PurchaseModel purchaseModel = BaseDao.dao.queryForEntity(PurchaseModel.class,sql.toString(),peId);
         List<PurchaseProduct> purchaseProducts = getPurchaseProductList(new Conditions("pe_id",SqlExpr.EQUAL,peId));
         purchaseModel.setProductList(purchaseProducts);
         return purchaseModel;
 
+    }
+
+    @Override
+    public RecordBean<String> auditPurchase(String peId, Integer status, String reason) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("UPDATE purchase SET reason = ?,status = ? WHERE pe_id = ?");
+        int result = BaseDao.dao.update(sql.toString(),reason,status,peId);
+        if (result == 0) {
+            return RecordBean.error("审核失败！");
+        }
+        return RecordBean.success("审核成功！");
+    }
+
+    @Override
+    public RecordBean<String> addAuditOrder(String peId) {
+        AuditOrder auditOrder = new AuditOrder();
+        auditOrder.setOrderId(peId);
+        auditOrder.setType(AuditOrderConstant.PURCHASE_TYPE);
+        auditOrder.setCreateTime(new Date());
+        auditOrder.setStatus(AuditOrderConstant.INITIAL_TYPE);
+        int result = BaseDao.dao.insert(auditOrder);
+        if (result == 0 ) {
+            return RecordBean.error("创建审核单失败！");
+        }
+        return RecordBean.success("创建审核单成功！");
     }
 
     /**

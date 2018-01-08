@@ -1,0 +1,100 @@
+<div style="margin: 15px; display:none" id="add-form">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">产品标题:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="poolName" placeholder="请输入流量池名称" autocomplete="off" class="layui-input" lay-verify="required">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">产品名称：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="poolDesc" placeholder="请输入说明" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">价格：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="poolDesc" placeholder="请输入说明" autocomplete="off" class="layui-input">
+			</div>
+			<i>(/人起)</i>
+		</div>
+		<div class="layui-form-item show-travel">
+			<div class="layui-input-inline">
+				<input type="radio" name="status" value="显示出发/目的地" title="显示出发/目的地：">
+			</div>
+			<div class="layui-input-inline">
+				<input type="radio" name="status" value="不显示出发/目的地" title="不显示出发/目的地：">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">出发地：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="start" placeholder="请输入出发地" autocomplete="off" class="layui-input">
+			</div>
+			<label class="layui-form-label">目的地：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="end" placeholder="请输入目的地" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+	      	<label class="layui-form-label">列表展示图片：</label>
+	      	<div class="layui-input-inline">
+				<input type="file" name="file" class="layui-upload-file">
+		  	</div>
+		<div class="layui-form-item">
+		    <label class="layui-form-label">合作商家：</label>
+		    <div class="layui-input-inline">
+		       <select name="channelId">
+				 <option value=" ">全部</option>
+				 <@module name="option" type="self" groupCode="channelGroup" itemCode="1" class="com.cnm.iot.service.dictionary.impl.DictionaryData"/>
+			   </select> 
+		    </div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">想去人数：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="poolDesc" placeholder="请输入想去人数" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">产品标签：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="poolDesc" placeholder="请输入产品标签" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-inline">
+				<input type="radio" name="status" value="开启轮播图：" title="开启轮播图：">
+			</div>
+			<div class="layui-input-inline">
+				<input type="radio" name="status" value="不开启轮播图：" title="不开启轮播图：">
+			</div>	
+			<div class="layui-input-inline">
+				<input type="file" name="file（可随便定义）" class="layui-upload-file">
+			</div>	
+		</div>	
+		<div class="layui-form-item">
+			<p class="product-info">产品详情介绍:</p>
+			<textarea id="productInfo" style="display: none;"></textarea>
+		</div>
+	</form>
+</div>
+<style type="text/css">
+	.show-travel{
+		padding: 10px;
+	}
+	.layui-travel{
+		width:100px;
+		border: 1px solid red;
+		display: block;
+	}
+	.product-info{
+		width: 100%;
+		font-size: 14px;
+	    margin-bottom: 8px;
+	    background-color: #d4d3d3;
+	    padding: 8px;
+	 }
+</style>
+<scprtit>

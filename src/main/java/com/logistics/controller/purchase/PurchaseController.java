@@ -15,7 +15,6 @@ import com.logistics.service.model.PurchaseModel;
 import com.logistics.service.product.IProductService;
 import com.logistics.service.purchase.IPurchaseService;
 import com.logistics.service.supplier.ISupplierService;
-import com.logistics.service.vo.Product;
 import com.logistics.service.vo.ProductCategory;
 import com.logistics.service.vo.Purchase;
 import com.logistics.service.vo.PurchaseProduct;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -174,6 +174,46 @@ public class PurchaseController extends BaseController {
 		}
 		return JsonBean.error(data.getMsg());
 	}
+
+
+	/**
+	 *
+	 * 添加数据
+	 *
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/edit",method = RequestMethod.POST)
+	@ResponseBody
+	public JSONObject edit(HttpServletRequest request, PurchaseModel purchaseModel){
+		if (StringUtils.isBlank(purchaseModel.getPurchaseName())){
+			return JsonBean.error("采购人员信息必填");
+		}
+		if (purchaseModel.getPeDate() == null) {
+			return JsonBean.error("单据日期信息必填");
+		}
+		String productData = ReqUtils.getParam(request,"productData",null);
+		List<PurchaseProduct> purchaseProducts = JSON.parseArray(productData, PurchaseProduct.class);
+		if (purchaseProducts == null || purchaseProducts.size() == 0) {
+			return JsonBean.error("商品信息不能为空");
+		}
+		purchaseProducts = CommonUtil.removeNullFromList(purchaseProducts);
+		List<Object> pidList = new ArrayList<Object>();
+		for (PurchaseProduct purchaseProduct:purchaseProducts){
+			if (pidList.contains(purchaseProduct.getPid())) {
+				return JsonBean.error("商品编号【"+purchaseProduct.getPid()+"】的商品重复");
+			}
+			pidList.add(purchaseProduct.getPid());
+		}
+		purchaseModel.setProductList(purchaseProducts);
+		Integer operatorId = ReqUtils.getSysUid(request);
+		String operatorName = ReqUtils.getSysName(request);
+		RecordBean<PurchaseModel> data = iPurchaseyService.editPurchaseModel(purchaseModel,operatorId,operatorName);
+		if(data.isSuccessCode()) {
+			return JsonBean.success("修改成功");
+		}
+		return JsonBean.error(data.getMsg());
+	}
 	
 	/**
 	 * 
@@ -192,7 +232,6 @@ public class PurchaseController extends BaseController {
 		model.addAttribute("data",purchase);
 		return "modules/purchase/_add";
 	}
-
 
 	/**
 	 * 获取活动详情页
@@ -223,6 +262,39 @@ public class PurchaseController extends BaseController {
 		Integer type = ReqUtils.getParamToInteger(request,"type",null);
 		List<ProductCategory> categorySummaryList= iPurchaseyService.getProductCategoryList(type);
 		return JsonBean.success("success",categorySummaryList);
+	}
+
+	/**
+	 *
+	 * 审核采购单
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/audit")
+	@ResponseBody
+	public JSONObject audit(HttpServletRequest request, @RequestParam("peId") String peId,@RequestParam("reason") String reason,@RequestParam("status") Integer status){
+		RecordBean<String> result = iPurchaseyService.auditPurchase(peId,status,reason);
+		if (result.isSuccessCode()) {
+			return JsonBean.success(result.getMsg());
+		}
+		return JsonBean.error(result.getMsg());
+	}
+
+
+	/**
+	 *
+	 * 审核采购单
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/addAuditOrder")
+	@ResponseBody
+	public JSONObject audit(HttpServletRequest request, @RequestParam("peId") String peId){
+		RecordBean<String> result = iPurchaseyService.addAuditOrder(peId);
+		if (result.isSuccessCode()) {
+			return JsonBean.success(result.getMsg());
+		}
+		return JsonBean.error(result.getMsg());
 	}
 
 }

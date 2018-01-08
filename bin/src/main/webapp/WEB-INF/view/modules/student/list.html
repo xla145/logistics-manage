@@ -1,0 +1,154 @@
+<#include "../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add"><i class="layui-icon">&#xe654;</i> 添加信息</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="edit"><i class="layui-icon">&#xe642;</i> 编辑信息</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-danger" id="delete"><i class="layui-icon">&#xe640;</i> 删除信息</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-warm"><i class="layui-icon">&#xe61e;</i> 导出信息</a>
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+		    <div class="layui-inline">
+		      <label class="layui-form-label">姓名</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="name" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">出身日期</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="birthday" id="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">年龄</label>
+		      <div class="layui-input-inline">
+		        <select name="age">
+				  <option value="">请选择一个年龄</option>
+				  <option value="12">12</option>
+				  <option value="17">17</option>
+				  <option value="18">18</option>
+				  <option value="35">35</option>
+				</select> 
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">数字框</label>
+		      <div class="layui-input-inline">
+		        <input type="number" name="test-number" class="layui-input">
+		      </div>
+		    </div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+		</form> 
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form">
+	  <table class="layui-table lay-even clear-padding" lay-skin="line">
+	    <thead>
+	      <tr>
+	        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+	        <th>姓名</th>
+	        <th>年龄</th>
+	        <th>地址</th>
+	        <th>出生日期</th>
+	        <th>操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody id="tbody"></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<#include "_add.html"><#t>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate'], function(){
+  var $ = layui.jquery;
+  var form = layui.form()
+  ,datagrid = layui.datagrid();
+  
+  /**
+	表格数据加载插件，可选参数：
+	
+	url: undefined, 		//数据远程地址【必填】
+	type: 'post', 			//数据的获取方式  get or post
+	dataType: 'json',		//返回模板格式
+	pageEm: undefined,		//分页模板容器 【暂时只支持id】【必填】
+	pageGroups: 5,			//连续显示分页数
+	pageSize: 10,			//每页数量
+	tempEm: undefined, 		//内容容器 用于存放模板的容器	【暂时只支持id】【必填】
+	filterForm: undefined,	//页面筛选form表单 （用于分页时筛选条件参数传递）	【暂时只支持id】
+	params: undefined, 		//获取数据时传递的额外参数（分页时参数传递，当该项值指定后则filterForm失效）
+	openWait: false, 		//加载数据时是否显示等待框 
+	success: undefined		//分页获取数据成功回调
+  **/
+  datagrid.init({
+	  url: 'data',
+	  pageEm: 'page',
+	  tempEm: 'tbody',
+	  filterForm: 'filterForm'
+  });
+  
+  //搜索， 依赖datagrid
+  $('#search').bind('click', function(){
+	  datagrid.search();	  
+  })
+  
+  /**
+  	添加、编辑插件可选配置：
+  	
+  	url: undefined,						//表单提交url 【必填】
+	content: undefined,					//内容 【必填】
+	formEm:$(this.content).find('form'),	//表单容器 【暂时只支持id
+	type: 1,							//弹框类型 http://www.layui.com/doc/modules/layer.html
+	title: '提示',						//标题
+	btn: ['保存', '取消'],					//按钮
+	offset: ['100px', '30%'],			//位置
+	area: ['700px', 'auto'],			//宽高
+	maxmin: true,						//是否可以最大化
+	yes: function(index, layero) {		//页面层展示出来后回调
+  **/
+  $('#add').bind('click', function(){
+	  datagrid.open({
+		  url: 'add',
+		  content: $('#add-form'),
+		  title: '添加用户'
+	  });
+  })
+  
+  $('#edit').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if(ids.length != 1){
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+	  //打开编辑框
+	  $.get("edit_view", {uid: ids[0]},function(html){
+		//打开编辑页
+		  datagrid.open({
+			  url: 'edit',
+			  content: html,
+			  title: '编辑用户'
+		  });
+	  }, "html")
+  })
+  
+  //删除
+  $('#delete').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if(ids.length < 1){
+		  layer.msg('请选择至少一条数据删除!');
+		  return;
+	  }
+	  alert(ids)
+  });
+
+});
+</script>
+</@footer>        

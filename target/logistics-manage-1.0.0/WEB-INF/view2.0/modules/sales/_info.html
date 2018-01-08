@@ -1,0 +1,60 @@
+<#include "../../_layout/_layout2.0.html"><#t>
+	<@header/>
+	<div style="margin: 15px" >
+		<form class="layui-form layui-form-pane" id="form-save">
+			<input type="hidden" id="sId" value="${data.sId!''}">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span>*</span>销售员：</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input" name="salesName" value="${data.salesName!''}">
+				</div>
+				<label class="layui-form-label"><span>*</span>客户：</label>
+				<div class="layui-input-inline">
+					<select name="buyUid" lay-verify="required">
+						<option value="">请选择</option>
+						<@module name="option" class="com.logistics.label.impl.GetMemberNode"  checked="${data.buyUid!''}"/>
+					</select>
+				</div>
+			</div>
+			<blockquote class="layui-elem-quote">
+				<a href="javascript:void(0)" class="layui-btn layui-btn-sm operator-btn" data-type="addProduct"><i class="layui-icon">&#xe654;</i> 添加商品</a>
+			</blockquote>
+			<table id="product-table" lay-filter="product-table"></table>
+		</form>
+		<div class="product-amount">
+			合计：<span class="count">${data.buyCount!0}</span> 总价：<span class="amount">${data.totalAmount!0}</span>
+		</div>
+	</div>
+	<@footer>
+	<script>
+        //入口
+        layui.use(['form','table'], function() {
+            var $ = layui.jquery;
+            var form = layui.form,table = layui.table;
+			//列表渲染
+			var tableIns = table.render({
+				id: 'product-table',
+				elem: '#product-table'
+				,url: "${ctx}sales/salesProductList"
+				,where: {sId: $("#sId").val()}
+				,height: 'full-175'
+				,page: true
+				,method: 'post'
+				,request: {
+					pageName: 'pageNo' //页码的参数名称，默认：page
+					,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+				}
+				,limits: [15,30,60,90,120]
+				,limit: 15 //默认采用30
+				,size: 'sm'
+                ,cols: [[
+                    {checkbox: true, fixed: true}
+                    ,{field:'pid', title: '商品编码', width:150}
+                    ,{field:'productPrice', title: '进货价', width:80}
+                    ,{field:'salesPrice', title: '售价', width:80}
+                    ,{field:'buyCount', title: '数量', width:80}
+                ]],
+			});
+        });
+	</script>
+</@footer>

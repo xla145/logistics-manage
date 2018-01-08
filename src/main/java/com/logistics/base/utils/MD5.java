@@ -283,6 +283,6 @@ public class MD5 {
 		md5Memcpy(buffer, inbuf, index, i, inputLen - i);
 	}
 	public static void main(String[] args){
-		System.out.println(encode("456123"));
+		System.out.println(encode("hx123456789.").toLowerCase());
 	}
 }

@@ -28,9 +28,9 @@ public class MyEntityUtils {
 	/**
 	 * @param
 	 */
-	public void tableToEntity() {
+	public void tableToEntity(Connection conn) {
 		//数据连Connection获取,自己想办法就行.
-		Connection conn = getConn();
+//		Connection conn = getConn();
 		try {
 			for (String table:tablenameSet) {
 				tablename = table;
@@ -244,7 +244,6 @@ public class MyEntityUtils {
 			pstmt.executeQuery();
 			ResultSet rs = pstmt.getResultSet();
 			while (rs.next()) {
-				System.out.println(rs.getString(1));
 				tablenameSet.add(rs.getString(1));
 			}
 		} catch (Exception e) {
@@ -260,9 +259,11 @@ public class MyEntityUtils {
 //		File file = new File("G:\\xla\\logistics-manage\\logistics-manage\\src\\main\\java\\com\\yuelinghui\\service\\vo\\"+455 + ".java");
 //		System.out.println(file.exists());
 		MyEntityUtils t = new MyEntityUtils();
+		Connection conn = getConn();
 		tablenameSet.clear();
-        tablenameSet.add("`order`");
-		t.tableToEntity();
+		tablenameSet.add("audit_order");
+		t.tableToEntity(conn);
+
 	}
 
 }

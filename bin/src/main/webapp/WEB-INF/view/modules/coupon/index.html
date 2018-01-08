@@ -1,0 +1,173 @@
+<#include "../../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add"><i class="layui-icon">&#xe654;</i> 生成代金券</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="edit"><i class="layui-icon">&#xe642;</i> 编辑</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-danger" id="delete"><i class="layui-icon">&#xe640;</i> 删除</a>
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+		     <div class="layui-inline">
+		      <label class="layui-form-label">生成时间：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="startTime" id="date" placeholder="开始时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+		      </div>
+		      --
+		      <div class="layui-input-inline">
+		        <input type="text" name="endTime" id="date" placeholder="结束时间" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">优惠券名称：</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="name" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">是否已发放：</label>
+		      <div class="layui-input-inline">
+		        <select name="status">
+				  <option value=" ">全部</option>
+				  <option value=1>是</option>
+				  <option value=0>否</option>
+				</select> 
+		      </div>
+		    </div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding" lay-skin="line">
+	    <thead>
+	      <tr>
+	        <th class="ckb"><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+	        <th>序号</th>
+	        <th>优惠券名称</th>
+	        <th>生成日期</th>
+	        <th>优惠券类型</th>
+	        <th>优惠券有效期</th>
+	        <!--<th>使用规则</th>-->
+	        <th>金额</th>
+	        <th>优惠券使用提示</th>
+	        <th fixed="right">是否已发放</th>
+	        <th fixed="right">操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<#include "_add.html"><#t>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate'], function(){
+  var $ = layui.jquery;
+  var form = layui.form()
+  ,datagrid = layui.datagrid();
+  
+  //表格数据加载插件，可选参数：
+  datagrid.init({
+	  url: 'list',
+	  pageSize: 15,
+	  pageEm: $('#page'),
+	  tempEm: $('#twrap'),
+	  filterForm: $('#filterForm')
+  });
+  
+  //搜索， 依赖datagrid
+  $('#search').bind('click', function(){
+	  datagrid.search();	  
+  })
+  
+  //添加、编辑插件可选配置：
+  $('#add').bind('click', function(){
+	  datagrid.open({
+		  url: 'add',
+		  content: $('#add-form'),
+		  title: '生成优惠券'
+	  });
+  })
+  
+  
+  $('#edit').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if (ids.length != 1) {
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+	  editFn(ids[0]);
+  })
+  
+  //删除
+  $('#delete').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if (ids.length < 1) {
+		  layer.msg('请选择至少一条数据删除!');
+		  return;
+	  }
+	  delFn(ids);
+  });
+  
+//操作
+  $('#twrap').on('click', '.operate', function(){
+	  var cmd = $(this).attr('data-fn');
+	  var id = $(this).siblings('.index-id').val();
+	  if (cmd == 'edit') {
+		  editFn(id);
+	  }
+	  if (cmd == 'del') {
+		  delFn(id);
+	  }
+  })
+  
+  //打开编辑框
+  var editFn = function(id){
+	  console.log(id)
+	  if(!id){
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+	  $.get("editView", {id: id},function(html){
+			//打开编辑页
+			  datagrid.open({
+				  url: 'edit',
+				  content: html,
+				  title: '编辑优惠券'
+			  });
+		}, "html")
+  }
+  
+//删除数据
+  var delFn = function(id){
+	  if(!id){
+		  layer.msg('请选择一条数据删除!');
+		  return;
+	  }
+	  layer.confirm('您确定要删除这些优惠券码？', {icon: 3, title:'提示'}, function(){
+		  $.ajax({ 
+			type: "POST", 
+			url: "del", 
+			data: {'ids':id.toString()}, 
+			success: function(json) { 
+				if (json.code == -1){
+					layer.msg(json.msg);
+				} else{
+					layer.msg("删除成功！",{time:500});
+					datagrid.search();
+				}	
+			} 
+		 });
+	  });  
+  }
+
+});
+</script>
+</@footer>        

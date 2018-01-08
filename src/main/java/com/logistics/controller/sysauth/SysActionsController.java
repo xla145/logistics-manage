@@ -3,6 +3,7 @@ package com.logistics.controller.sysauth;
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
 import cn.assist.easydao.pojo.PagePojo;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.logistics.base.utils.JsonBean;
 import com.logistics.base.utils.ReqUtils;
@@ -10,6 +11,7 @@ import com.logistics.service.auth.ISysActionService;
 import com.logistics.service.auth.impl.AuthServiceImpl;
 import com.logistics.service.vo.Option;
 import com.logistics.service.vo.sys.SysAction;
+import com.logistics.service.vo.sys.TreeNode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -83,9 +85,9 @@ public class SysActionsController {
 			if(StringUtils.isBlank(sysAction.getUrl())){
 				return JsonBean.error("系统菜单url必填");
 			}
-		}
-		if(StringUtils.isBlank(sysAction.getRemark())){
-			return JsonBean.error("功能描述必填");
+			if(StringUtils.isBlank(sysAction.getRemark())){
+				return JsonBean.error("功能描述必填");
+			}
 		}
 	
 		sysAction.setCreateTime(new Date());	//创建时间
@@ -150,9 +152,9 @@ public class SysActionsController {
 			if(StringUtils.isBlank(sysAction.getUrl())){
 				return JsonBean.error("系统菜单url必填");
 			}
-		}
-		if(StringUtils.isBlank(sysAction.getRemark())){
-			return JsonBean.error("功能描述必填");
+			if(StringUtils.isBlank(sysAction.getRemark())){
+				return JsonBean.error("功能描述必填");
+			}
 		}
 		boolean result = sysActionService.editSysAction(sysAction);
 		return result ? JsonBean.success("更新成功") : JsonBean.error("更新失败");
@@ -169,5 +171,14 @@ public class SysActionsController {
 	@RequestMapping(value = "/catIcon")
 	public String catIcon(HttpServletRequest request){
 		return "modules/sys-auth/action/fontclass";
+	}
+
+
+
+	@RequestMapping(value = "/tree")
+	public String tree(HttpServletRequest request, Model model){
+		List<TreeNode> list = sysActionService.getActionTrees();
+		model.addAttribute("treeNode", JSONArray.toJSONString(list));
+		return "modules/sys-auth/action/_tree";
 	}
 }

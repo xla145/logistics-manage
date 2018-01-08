@@ -1,13 +1,13 @@
 package com.logistics.service.auth;
 
-import java.util.List;
-
 import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.pojo.PagePojo;
-
 import com.logistics.service.vo.sys.SysAction;
 import com.logistics.service.vo.sys.SysUserAction;
 import com.logistics.service.vo.sys.TreeNode;
+
+
+import java.util.List;
 
 
 /**
@@ -22,7 +22,13 @@ public interface ISysActionService {
 	 * 获取菜单详细信息
 	 */
 	public List<TreeNode> getActionTrees();
-	
+
+
+	/**
+	 * 获取菜单详细信息
+	 */
+	public List<SysAction> getAllAction();
+
 	/**
 	 * 获取菜单详细信息
 	 */
@@ -40,7 +46,16 @@ public interface ISysActionService {
 	 * @return
 	 */
 	public List<SysUserAction> getSysUserAction(int uid);
-	
+
+
+	/**
+	 * 查询用户角色权限列表
+	 *
+	 * @param
+	 * @return
+	 */
+	public List<SysAction> getSysUserActionByUid(int uid);
+
 	/**
 	 * 更新用户权限
 	 * 

@@ -1,0 +1,173 @@
+<#include "../_layout/_layout.html"><#t>
+<@header/>
+<div class="admin-main">
+	<!-- 按钮组 -->
+	<blockquote class="layui-elem-quote">
+		<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="add"><i class="layui-icon">&#xe654;</i> 添加信息</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-normal" id="edit"><i class="layui-icon">&#xe642;</i> 编辑信息</a>
+		<a href="#" class="layui-btn layui-btn-small layui-btn-danger" id="delete"><i class="layui-icon">&#xe640;</i> 删除信息</a>
+	</blockquote>
+	<!-- 筛选组 -->
+	<blockquote class="layui-elem-quote filter-bar">
+		<form class="layui-form" action="/table.html" id="filterForm">
+		    <div class="layui-inline">
+		      <label class="layui-form-label">登录名</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="name" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">真实姓名</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="realName" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">手机号</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="mobile" class="layui-input">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">创建时间</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="createTime" id="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">最后登录时间</label>
+		      <div class="layui-input-inline">
+		        <input type="text" name="lastLoginTime" id="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">是否有效</label>
+		      <div class="layui-input-inline">
+		        <select name="isValid">
+				  <option value=" ">全部</option>
+				  <option value=1>有效</option>
+				  <option value=0>无效</option>
+				</select> 
+		      </div>
+		    </div>
+		    <div class="layui-inline">
+		      <label class="layui-form-label">用户类型</label>
+		      <div class="layui-input-inline">
+		        <select name="type">
+				  <option value=" ">全部</option>
+				  <option value=1>系统根用户</option>
+				  <option value=2>商户</option>
+				</select> 
+		      </div>
+		    </div>
+			<a href="javascript:void(0)" class="layui-btn layui-btn-small" id="search"><i class="layui-icon">&#xe615;</i>搜索</a>
+		</form>
+	</blockquote>
+	<!-- 表格区域 -->
+	<div class="layui-form" id="twrap">
+	  <table class="layui-table lay-even clear-padding" >
+	    <thead>
+	      <tr>
+	        <th fixed="left" class="ckb" ><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+	        <th fixed="left" >用户名</th>
+	        <th>真实姓名</th>
+	        <th>手机号</th>
+	        <th>联系QQ</th>
+	        <th>邮箱</th>
+	        <th>创建时间</th>
+	        <th>最后登录时间</th>
+	        <th fixed="right" >是否有效</th>
+	        <th fixed="right" >操作</th>
+	      </tr> 
+	    </thead>
+	    <tbody></tbody>
+	  </table>
+	  <!-- 分页容器 -->
+	  <div class="layui-show"><div id="page"></div></div>
+	</div>
+</div>
+<#include "_add.html"><#t>
+<@footer>
+<script type="text/javascript" src="${assets}js/datagrid.js"></script>
+<script>
+//入口
+layui.use(['datagrid','laydate'], function(){
+  var $ = layui.jquery;
+  var form = layui.form()
+  ,datagrid = layui.datagrid();
+  
+  //表格数据加载插件，可选参数：
+  datagrid.init({
+	  url: 'list',
+	  pageSize: 15,
+	  pageEm: $('#page'),
+	  tempEm: $('#twrap'),
+	  filterForm: $('#filterForm')
+  });
+  
+  //搜索， 依赖datagrid
+  $('#search').bind('click', function(){
+	  datagrid.search();	  
+  })
+  
+  //添加
+  $('#add').bind('click', function(){
+	  datagrid.open({
+		  url: 'add',
+		  content: $('#add-form'),
+		  title: '添加用户'
+	  });
+  })
+  //编辑
+  $('#edit').bind('click', function(){
+	  var ids = datagrid.getCheckedVal();
+	  if(ids.length != 1){
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+	  editFn(ids[0]);
+  })
+  //操作
+  $('#twrap').on('click', '.operate', function(){
+	  var cmd = $(this).attr('data-fn');
+	  var uid = $(this).siblings('.index-id').val();
+	  if(cmd == 'edit'){
+		  editFn(uid);
+	  }
+	  if(cmd == 'auth'){
+		  authFn(uid);
+	  }
+  })
+  
+  //赋权
+  var authFn = function(uid){
+	  if(!uid){
+		  layer.msg('请选择一条数据!');
+		  return;
+	  }
+	  layer.open({
+		  type: 2,
+		  area: ['646px', '486px'],
+		  maxmin: false,
+		  content: '/sysUserAuth/index?targetUid=' + uid,
+		  title: '用户赋权'
+	  });
+  }
+  
+  //打开编辑框
+  var editFn = function(uid){
+	  if(!uid){
+		  layer.msg('请选择一条数据编辑!');
+		  return;
+	  }
+	  $.get("editView", {uid: uid},function(html){
+		  datagrid.open({
+			  url: 'edit',
+			  content: html,
+			  title: '编辑用户'
+		  });
+	  }, "html")
+  }
+});
+</script>
+</@footer>        

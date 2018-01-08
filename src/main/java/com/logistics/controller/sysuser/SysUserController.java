@@ -1,9 +1,13 @@
 package com.logistics.controller.sysuser;
-import cn.assist.easydao.common.Conditions;
+
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
 import com.logistics.base.constant.BaseConstant;
-import com.logistics.base.utils.*;
+import com.logistics.base.constant.SysUserConstant;
+import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.MD5;
+import com.logistics.base.utils.ReqUtils;
+import com.logistics.base.utils.ShiroUtils;
 import com.logistics.controller.BaseController;
 import com.logistics.service.sys.sysuser.ISysUserService;
 import com.logistics.service.vo.sys.SysAction;
@@ -15,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,16 +100,16 @@ public class SysUserController extends BaseController{
 		if(StringUtils.isBlank(sysUser.getQq())){
 			return JsonBean.error("联系qq必填");
 		}
-		if(sysUserService.getSysUser(sysUser.getName())){
+		if(sysUserService.getSysUser(sysUser.getName()) != null){
 			return JsonBean.error("用户名已被占用");
 		}
 		
-		int loginUid = (Integer)request.getSession().getAttribute(BaseConstant.SYS_UID);
+		int loginUid = ShiroUtils.getUserId();
 		Date date = new Date();
 		sysUser.setCreateTime(date);	//创建时间
 		sysUser.setLastLoginTime(date); //最后登录时间
 		sysUser.setCreateUid(loginUid); //创建人
-		sysUser.setType(ISysUserService.USET_TYPE_ROOT);
+		sysUser.setType(SysUserConstant.USET_TYPE_ROOT);
 		
 		boolean result = sysUserService.addSysUsers(sysUser);
 		
@@ -191,7 +194,7 @@ public class SysUserController extends BaseController{
 	 */
 	@RequestMapping(value = "/getUserInfo")
 	public String getPwdView(HttpServletRequest request,Model model){
-		Integer uid = (Integer) request.getSession().getAttribute(BaseConstant.SYS_UID);
+		Integer uid = ShiroUtils.getUserId();
 		SysAction.SysUser sysUser = sysUserService.getSysUser(uid);
 		model.addAttribute("data",sysUser);
 		return "modules/sysuser/_info";

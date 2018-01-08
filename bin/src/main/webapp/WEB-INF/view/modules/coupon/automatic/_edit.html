@@ -1,0 +1,59 @@
+<div style="margin: 15px;display:none2" id="edit-form">
+<form class="layui-form">
+		<input type="hidden" name="id" autocomplete="off" class="layui-input" value="${data.id!''}">
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券名称:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="name" placeholder="请输入优惠券名称" autocomplete="off" class="layui-input" value="${data.name!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券码:</label>
+			<div class="layui-input-inline">
+				<input type="text" name="couponCode" autocomplete="off" class="layui-input" readonly="readonly" value="${data.couponCode!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券类型:</label>
+			<div class="layui-input-inline">
+				<select name="type" id="type" lay-filter="expenses">
+                  <option value="1" <#if data.type??&&data.type == 1> selected</#if>>代金券</option>
+				</select> 
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券有效期:</label>
+			  <div class="layui-input-inline">
+				<input type="text" name="validPeriod" autocomplete="off" class="layui-input" value="${data.validPeriod!''}">
+			  </div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">使用规则:</label>
+			<div class="layui-input-inline">
+				<select name="useRules" id="useRules"  lay-filter="expenses">
+				  <option value="3"<#if data.type??&&data.type == 3> selected</#if>>活动劵</option>
+                  <option value="2"<#if data.type??&&data.type == 2> selected</#if>>好物劵</option>
+                  <option value="1"<#if data.type??&&data.type == 1> selected</#if>>通用劵</option>
+				</select> 
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">金额:</label>
+			<div class="layui-input-inline">
+				<input type="number" name="price" autocomplete="off" class="layui-input" value="${data.price!''}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">优惠券使用提示:</label>
+			<div class="layui-input-inline">
+				<textarea name="alertContent" placeholder="请输入备注信息" class="layui-textarea">${data.alertContent!''}</textarea>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">生成总张数:</label>
+			<div class="layui-input-inline">
+				<input type="number" name="sumNumber" autocomplete="off" class="layui-input" value="${data.sumNumber!''}">
+			</div>
+		</div>
+	</form>
+</div>

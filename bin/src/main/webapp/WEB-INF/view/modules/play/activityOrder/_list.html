@@ -1,0 +1,22 @@
+<#if dataList??>
+	<#list dataList as list>
+		<tr>
+		    <td><input type="checkbox" class="data-ckx" lay-skin="primary" data="${list.id}"></td>
+		    <td>${list.poolName!''}</td>
+		    <td>${list.flowProviderName!''}</td>
+		    <td>${list.channelName!''}</td>
+		    <td>${list.expensesName!''}</td>
+		    <td>${list.poolTotalFlow!''}</td>
+		    <td>${list.usedTotalFlow!''}</td>
+		    <td>${list.leftTotalFlow!''}</td>
+		    <td>${list.usedRatio?c}%</td>
+		    <td><#if list.deadline??>${list.deadline?string("yyyy-MM-dd")}</#if></td>
+		    <td>${list.creatorName!''}</td>
+		    <td>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-normal layui-btn-mini">预览</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-mini">编辑</a>
+				<a href="javascript:void(0)" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+		 	</td>
+		</tr>
+	</#list>
+</#if>

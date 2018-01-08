@@ -1,9 +1,18 @@
 package com.logistics.controller.sysauth;
-import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.logistics.base.utils.JsonBean;
+import com.logistics.base.utils.ReqUtils;
+import com.logistics.base.utils.ShiroUtils;
+import com.logistics.controller.BaseController;
+import com.logistics.service.auth.ISysActionService;
+import com.logistics.service.auth.ISysRoleService;
+import com.logistics.service.sys.sysuser.ISysUserService;
 import com.logistics.service.vo.sys.SysAction;
+import com.logistics.service.vo.sys.SysRole;
+import com.logistics.service.vo.sys.SysUserRole;
+import com.logistics.service.vo.sys.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,18 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.logistics.base.constant.BaseConstant;
-import com.logistics.base.utils.JsonBean;
-import com.logistics.base.utils.ReqUtils;
-import com.logistics.controller.BaseController;
-import com.logistics.service.auth.ISysActionService;
-import com.logistics.service.auth.ISysRoleService;
-import com.logistics.service.sys.sysuser.ISysUserService;
-import com.logistics.service.vo.sys.SysRole;
-import com.logistics.service.vo.sys.SysUserRole;
-import com.logistics.service.vo.sys.TreeNode;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 用户权限管理
@@ -32,7 +31,7 @@ import com.logistics.service.vo.sys.TreeNode;
  */
 @Controller
 @RequestMapping(value = "/sysUserAuth")
-public class SysUserAuthController extends BaseController{
+public class SysUserAuthController extends BaseController {
 
 	@Autowired
 	private ISysActionService sysActionService;
@@ -81,7 +80,7 @@ public class SysUserAuthController extends BaseController{
 	@RequestMapping(value = "/authSave")
 	@ResponseBody
 	public JSONObject authSave(HttpServletRequest request,@RequestParam("roleIds[]") List<Integer> roleIds){
-		int operateUid = (Integer)request.getSession().getAttribute(BaseConstant.SYS_UID);
+		int operateUid = ShiroUtils.getUserId();
 		int targetUid = ReqUtils.getParamToInt(request, "targetUid", 0);
 		boolean result = sysActionService.reloadSysUserAction(operateUid,targetUid, roleIds);
 		return result ? JsonBean.success("保存用户角色成功") : JsonBean.error("保存用户角色失败");

@@ -4,14 +4,11 @@ import cn.assist.easydao.common.Conditions;
 import cn.assist.easydao.common.SqlExpr;
 import cn.assist.easydao.pojo.PagePojo;
 import com.alibaba.fastjson.JSONObject;
-import com.logistics.base.constant.BaseConstant;
 import com.logistics.base.utils.JsonBean;
-import com.logistics.base.utils.MD5;
 import com.logistics.base.utils.RecordBean;
 import com.logistics.base.utils.ReqUtils;
 import com.logistics.controller.BaseController;
 import com.logistics.service.member.IMemberService;
-import com.logistics.service.sys.sysuser.ISysUserService;
 import com.logistics.service.vo.Member;
 import com.logistics.service.vo.sys.SysAction;
 import org.apache.commons.lang.StringUtils;
@@ -22,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 系统用户管理
@@ -63,7 +57,7 @@ public class MemberController extends BaseController{
 		Conditions conn = new Conditions("mobile", SqlExpr.EQUAL,mobile);
 
 		PagePojo<Member> page = imemberService.getMemberPage(conn, pageNo, pageSize);
-		
+
 		//render结果
 		return JsonBean.success(page);
 	}
